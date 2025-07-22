@@ -58,14 +58,6 @@ Gym Manager - это комплексное приложение для упра
 
 ## Скриншоты интерфейса
 
-<img width="1376" height="778" alt="image" src="https://github.com/user-attachments/assets/79a42d56-ed29-42c5-823a-511915340d12" />
-<img width="1152" height="707" alt="image" src="https://github.com/user-attachments/assets/2a850aa2-09ad-42fe-bbdb-205ad698ba12" />
-<img width="1247" height="705" alt="image" src="https://github.com/user-attachments/assets/41446456-7522-4ca7-840a-c608a2bb8876" />
-<img width="1440" height="867" alt="image" src="https://github.com/user-attachments/assets/d41a94bf-7053-48fa-8c08-70f31ee46b9f" />
-<img width="1361" height="769" alt="image" src="https://github.com/user-attachments/assets/fdc4ff55-bb08-43c2-92dd-1022a6a073e1" />
-<img width="1617" height="918" alt="image" src="https://github.com/user-attachments/assets/5f741cba-e5e5-4ad7-a51d-ba14c95dc603" />
-<img width="1005" height="639" alt="image" src="https://github.com/user-attachments/assets/6ada11ac-84b0-4e02-9759-6cf9e571116e" />
-
 ## Контакты разработчиков
 
 По всем вопросам обращайтесь:
