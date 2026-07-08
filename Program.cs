@@ -18,39 +18,46 @@ namespace GymApplicationV2._0
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
 
-            //LoadingScreen splash = new LoadingScreen();
-            //splash.Show();
+                LoadingScreen splash = new LoadingScreen();
+                splash.Show();
 
-            //string messageDB = string.Empty;
-            //for (int i = 0; i <= 100; i += 10)
-            //{
-            //    if (i < 20)
-            //    {
-            //        messageDB = "Инициализация Баз Данных...";
-            //    }
-            //    else if (i > 20 && i < 40)
-            //    {
-            //        messageDB = "Загрузка Клиентов...";
-            //    }
-            //    else if (i > 40 && i < 60)
-            //    {
-            //        messageDB = "Загрузка Услуг...";
-            //    }
-            //    else
-            //    {
-            //        messageDB = "Загрузка Архива...";
-            //    }
-            //    splash.UpdateProgress($"Загрузка... {i}%", messageDB, i);
-            //    Thread.Sleep(100);
-            //}
+                string messageDB = string.Empty;
+                for (int i = 0; i <= 100; i += 10)
+                {
+                    if (i < 20)
+                    {
+                        messageDB = "Инициализация Баз Данных...";
+                    }
+                    else if (i > 20 && i < 40)
+                    {
+                        messageDB = "Загрузка Клиентов...";
+                    }
+                    else if (i > 40 && i < 60)
+                    {
+                        messageDB = "Загрузка Услуг...";
+                    }
+                    else
+                    {
+                        messageDB = "Загрузка Архива...";
+                    }
+                    splash.UpdateProgress($"Загрузка... {i}%", messageDB, i);
+                    Thread.Sleep(100);
+                }
 
-            //splash.Close();
+                splash.Close();
 
 
-            Application.Run(new Form1());
+                Application.Run(new Form1());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString(), "Ошибка при запуске");
+            }
         }
     }
 }

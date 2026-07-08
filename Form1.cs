@@ -84,7 +84,10 @@ namespace GymApplicationV2._0
         public Form1()
         {
             InitializeComponent();
-            
+
+            EnsureRequiredDirectoriesExist();
+            CopyPhotosToOutput();
+
             InitializeCustomDesign();
             UpdateButtonLayout();
 
@@ -130,6 +133,34 @@ namespace GymApplicationV2._0
 
             
             SetupAnimation();
+        }
+
+        public static void CopyPhotosToOutput()
+        {
+            string repoRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
+            string sourcePath = Path.Combine(repoRoot, "Photos");
+            string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
+
+            if (Directory.Exists(sourcePath))
+            {
+                CopyDirectory(sourcePath, targetPath);
+            }
+        }
+
+        private static void CopyDirectory(string sourceDir, string targetDir)
+        {
+            if (!Directory.Exists(targetDir))
+                Directory.CreateDirectory(targetDir);
+
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)), true);
+            }
+
+            foreach (string subDir in Directory.GetDirectories(sourceDir))
+            {
+                CopyDirectory(subDir, Path.Combine(targetDir, Path.GetFileName(subDir)));
+            }
         }
 
         private void UpdateButtonLayout()
@@ -247,6 +278,25 @@ namespace GymApplicationV2._0
             else if (DataClass.styleBackground == "Static")
             {
                 CreateStaticBackground();
+            }
+        }
+
+        public static void EnsureRequiredDirectoriesExist()
+        {
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Создаем папку Databases
+            string databasesPath = Path.Combine(appDirectory, "Databases");
+            if (!Directory.Exists(databasesPath))
+            {
+                Directory.CreateDirectory(databasesPath);
+            }
+
+            // Создаем папку AppFiles
+            string appFilesPath = Path.Combine(appDirectory, "AppFiles");
+            if (!Directory.Exists(appFilesPath))
+            {
+                Directory.CreateDirectory(appFilesPath);
             }
         }
 

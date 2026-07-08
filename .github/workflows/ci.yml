@@ -2,9 +2,13 @@ name: .NET Core Desktop CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
+    tags: [ "v*" ]
   pull_request:
     branches: [ "main" ]
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -18,20 +22,46 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Устанавливаем .NET SDK
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x'
 
-    # Добавляем MSBuild в PATH для сборки проекта
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    # Восстанавливаем NuGet-пакеты
     - name: Restore NuGet packages
-      run: nuget restore GymApplicationV2.0.sln
+      run: |
+        nuget sources Add -Name nuget.org -Source https://api.nuget.org/v3/index.json
+        nuget restore GymApplicationV2.0.sln -PackagesDirectory packages -NonInteractive
 
-    # Собираем решение
     - name: Build the solution
-      run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }}
+      run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }} /p:RestorePackages=false
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.configuration }}
+        path: bin/${{ matrix.configuration }}
+
+    - name: Copy Photos folder
+      run: |
+        if (Test-Path "Photos") {
+          Copy-Item -Path "Photos" -Destination "bin\Debug\" -Recurse -Force
+          Copy-Item -Path "Photos" -Destination "bin\Release\" -Recurse -Force
+        }
+
+    - name: Archive Release Build
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.configuration == 'Release'
+      run: Compress-Archive -Path bin/Release/* -DestinationPath GymApplication-${{ github.ref_name }}.zip
+
+    - name: Create GitHub Release
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.configuration == 'Release'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: GymApplication-${{ github.ref_name }}.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
