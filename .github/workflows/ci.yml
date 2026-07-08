@@ -30,7 +30,9 @@ jobs:
 
     # Восстанавливаем NuGet-пакеты
     - name: Restore NuGet packages
-      run: dotnet restore GymApplicationV2.0.sln
+      run: |
+        nuget sources Add -Name nuget.org -Source https://api.nuget.org/v3/index.json
+        nuget restore GymApplicationV2.0.sln -PackagesDirectory packages -NonInteractive
 
     # Собираем решение 
     - name: Build the solution
