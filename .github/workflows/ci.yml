@@ -10,9 +10,9 @@ jobs:
   build:
     strategy:
       matrix:
-        configuration: [Debug, Release] # Будет собрано в двух конфигурациях
+        configuration: [Debug, Release] 
 
-    runs-on: windows-latest # Сборка будет происходить на Windows-окружении GitHub
+    runs-on: windows-latest 
 
     steps:
     - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.x' # Укажите вашу версию (например, 6.0.x, 7.0.x)
+        dotnet-version: '8.0.x' 
 
     # Добавляем MSBuild в PATH для сборки проекта
     - name: Setup MSBuild
@@ -32,6 +32,6 @@ jobs:
     - name: Restore NuGet packages
       run: nuget restore GymApplicationV2.0.sln
 
-    # Собираем решение (используем MSBuild, т.к. это Windows Forms)
+    # Собираем решение 
     - name: Build the solution
       run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }}
