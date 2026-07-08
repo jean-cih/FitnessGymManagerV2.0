@@ -1,0 +1,37 @@
+name: .NET Core Desktop CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Debug, Release] # Будет собрано в двух конфигурациях
+
+    runs-on: windows-latest # Сборка будет происходить на Windows-окружении GitHub
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Устанавливаем .NET SDK
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x' # Укажите вашу версию (например, 6.0.x, 7.0.x)
+
+    # Добавляем MSBuild в PATH для сборки проекта
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # Восстанавливаем NuGet-пакеты
+    - name: Restore NuGet packages
+      run: nuget restore GymApplicationV2.0.sln
+
+    # Собираем решение (используем MSBuild, т.к. это Windows Forms)
+    - name: Build the solution
+      run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }}
