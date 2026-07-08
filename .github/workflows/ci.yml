@@ -18,21 +18,19 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Устанавливаем .NET SDK
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.0.x' 
 
-    # Добавляем MSBuild в PATH для сборки проекта
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    # Восстанавливаем NuGet-пакеты
     - name: Restore NuGet packages
-      run: |
-        nuget sources Add -Name nuget.org -Source https://api.nuget.org/v3/index.json
-        nuget restore GymApplicationV2.0.sln -PackagesDirectory packages -NonInteractive
+      run: nuget restore GymApplicationV2.0.sln
 
     # Собираем решение 
     - name: Build the solution
