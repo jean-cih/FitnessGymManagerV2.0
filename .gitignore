@@ -1,11 +1,16 @@
 # Visual Studio Files
 .vs/
+bin/
 obj/
 packages/
 
 # User settings
 *.user
 *.suo
+
+# Build results
+*.exe
+*.dll
 
 # Temporary files
 *.tmp
