@@ -1,0 +1,16 @@
+# Visual Studio Files
+.vs/
+obj/
+packages/
+
+# User settings
+*.user
+*.suo
+
+# Temporary files
+*.tmp
+*.log
+
+# OS junk
+Thumbs.db
+Desktop.ini

@@ -1,0 +1,230 @@
+﻿using GymApplicationV2._0;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.FormsServices;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
+
+namespace GymApplicationV2._0
+{
+    public partial class ArchiveServices : Form
+    {
+        private Timer _fadeTimer;
+        private float _opacity = 0;
+
+        private ToolStripDropDownMenu _menu;
+        private string client = "", membership = "", term = "", cost = "", numberCard = "", visits = "";
+
+        public ArchiveServices()
+        {
+            InitializeComponent();
+
+            InitializeMenu();
+            jeanModernButtonChangeData.Click += Button_Click;
+            Controls.Add(jeanModernButtonChangeData);
+
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Opacity = 0;
+            SetupAnimation();
+        }
+
+        private void SetupAnimation()
+        {
+            _fadeTimer = new Timer();
+            _fadeTimer.Interval = 10;
+            _fadeTimer.Tick += (s, e) =>
+            {
+                _opacity += 0.05f;
+                this.Opacity = _opacity;
+
+                if (_opacity >= 1)
+                {
+                    _fadeTimer.Stop();
+                    _fadeTimer.Dispose();
+                }
+            };
+            _fadeTimer.Start();
+        }
+
+        private void InitializeMenu()
+        {
+            _menu = new ToolStripDropDownMenu();
+            _menu.Font = new System.Drawing.Font("Arial", 12, FontStyle.Regular);
+            ToolStripMenuItem item1 = new ToolStripMenuItem("Вернуть из архива", Properties.Resources.backToLife);
+            ToolStripMenuItem item2 = new ToolStripMenuItem("Изменить параметры", Properties.Resources.change);
+            _menu.Items.Add(item1);
+            _menu.Items.Add(item2);
+
+            _menu.Items[0].Click += jeanModernButtonBackLife_Click;
+            _menu.Items[1].Click += jeanModernButtonChange_Click;
+        }
+
+        private void ArchiveServices_Load(object sender, EventArgs e)
+        {
+            ConfigureFormSize();
+            LoadArchiveData();
+        }
+
+        private void ConfigureFormSize()
+        {
+            Width = (int)(Screen.PrimaryScreen.Bounds.Width * 0.75);
+            Height = (int)(Screen.PrimaryScreen.Bounds.Height * 0.75);
+
+            jeanPanel.Size = new Size(Width - 40, Height - 180);
+            jeanSoftTextBoxSearch.Location = new Point(Width / 2 - 150, 30);
+            jeanModernButtonErase.Location = new Point(Width / 2 - 150 + 260, 35);
+            pictureBoxSearch.Location = new Point(Width / 2 - 140, 35);
+            jeanModernButtonChangeData.Location = new Point(Width - 150, 30);
+
+            dataGridViewArchive.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        }
+
+        private void LoadArchiveData()
+        {
+            dataGridViewArchive.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
+            "Клиент, " +
+            "№Карты, " +
+            "Дата_окончания AS 'Дата окончания', " +
+            "Абонемент, " +
+            "Оплата, " +
+            "Посещений_осталось AS 'Посещений осталось' " +
+            "FROM Archive",
+                ArchiveServicesContext.ConnectionStringArchive());
+        }
+
+        private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(jeanSoftTextBoxSearch.Texts))
+            {
+                jeanModernButtonErase.Visible = false;
+                LoadArchiveData();
+                return;
+            }
+
+            jeanModernButtonErase.Visible = true;
+            var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
+            dataGridViewArchive.DataSource = GeneralContext.GetDataFromDatabase(searchQuery,
+                ArchiveServicesContext.ConnectionStringArchive());
+        }
+
+        private string BuildSearchQuery(string searchText)
+        {
+            string[] names = searchText.Split(' ');
+            for (int i = 0; i < names.Length; i++)
+            {
+                if (!string.IsNullOrEmpty(names[i]))
+                {
+                    names[i] = char.ToUpper(names[i][0]) + names[i].Substring(1);
+                }
+            }
+
+            return names.Length > 1
+                ? BuildFullNameSearchQuery(names)
+                : BuildSimpleSearchQuery(names[0]);
+        }
+
+        private string BuildFullNameSearchQuery(string[] names)
+        {
+            return $@"SELECT 
+                    Клиент,
+                    №Карты AS 'Карта',
+                    Дата_окончания AS 'Дата окончания',
+                    Абонемент,
+                    Оплата,
+                    Посещений_осталось AS 'Посещений осталось'
+                    FROM Archive 
+                    WHERE №Карты LIKE '%{names[0]}%' 
+                    OR Клиент LIKE '%{names[0]}%' 
+                    AND Клиент LIKE '%{names[1]}%'";
+        }
+
+        private string BuildSimpleSearchQuery(string name)
+        {
+            return $@"SELECT 
+                Клиент,
+                №Карты AS 'Карта',
+                Дата_окончания AS 'Дата окончания',
+                Абонемент,
+                Оплата,
+                Посещений_осталось AS 'Посещений осталось'
+                FROM Archive 
+                WHERE №Карты LIKE '%{name}%' 
+                OR Клиент LIKE '%{name}%'";
+        }
+
+        private void jeanModernButtonErase_Click(object sender, EventArgs e)
+        {
+            jeanSoftTextBoxSearch.Texts = "";
+        }
+
+        private void jeanModernButtonRefresh_Click(object sender, EventArgs e)
+        {
+            LoadArchiveData();
+        }
+
+        private void Button_Click(object sender, EventArgs e)
+        {
+            _menu.Show(jeanModernButtonChangeData, new Point(0, jeanModernButtonChangeData.Height));
+        }
+
+        private void dataGridViewArchive_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            var row = dataGridViewArchive.Rows[e.RowIndex];
+            client = row.Cells[0].Value?.ToString() ?? "";
+            numberCard = row.Cells[1].Value?.ToString() ?? "";
+            term = row.Cells[2].Value?.ToString() ?? "";
+            membership = row.Cells[3].Value?.ToString() ?? "";
+            cost = row.Cells[4].Value?.ToString() ?? "";
+            visits = row.Cells[5].Value?.ToString() ?? "";
+
+            nameClient.Text = client;
+            card.Text = numberCard;
+        }
+
+        private void ShowFormWithData(Form form, Action<Form> setData)
+        {
+            if (!new Regex(@"^\d{13}$").IsMatch(numberCard))
+            {
+                Message.MessageWindowOk("Выберите номер клиента из таблицы");
+                return;
+            }
+
+            setData(form);
+            form.ShowDialog();
+            LoadArchiveData();
+        }
+
+        private void jeanModernButtonBackLife_Click(object sender, EventArgs e)
+        {
+            ShowFormWithData(new BackToLife(), form => {
+                var f = (BackToLife)form;
+                f.labelNameClient.Text = client;
+                f.labelNubmerCard.Text = numberCard;
+                f.jeanSoftTextBoxMembership.Texts = membership;
+                f.jeanSoftTextBoxTerm.Texts = term;
+                f.jeanSoftTextBoxVisits.Texts = visits;
+            });
+        }
+
+        private void jeanModernButtonChange_Click(object sender, EventArgs e)
+        {
+            ShowFormWithData(new ChangeArhiveService(), form => {
+                var f = (ChangeArhiveService)form;
+                f.jeanSoftTextBoxClient.Texts = client;
+                f.jeanSoftTextBoxCard.Texts = numberCard;
+                f.jeanSoftTextBoxMembership.Texts = membership;
+                f.jeanSoftTextBoxTerm.Texts = term;
+                f.jeanSoftTextBoxCost.Texts = cost;
+                f.jeanSoftTextBoxVisits.Texts = visits;
+            });
+        }
+    }
+}
