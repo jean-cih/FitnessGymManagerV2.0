@@ -51,17 +51,17 @@ jobs:
     permissions:
       contents: write 
     steps:
-      - name: Download Debug artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: Debug
-          path: Debug
+    - name: Download Debug artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: Debug
+        path: Debug
 
-      - name: Download Release artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: Release
-          path: Release 
+    - name: Download Release artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: Release
+        path: Release 
 
     - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v2
