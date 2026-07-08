@@ -12,7 +12,8 @@ namespace GymApplicationV2._0.FormsSettings
 {
     public partial class Design : ShadowedForm
     {
-        private string FontFilePath = Path.Combine("AppFiles", "Font.txt");
+        static string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        string FontFilePath = Path.Combine(appDirectory, "AppFiles", "Font.txt");
         private FlowLayoutPanel flowLayout;
         private Panel previewPanel;
         private JeanModernButton documentationButton;

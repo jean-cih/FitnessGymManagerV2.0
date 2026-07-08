@@ -472,6 +472,21 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+  
+  <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
+    <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
+  <ItemGroup>
+<Content Include="AppFiles\**\*">
+  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+</Content>
+<Content Include="Databases\**\*">
+  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+</Content>
+</ItemGroup>
+  <ItemGroup>
     <Content Include="Assets\Buttons\AdjustingFont.png" />
     <Content Include="Resources\bearFront.ico" />
     <None Include="Resources\pow.png" />
