@@ -269,13 +269,16 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void InitializeDropZone(Panel parent)
         {
-            dropZonePanel = new Panel
+            dropZonePanel = new JeanPanel
             {
                 Size = new Size(400, 150),
                 Location = new System.Drawing.Point(20, 20),
-                BackColor = Color.FromArgb(55, 55, 58),
                 BorderStyle = BorderStyle.None,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BackColor = Color.FromArgb(55, 55, 58),
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                BorderRadius = 20
             };
 
             dropZoneLabel = new System.Windows.Forms.Label
@@ -295,12 +298,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void InitializeInfoPanel(Panel parent)
         {
-            var infoPanel = new Panel
+            var infoPanel = new JeanPanel
             {
                 Size = new Size(400, 80),
-                Location = new System.Drawing.Point(20, 190),
+                Location = new System.Drawing.Point(20, 180),
+                Padding = new Padding(15),
                 BackColor = Color.FromArgb(55, 55, 58),
-                Padding = new Padding(15)
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                BorderRadius = 20
             };
 
             infoPanel.Paint += (s, e) =>

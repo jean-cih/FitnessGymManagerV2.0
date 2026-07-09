@@ -107,7 +107,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var settingsContainer = new Panel
             {
-                BackColor = Color.White,
+                BackColor = Color.FromArgb(240, 240, 250),
                 Padding = new Padding(10),
                 Location = new Point(20, 50),
                 Size = new Size(893, 500),
@@ -135,13 +135,13 @@ namespace GymApplicationV2._0.FormsSettings
             settingsContainer.Controls.Add(documentationButton);
 
             // Элементы для выбора шрифтов
-            AddFontSetting("🔤 Размер шрифта кнопок:", "comboBoxFontButtons", DataConfig.sizeFontButtons,
+            AddFontSetting("🔤 Шрифт кнопок", "comboBoxFontButtons", DataConfig.sizeFontButtons,
                 "Размер текста на всех кнопках интерфейса");
 
-            AddFontSetting("📊 Размер шрифта таблиц:", "comboBoxFontTables", DataConfig.sizeFontTables,
+            AddFontSetting("📊 Шрифт таблиц", "comboBoxFontTables", DataConfig.sizeFontTables,
                 "Размер текста в таблицах и списках");
 
-            AddFontSetting("📝 Размер шрифта надписей:", "comboBoxFontCaptions", DataConfig.sizeFontCaptions,
+            AddFontSetting("📝 Шрифт надписей", "comboBoxFontCaptions", DataConfig.sizeFontCaptions,
                 "Размер текста заголовков и меток");
 
             AddFormStyleSetting();
@@ -185,13 +185,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void AddFontSetting(string labelText, string comboBoxName, int defaultValue, string tooltipText)
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
                 Padding = new Padding(20),
-                Cursor = Cursors.Default
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -241,7 +243,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var previewLabel = new Label
             {
-                Text = "Пример текста",
+                Text = "Пример",
                 Location = new Point(360, 15),
                 Width = 120,
                 Font = new Font("Segoe UI", defaultValue, FontStyle.Regular),
@@ -265,12 +267,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void AddFormStyleSetting()
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
-                Padding = new Padding(20)
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -283,7 +288,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var label = new Label
             {
-                Text = "🎭 Стиль интерфейса:",
+                Text = "🎭 Интерфейс",
                 Location = new Point(15, 15),
                 Width = 250,
                 Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
@@ -331,12 +336,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void AddBackgroundStyleSetting()
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
-                Padding = new Padding(20)
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -349,7 +357,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var label = new Label
             {
-                Text = "🌊 Стиль заднего фона:",
+                Text = "🌊 Задний фон",
                 Location = new Point(15, 15),
                 Width = 250,
                 Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
