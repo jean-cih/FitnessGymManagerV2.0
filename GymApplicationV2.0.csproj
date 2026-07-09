@@ -172,6 +172,7 @@
       <DependentUpon>JeanFormStyle.cs</DependentUpon>
     </Compile>
     <Compile Include="Components\JeanStyle.cs" />
+    <Compile Include="ConfigManager.cs" />
     <Compile Include="Connections\GeneralContext.cs" />
     <Compile Include="Connections\IssuedMembershipContext.cs" />
     <Compile Include="Connections\ProductsContext.cs" />
@@ -291,7 +292,7 @@
     <Compile Include="FormsClients\Clients.Designer.cs">
       <DependentUpon>Clients.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataClass.cs" />
+    <Compile Include="DataConfig.cs" />
     <Compile Include="FormsServices\Services\FieldForService.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -371,6 +372,9 @@
     <Compile Include="FormsSplashScreens\SplashScreen.Designer.cs">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="FormsClients\Person.resx">
+      <DependentUpon>Person.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormsProducts\EditProductsForm.resx">
       <DependentUpon>EditProductsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -472,20 +476,19 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-  
-  <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
-    <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </Content>
-</ItemGroup>
+    <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
+      <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
-<Content Include="AppFiles\**\*">
-  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-</Content>
-<Content Include="Databases\**\*">
-  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-</Content>
-</ItemGroup>
+    <Content Include="AppFiles\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Databases\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\Buttons\AdjustingFont.png" />
     <Content Include="Resources\bearFront.ico" />
@@ -528,6 +531,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="x64\" />
+    <Folder Include="x86\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

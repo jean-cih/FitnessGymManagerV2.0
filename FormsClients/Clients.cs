@@ -93,11 +93,11 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonChangeData.Font = new System.Drawing.Font("Изменить данные клиента", DataClass.sizeFontButtons);
+            jeanModernButtonChangeData.Font = new System.Drawing.Font("Изменить данные клиента", DataConfig.sizeFontButtons);
 
             dataGridViewClients.DefaultCellStyle.Font =
             dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new System.Drawing.Font("Contacts", DataClass.sizeFontTables);
+                new System.Drawing.Font("Contacts", DataConfig.sizeFontTables);
         }
 
         private void button_Click(object sender, EventArgs e)

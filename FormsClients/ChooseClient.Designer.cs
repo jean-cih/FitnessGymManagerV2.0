@@ -212,10 +212,11 @@
             this.Controls.Add(this.jeanModernButtonErase);
             this.Controls.Add(this.jeanSoftTextBoxSearch);
             this.Controls.Add(this.jeanModernButtonChoose);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ChooseClient";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "ChooseClient";
+            this.Text = "Выбор клиента";
             this.Load += new System.EventHandler(this.ChooseClient_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.jeanPanel1.ResumeLayout(false);

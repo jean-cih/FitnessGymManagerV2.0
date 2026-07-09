@@ -219,7 +219,7 @@ namespace GymApplicationV2._0
 
         private void FieldForService_Load(object sender, EventArgs e)
         {
-            jeanModernButtonAdd.Font = new Font("Montserrat", DataClass.sizeFontButtons, FontStyle.Bold);
+            jeanModernButtonAdd.Font = new Font("Montserrat", DataConfig.sizeFontButtons, FontStyle.Bold);
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

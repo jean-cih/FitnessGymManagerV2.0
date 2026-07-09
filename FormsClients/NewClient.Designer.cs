@@ -360,7 +360,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "NewClient";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Новый Клиент";
+            this.Text = "Новый клиент";
             this.Load += new System.EventHandler(this.NewClient_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewServices)).EndInit();
             this.ResumeLayout(false);

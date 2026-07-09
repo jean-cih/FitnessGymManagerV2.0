@@ -58,11 +58,11 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonAdd.Font = new Font("Добавить", DataClass.sizeFontButtons);
-            jeanModernButtonDelete.Font = new Font("Удалить", DataClass.sizeFontButtons);
-            dataGridViewServices.DefaultCellStyle.Font = new Font("Contacts", DataClass.sizeFontTables);
-            dataGridViewServices.ColumnHeadersDefaultCellStyle.Font = new Font("Contacts", DataClass.sizeFontTables);
-            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataClass.sizeFontCaptions - 2);
+            jeanModernButtonAdd.Font = new Font("Добавить", DataConfig.sizeFontButtons);
+            jeanModernButtonDelete.Font = new Font("Удалить", DataConfig.sizeFontButtons);
+            dataGridViewServices.DefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
+            dataGridViewServices.ColumnHeadersDefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
+            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataConfig.sizeFontCaptions - 2);
         }
 
         private void InitializeData()
@@ -276,7 +276,7 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            DataClass.membershipId = GeneralContext.GetElementFromDatabase("SELECT Id FROM Descriptions",
+            DataConfig.membershipId = GeneralContext.GetElementFromDatabase("SELECT Id FROM Descriptions",
                 ServicesContext.ConnectionStringServices()).ToString();
 
             ShowFormWithData(new ChangeService(), form => {

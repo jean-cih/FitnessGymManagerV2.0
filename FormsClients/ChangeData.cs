@@ -82,12 +82,12 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonDelete.Font = new Font("Удалить", DataClass.sizeFontButtons);
-            jeanModernButtonChange.Font = new Font("Изменить", DataClass.sizeFontButtons);
+            jeanModernButtonDelete.Font = new Font("Удалить", DataConfig.sizeFontButtons);
+            jeanModernButtonChange.Font = new Font("Изменить", DataConfig.sizeFontButtons);
 
             dataGridViewClients.DefaultCellStyle.Font =
             dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataClass.sizeFontTables);
+                new Font("Contacts", DataConfig.sizeFontTables);
         }
 
         private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)

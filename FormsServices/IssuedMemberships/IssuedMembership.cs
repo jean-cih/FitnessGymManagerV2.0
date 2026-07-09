@@ -87,8 +87,8 @@ namespace GymApplicationV2._0
             jeanModernButtonChangeData.Location = new Point(Width - 150, 55);
 
             dataGridViewIssued.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewIssued.DefaultCellStyle.Font = new Font("Issued", DataClass.sizeFontTables);
-            dataGridViewIssued.ColumnHeadersDefaultCellStyle.Font = new Font("Issued", DataClass.sizeFontTables);
+            dataGridViewIssued.DefaultCellStyle.Font = new Font("Issued", DataConfig.sizeFontTables);
+            dataGridViewIssued.ColumnHeadersDefaultCellStyle.Font = new Font("Issued", DataConfig.sizeFontTables);
         }
 
         private void IssuedMembership_Load(object sender, EventArgs e) =>

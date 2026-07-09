@@ -395,7 +395,7 @@
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ChangeData";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "ChangeData";
+            this.Text = "Изменение информации";
             this.Load += new System.EventHandler(this.ChangeData_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.jeanPanel1.ResumeLayout(false);

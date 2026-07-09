@@ -239,10 +239,11 @@
             this.Controls.Add(this.pictureBoxSearch);
             this.Controls.Add(this.jeanModernButtonErase);
             this.Controls.Add(this.jeanSoftTextBoxSearch);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ArchiveServices";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "AchiveServices";
+            this.Text = "Архив";
             this.Load += new System.EventHandler(this.ArchiveServices_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
             this.jeanPanel.ResumeLayout(false);
