@@ -84,11 +84,11 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonChoose.Font = new Font("Выбрать", DataClass.sizeFontButtons);
+            jeanModernButtonChoose.Font = new Font("Выбрать", DataConfig.sizeFontButtons);
 
             dataGridViewClients.DefaultCellStyle.Font =
             dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataClass.sizeFontTables);
+                new Font("Contacts", DataConfig.sizeFontTables);
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)

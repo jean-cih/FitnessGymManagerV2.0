@@ -51,8 +51,8 @@
             this.dataGridViewIssued.AllowUserToAddRows = false;
             this.dataGridViewIssued.AllowUserToDeleteRows = false;
             this.dataGridViewIssued.AllowUserToResizeRows = false;
-            this.dataGridViewIssued.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.dataGridViewIssued.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridViewIssued.BackgroundColor = System.Drawing.Color.White;
             this.dataGridViewIssued.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -70,7 +70,7 @@
             this.dataGridViewIssued.EnableHeadersVisualStyles = false;
             this.dataGridViewIssued.GridColor = System.Drawing.Color.Black;
             this.dataGridViewIssued.Location = new System.Drawing.Point(14, 10);
-            this.dataGridViewIssued.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataGridViewIssued.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridViewIssued.Name = "dataGridViewIssued";
             this.dataGridViewIssued.ReadOnly = true;
             this.dataGridViewIssued.RowHeadersVisible = false;
@@ -85,8 +85,8 @@
             // 
             // jeanPanel
             // 
-            this.jeanPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.jeanPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.jeanPanel.BackColor = System.Drawing.Color.White;
             this.jeanPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
@@ -97,7 +97,7 @@
             this.jeanPanel.GradientBottomColor = System.Drawing.Color.DodgerBlue;
             this.jeanPanel.GradientTapColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
             this.jeanPanel.Location = new System.Drawing.Point(10, 102);
-            this.jeanPanel.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.jeanPanel.Margin = new System.Windows.Forms.Padding(2);
             this.jeanPanel.Name = "jeanPanel";
             this.jeanPanel.Size = new System.Drawing.Size(913, 473);
             this.jeanPanel.TabIndex = 52;
@@ -107,7 +107,7 @@
             this.pictureBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.pictureBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSearch.Image")));
             this.pictureBoxSearch.Location = new System.Drawing.Point(323, 62);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBoxSearch.Name = "pictureBoxSearch";
             this.pictureBoxSearch.Size = new System.Drawing.Size(26, 24);
             this.pictureBoxSearch.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -128,7 +128,7 @@
             this.jeanModernButtonErase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonErase.ForeColor = System.Drawing.Color.White;
             this.jeanModernButtonErase.Location = new System.Drawing.Point(580, 62);
-            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonErase.Name = "jeanModernButtonErase";
             this.jeanModernButtonErase.Size = new System.Drawing.Size(26, 24);
             this.jeanModernButtonErase.TabIndex = 55;
@@ -146,6 +146,7 @@
             this.jeanSoftTextBoxSearch.BorderSize = 2;
             this.jeanSoftTextBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanSoftTextBoxSearch.Location = new System.Drawing.Point(315, 57);
+            this.jeanSoftTextBoxSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.jeanSoftTextBoxSearch.Multiline = false;
             this.jeanSoftTextBoxSearch.Name = "jeanSoftTextBoxSearch";
             this.jeanSoftTextBoxSearch.Padding = new System.Windows.Forms.Padding(38, 8, 38, 8);
@@ -171,7 +172,7 @@
             this.jeanModernButtonChangeData.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChangeData.ForeColor = System.Drawing.Color.Black;
             this.jeanModernButtonChangeData.Location = new System.Drawing.Point(809, 54);
-            this.jeanModernButtonChangeData.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.jeanModernButtonChangeData.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonChangeData.Name = "jeanModernButtonChangeData";
             this.jeanModernButtonChangeData.Size = new System.Drawing.Size(106, 37);
             this.jeanModernButtonChangeData.TabIndex = 57;
@@ -232,10 +233,11 @@
             this.Controls.Add(this.jeanModernButtonErase);
             this.Controls.Add(this.jeanSoftTextBoxSearch);
             this.Controls.Add(this.jeanPanel);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "IssuedMembership";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "IssuedMembership";
+            this.Text = "Выданные абонементы";
             this.Load += new System.EventHandler(this.IssuedMembership_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewIssued)).EndInit();
             this.jeanPanel.ResumeLayout(false);

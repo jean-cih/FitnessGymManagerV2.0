@@ -70,15 +70,15 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonAdd.Font = new Font("Добавить", DataClass.sizeFontButtons);
+            jeanModernButtonAdd.Font = new Font("Добавить", DataConfig.sizeFontButtons);
 
             dataGridViewServices.DefaultCellStyle.Font =
             dataGridViewServices.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataClass.sizeFontTables);
+                new Font("Contacts", DataConfig.sizeFontTables);
 
-            radioButtonMan.Font = new Font("муж", DataClass.sizeFontCaptions - 2);
-            radioButtonWoman.Font = new Font("жен", DataClass.sizeFontCaptions - 2);
-            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataClass.sizeFontCaptions - 2);
+            radioButtonMan.Font = new Font("муж", DataConfig.sizeFontCaptions - 2);
+            radioButtonWoman.Font = new Font("жен", DataConfig.sizeFontCaptions - 2);
+            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataConfig.sizeFontCaptions - 2);
         }
 
         string lefts = "", price = "", termMembership = "";

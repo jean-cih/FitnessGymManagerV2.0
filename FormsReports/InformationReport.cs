@@ -63,8 +63,8 @@ namespace GymApplicationV2._0
         private void SetupDataGridView()
         {
             dataGridViewShowReport.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewShowReport.DefaultCellStyle.Font = new Font("ShowTables", DataClass.sizeFontTables);
-            dataGridViewShowReport.ColumnHeadersDefaultCellStyle.Font = new Font("ShowTables", DataClass.sizeFontTables);
+            dataGridViewShowReport.DefaultCellStyle.Font = new Font("ShowTables", DataConfig.sizeFontTables);
+            dataGridViewShowReport.ColumnHeadersDefaultCellStyle.Font = new Font("ShowTables", DataConfig.sizeFontTables);
         }
 
         private void LoadReportData()

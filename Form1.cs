@@ -20,11 +20,13 @@ using System.Media;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using System.Configuration;
 
 
 namespace GymApplicationV2._0
@@ -33,7 +35,7 @@ namespace GymApplicationV2._0
     {
         private string nameClient = "";
         private string numberCard;
-        private string filePath = Path.Combine("AppFiles", "Font.txt");
+        private string FontFilePath = Path.Combine("AppFiles", "Font.json");
         private int numberLeft;
 
         private ToolStripDropDownMenu _menu_service;
@@ -80,10 +82,20 @@ namespace GymApplicationV2._0
         private int baseButtonHeight = 40;
 
         JeanModernButton btnClose;
+        JeanModernButton btnCollapse;
+
+        private bool isMinimized = false;
+        private int originalHeight;
+        private int originalWidth;
+        private System.Drawing.Point originalLocation;
 
         public Form1()
         {
             InitializeComponent();
+
+            ConfigManager.Initialize(FontFilePath);
+
+            LoadSettings();
 
             EnsureRequiredDirectoriesExist();
             CopyPhotosToOutput();
@@ -133,6 +145,8 @@ namespace GymApplicationV2._0
 
             
             SetupAnimation();
+
+            this.Resize += Form_Resize;
         }
 
         public static void CopyPhotosToOutput()
@@ -180,7 +194,7 @@ namespace GymApplicationV2._0
 
             int spacing = (int)(baseSpacing * scaleX);
 
-            int startX = this.Width - (buttonWidth * 6);
+            int startX = this.Width - (buttonWidth * 6) - 40;
             if ( screenWidth <= 1400)
             {
                 startX += (int)(1.5 * buttonWidth) - 20;
@@ -215,16 +229,17 @@ namespace GymApplicationV2._0
 
             jeanModernButtonReport.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 4, 15);
 
-            btnClose.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 5 + 10, 20);
+            btnCollapse.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 5 + 10, 20);
+
+            btnClose.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 5 + 50, 20);
+
         }
 
         private void InitializeCustomDesign()
         {
-            CheckIfDataExistsFont();
-
             btnClose = new JeanModernButton
             {
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons, FontStyle.Bold),
                 ForeColor = Color.FromArgb(120, 120, 120),
                 BackColor = Color.Transparent,
                 FlatStyle = FlatStyle.Flat,
@@ -236,6 +251,21 @@ namespace GymApplicationV2._0
             btnClose.Click += (s, e) => CloseWithAnimation();
             this.Controls.Add(btnClose);
             btnClose.Visible = false;
+
+            btnCollapse = new JeanModernButton
+            {
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons, FontStyle.Bold),
+                ForeColor = Color.FromArgb(120, 120, 120),
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(30, 28),
+                Cursor = Cursors.Hand,
+            };
+
+            btnCollapse = CreateStyledButton("—", Color.FromArgb(180, 70, 70), 0, 0, PrimaryOrange, new System.Drawing.Point(jeanModernButtonReport.Location.X + jeanModernButtonReport.Width + 20, 20), new Size(30, 28));
+            btnCollapse.Click += (s, e) => CollapseWithAnimation();
+            this.Controls.Add(btnCollapse);
+            btnCollapse.Visible = false;
 
             // Основные настройки формы
             this.Text = "GYM MASTER";
@@ -263,21 +293,30 @@ namespace GymApplicationV2._0
 
             CreateClientPanel();
 
-            if (DataClass.styleBackground == "Dynamic")
+            SetBackgroundColor();
+        }
+
+        public void SetBackgroundColor()
+        {
+            if (DataConfig.styleBackground == "Dynamic")
             {
                 CreateDynamicBackground();
             }
-            else if (DataClass.styleBackground == "Casual")
+            else if (DataConfig.styleBackground == "Casual")
             {
                 CreateBackground();
             }
-            else if (DataClass.styleBackground == "Minimal")
+            else if (DataConfig.styleBackground == "Minimal")
             {
                 CreateMinimalBackground();
             }
-            else if (DataClass.styleBackground == "Static")
+            else if (DataConfig.styleBackground == "Static")
             {
                 CreateStaticBackground();
+            }
+            else if (DataConfig.styleBackground == "None")
+            {
+                this.BackColor = Color.FromArgb(243, 243, 243);
             }
         }
 
@@ -360,7 +399,7 @@ namespace GymApplicationV2._0
         {
             var mainCard = new JeanPanel
             {
-                Size = new Size((int)(2.9 * jeanModernButtonSettings.Width), 300),
+                Size = new Size(320, 300),
                 Location = new System.Drawing.Point(80, 100),
                 BackColor = White,
                 GradientBottomColor = White,
@@ -382,16 +421,16 @@ namespace GymApplicationV2._0
 
             // Стилизуем кнопки продаж в оранжевой гамме
             StyleButton(jeanModernButtonNewMember, "🆕 Новый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonNewMember.Location = new System.Drawing.Point(40, 65);
+            jeanModernButtonNewMember.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonNewMember.Size.Width - 10, 75);
 
-            StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonSingleTicket.Location = new System.Drawing.Point(180, 65);
-
-            StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(140, 50), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonChooseClient.Location = new System.Drawing.Point(100, 210);
+            StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
+            jeanModernButtonSingleTicket.Location = new System.Drawing.Point(mainCard.Size.Width / 2 + 10, 75);
 
             StyleButton(jeanModernButtonSell, "💰 Продать", Color.FromArgb(220, 80, 60), White, Color.FromArgb(240, 100, 80), Color.FromArgb(200, 60, 40), new Size(160, 45), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonSell.Location = new System.Drawing.Point(90, 150);
+            jeanModernButtonSell.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonSell.Size.Width / 2, 140);
+
+            StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(140, 50), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
+            jeanModernButtonChooseClient.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonChooseClient.Size.Width / 2, mainCard.Size.Height - jeanModernButtonChooseClient.Height - 40);
 
             mainCard.Controls.AddRange(new Control[] { titleLabel, jeanModernButtonNewMember, jeanModernButtonSingleTicket,
             jeanModernButtonChooseClient, jeanModernButtonSell });
@@ -533,20 +572,21 @@ namespace GymApplicationV2._0
         }
 
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void ApplyFormStyle()
         {
-            this.Hide();
-            
+            btnClose.Visible = false;
+            btnCollapse.Visible = false;
+
             JeanFormStyle.fStyle style;
-            if (DataClass.styleForm == "UserStyle")
+            if (DataConfig.styleForm == "UserStyle")
             {
                 style = JeanFormStyle.fStyle.UserStyle;
             }
-            else if (DataClass.styleForm == "SimpleDark")
+            else if (DataConfig.styleForm == "SimpleDark")
             {
                 style = JeanFormStyle.fStyle.SimpleDark;
             }
-            else if (DataClass.styleForm == "TelegramStyle")
+            else if (DataConfig.styleForm == "TelegramStyle")
             {
                 style = JeanFormStyle.fStyle.TelegramStyle;
             }
@@ -554,23 +594,17 @@ namespace GymApplicationV2._0
             {
                 style = JeanFormStyle.fStyle.None;
                 btnClose.Visible = true;
+                btnCollapse.Visible = true;
             }
 
             jeanFormStyle.FormStyle = style;
+        }
 
-            jeanModernButtonSettings.Font = new System.Drawing.Font("⚙️ Настройки", DataClass.sizeFontButtons);
-            jeanModernButtonServices.Font = new System.Drawing.Font("🎫 Услуги", DataClass.sizeFontButtons);
-            jeanModernButtonPurchase.Font = new System.Drawing.Font("🛒 Товары", DataClass.sizeFontButtons);
-            jeanModernButtonClients.Font = new System.Drawing.Font("👥 Клиенты", DataClass.sizeFontButtons);
-            jeanModernButtonReport.Font = new System.Drawing.Font("📊 Отчет", DataClass.sizeFontButtons);
-            jeanModernButtonNewMember.Font = new System.Drawing.Font("🆕 Новый", DataClass.sizeFontButtons);
-            jeanModernButtonSingleTicket.Font = new System.Drawing.Font("🎫 Разовый", DataClass.sizeFontButtons);
-            jeanModernButtonChooseClient.Font = new System.Drawing.Font("👤 Выбрать клиента", DataClass.sizeFontButtons);
-            jeanModernButtonSell.Font = new System.Drawing.Font("💰 Продать", DataClass.sizeFontButtons);
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            this.Hide();
 
-
-            dataGridViewClient.DefaultCellStyle.Font = new System.Drawing.Font("Issued", DataClass.sizeFontTables);
-            dataGridViewClient.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Issued", DataClass.sizeFontTables);
+            ApplySettingsToAllControls();
 
             CheckIfDataExistsClients();
             CheckIfDataExistsServices();
@@ -597,6 +631,86 @@ namespace GymApplicationV2._0
                 }
             };
             closeTimer.Start();
+        }
+
+        private void Form_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                isMinimized = true;
+            }
+            else if (this.WindowState == FormWindowState.Normal && isMinimized)
+            {
+                ExpandWithAnimation();
+                isMinimized = false;
+            }
+        }
+
+        private void CollapseWithAnimation()
+        {
+            originalWidth = this.Width;
+            originalHeight = this.Height;
+
+            var collapseTimer = new System.Windows.Forms.Timer();
+            collapseTimer.Interval = 10;
+
+            float opacity = 1.0f;
+            int currentHeight = originalHeight;
+            int step = Math.Max(2, originalHeight / 10);
+
+            collapseTimer.Tick += (s, args) =>
+            {
+                // Эффект затухания
+                opacity -= 0.07f;
+                if (opacity < 0) opacity = 0;
+                this.Opacity = opacity;
+
+                // Эффект сжатия
+                currentHeight -= step;
+                if (currentHeight <= 0)
+                {
+                    currentHeight = 0;
+                    collapseTimer.Stop();
+                    this.Opacity = 1;
+                    this.WindowState = FormWindowState.Minimized;
+                }
+                this.Height = Math.Max(1, currentHeight);
+            };
+            collapseTimer.Start();
+        }
+
+        private void ExpandWithAnimation()
+        {
+            var expandTimer = new System.Windows.Forms.Timer();
+            expandTimer.Interval = 10;
+
+            float opacity = 0f;
+            int currentHeight = 1;
+            int targetHeight = originalHeight;
+            int step = Math.Max(2, targetHeight / 10);
+
+            // Восстанавливаем размеры
+            this.Height = 1;
+            this.Width = originalWidth;
+            this.Location = originalLocation;
+            this.Opacity = 0;
+
+            expandTimer.Tick += (s, args) =>
+            {
+                opacity += 0.07f;
+                if (opacity > 1) opacity = 1;
+                this.Opacity = opacity;
+
+                currentHeight += step;
+                if (currentHeight >= targetHeight)
+                {
+                    currentHeight = targetHeight;
+                    expandTimer.Stop();
+                    this.Opacity = 1;
+                }
+                this.Height = currentHeight;
+            };
+            expandTimer.Start();
         }
 
         private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, System.Drawing.Point location, Size size)
@@ -678,41 +792,6 @@ namespace GymApplicationV2._0
             _fadeTimer.Start();
         }
 
-        private void CheckIfDataExistsFont()
-        {
-            if (!File.Exists(filePath))
-            {
-                CreateFile();
-            }
-            else
-            {
-                List<string> lines = new List<string>();
-                using (StreamReader sr = new StreamReader(filePath))
-                {
-                    string line;
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        lines.Add(line);
-                    }
-                }
-                try
-                {
-                    DataClass.sizeFontCaptions = Convert.ToInt32(lines[3]);
-                    DataClass.sizeFontButtons = Convert.ToInt32(lines[5]);
-                    DataClass.sizeFontTables = Convert.ToInt32(lines[7]);
-                    DataClass.styleForm = lines[9];
-                    DataClass.styleBackground = lines[11];
-                }
-                catch
-                {
-                    File.Delete(filePath);
-
-                    CreateFile();
-                }
-            }
-        }
-
-
         private void CheckIfDataExistsClients()
         {
             if (!File.Exists("Databases\\Clients.db"))
@@ -762,22 +841,8 @@ namespace GymApplicationV2._0
             }
         }
 
-        private void CreateFile()
-        {
-            using (FileStream fs = File.Create(filePath))
-            {
-                byte[] info = new UTF8Encoding(true).GetBytes(
-                    "НИ В КОЕМ СЛУЧАЕ НЕ ИЗМЕНЯТЬ ЭТОТ ФАЙЛ\n\n" +
-                    "Размер шрифта заголовков:\n10\n" +
-                    "Размер шрифта названий кнопок:\n10\n" +
-                    "Размер шрифта в таблице:\n10\n" +
-                    "Дизайн оформления:\nNone\n" +
-                    "Дизайн заднего фона:\nCasual");
-                fs.Write(info, 0, info.Length);
-            }
-        }
-
         private bool isProgrammaticChange = false;
+
         private void jeanTextBoxNumberCard_KeyPress(object sender, KeyPressEventArgs e)
         {
             isProgrammaticChange = true;
@@ -1240,6 +1305,105 @@ namespace GymApplicationV2._0
             services.checkBoxVisited.Visible = true;
         }
 
+        private void LoadSettings()
+        {
+            try
+            {
+                DataConfig.sizeFontCaptions = ConfigManager.GetSetting<int>("headlineSize");
+                DataConfig.sizeFontButtons = ConfigManager.GetSetting<int>("sizeKeyName");
+                DataConfig.sizeFontTables = ConfigManager.GetSetting<int>("sizeTableTitle");
+                DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
+                DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки настроек: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void RemoveBackgroundControls()
+        {
+            // Удаляем все PictureBox, которые были добавлены как фон
+            var toRemove = new List<Control>();
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox pb && pb.Tag?.ToString() == "Background")
+                {
+                    toRemove.Add(control);
+                }
+            }
+
+            foreach (var control in toRemove)
+            {
+                this.Controls.Remove(control);
+                control.Dispose();
+            }
+
+            // Сбрасываем BackColor на стандартный, чтобы не было конфликтов
+            if (toRemove.Count > 0)
+            {
+                this.BackColor = Color.FromArgb(243, 243, 243);
+            }
+        }
+
+        private void ApplySettingsToAllControls()
+        {
+            // Обходим все элементы управления на форме
+            foreach (Control control in GetAllControls(this))
+            {
+                // Обновляем кнопки
+                if (control is JeanModernButton button)
+                {
+                    button.Font = new System.Drawing.Font(button.Font.FontFamily, DataConfig.sizeFontButtons, button.Font.Style);
+                }
+                // Обновляем метки
+                else if (control is System.Windows.Forms.Label label)
+                {
+                    if (label.Text != "🏋️ СИБИРЯК")
+                    {
+                        label.Font = new System.Drawing.Font(label.Font.FontFamily, DataConfig.sizeFontCaptions, label.Font.Style);
+                    }
+                }
+                // Обновляем TextBox
+                else if (control is jeanSoftTextBox textBox)
+                {
+                    textBox.Font = new System.Drawing.Font(textBox.Font.FontFamily, DataConfig.sizeFontCaptions, textBox.Font.Style);
+                }
+                // Обновляем ComboBox
+                else if (control is ComboBox comboBox)
+                {
+                    comboBox.Font = new System.Drawing.Font(comboBox.Font.FontFamily, DataConfig.sizeFontCaptions, comboBox.Font.Style);
+                }
+                else if (control is DataGridView dataGrid)
+                {
+                    dataGrid.Font = new System.Drawing.Font(dataGrid.Font.FontFamily, DataConfig.sizeFontTables, dataGrid.Font.Style);
+                }
+            }
+
+            ApplyFormStyle();
+
+            //RemoveBackgroundControls();
+            //SetBackgroundColor();
+        }
+
+        private IEnumerable<Control> GetAllControls(Control parent)
+        {
+            foreach (Control control in parent.Controls)
+            {
+                yield return control;
+
+                // Рекурсивно обходим вложенные элементы
+                if (control.HasChildren)
+                {
+                    foreach (Control child in GetAllControls(control))
+                    {
+                        yield return child;
+                    }
+                }
+            }
+        }
+
         private void jeanModernButtonService_Click(object sender, EventArgs e)
         {
             Services services = new Services();
@@ -1267,6 +1431,8 @@ namespace GymApplicationV2._0
         private void jeanModernButtonDesign_Click(object sender, EventArgs e)
         {
             Design design = new Design();
+            design.SetRefreshAction(ApplySettingsToAllControls);
+            design.ShowDialog();
             design.Show();
         }
 
@@ -1352,7 +1518,8 @@ namespace GymApplicationV2._0
             backgroundPicture = new System.Windows.Forms.PictureBox
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Tag = "Background"
             };
 
             backgroundPicture.Paint += (s, e) =>
@@ -1456,7 +1623,8 @@ namespace GymApplicationV2._0
                 {
                     Dock = DockStyle.Fill,
                     SizeMode = PictureBoxSizeMode.Zoom,
-                    BackColor = Color.Transparent
+                    BackColor = Color.Transparent,
+                    Tag = "Background"
                 };
 
                 // Создаем программное изображение с спортивной тематикой
@@ -1674,7 +1842,8 @@ namespace GymApplicationV2._0
             backgroundPicture = new System.Windows.Forms.PictureBox
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Tag = "Background"
             };
 
             backgroundPicture.Paint += (s, e) =>
@@ -1851,7 +2020,8 @@ namespace GymApplicationV2._0
             backgroundPicture = new System.Windows.Forms.PictureBox
             {
                 Dock = DockStyle.Fill,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Tag = "Background"
             };
 
             backgroundPicture.Paint += (s, e) =>

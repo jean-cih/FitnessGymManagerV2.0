@@ -438,24 +438,24 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonChooseFile.Font = new System.Drawing.Font("Выбрать", DataClass.sizeFontButtons);
-            jeanModernButtonExport.Font = new System.Drawing.Font("Экспортировать", DataClass.sizeFontButtons);
-            jeanModernButtonShow.Font = new System.Drawing.Font("Показать", DataClass.sizeFontButtons);
+            jeanModernButtonChooseFile.Font = new System.Drawing.Font("Выбрать", DataConfig.sizeFontButtons);
+            jeanModernButtonExport.Font = new System.Drawing.Font("Экспортировать", DataConfig.sizeFontButtons);
+            jeanModernButtonShow.Font = new System.Drawing.Font("Показать", DataConfig.sizeFontButtons);
 
-            checkBoxAllClients.Font = new System.Drawing.Font("Все клиенты", DataClass.sizeFontCaptions);
-            checkBoxClientsForPeriod.Font = new System.Drawing.Font("Посещаемость по дням", DataClass.sizeFontCaptions);
-            checkBoxSellServices.Font = new System.Drawing.Font("Количество проданных", DataClass.sizeFontCaptions);
+            checkBoxAllClients.Font = new System.Drawing.Font("Все клиенты", DataConfig.sizeFontCaptions);
+            checkBoxClientsForPeriod.Font = new System.Drawing.Font("Посещаемость по дням", DataConfig.sizeFontCaptions);
+            checkBoxSellServices.Font = new System.Drawing.Font("Количество проданных", DataConfig.sizeFontCaptions);
 
-            radioForMonth.Font = new System.Drawing.Font("За месяц", DataClass.sizeFontCaptions - 2);
-            radioForWeek.Font = new System.Drawing.Font("За неделю", DataClass.sizeFontCaptions - 2);
-            radioForDay.Font = new System.Drawing.Font("За день", DataClass.sizeFontCaptions - 2);
-            radioOtherPeriod.Font = new System.Drawing.Font("Другой период", DataClass.sizeFontCaptions - 2);
+            radioForMonth.Font = new System.Drawing.Font("За месяц", DataConfig.sizeFontCaptions - 2);
+            radioForWeek.Font = new System.Drawing.Font("За неделю", DataConfig.sizeFontCaptions - 2);
+            radioForDay.Font = new System.Drawing.Font("За день", DataConfig.sizeFontCaptions - 2);
+            radioOtherPeriod.Font = new System.Drawing.Font("Другой период", DataConfig.sizeFontCaptions - 2);
 
-            checkBoxXLS.Font = new System.Drawing.Font(".xls", DataClass.sizeFontCaptions);
-            checkBoxTXT.Font = new System.Drawing.Font("txt", DataClass.sizeFontCaptions);
-            checkBoxJSON.Font = new System.Drawing.Font(".json", DataClass.sizeFontCaptions);
-            checkBoxCSV.Font = new System.Drawing.Font(".csv", DataClass.sizeFontCaptions);
-            checkBoxTSV.Font = new System.Drawing.Font(".tsv", DataClass.sizeFontCaptions);
+            checkBoxXLS.Font = new System.Drawing.Font(".xls", DataConfig.sizeFontCaptions);
+            checkBoxTXT.Font = new System.Drawing.Font("txt", DataConfig.sizeFontCaptions);
+            checkBoxJSON.Font = new System.Drawing.Font(".json", DataConfig.sizeFontCaptions);
+            checkBoxCSV.Font = new System.Drawing.Font(".csv", DataConfig.sizeFontCaptions);
+            checkBoxTSV.Font = new System.Drawing.Font(".tsv", DataConfig.sizeFontCaptions);
         }
 
         private void buttonShow_Click(object sender, EventArgs e)

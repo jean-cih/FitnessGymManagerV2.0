@@ -226,7 +226,7 @@ namespace GymApplicationV2._0
                               Цена = '{jeanSoftTextBoxPrice.Texts.Trim()}',
                               Срок_действия = '{jeanSoftTextBoxTerm.Texts.Trim()}',
                               Посещений = '{jeanSoftTextBoxQuantity.Texts.Trim()}'
-                              WHERE Id = '{DataClass.membershipId}'";
+                              WHERE Id = '{DataConfig.membershipId}'";
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ServicesContext.ConnectionStringServices());

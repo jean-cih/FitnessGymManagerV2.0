@@ -63,10 +63,10 @@ namespace GymApplicationV2._0
 
         private void SetFonts()
         {
-            jeanModernButtonSell.Font = new Font("Продать", DataClass.sizeFontButtons);
-            dataGridViewClients.DefaultCellStyle.Font = new Font("Contacts", DataClass.sizeFontTables);
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Contacts", DataClass.sizeFontTables);
-            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataClass.sizeFontCaptions - 2);
+            jeanModernButtonSell.Font = new Font("Продать", DataConfig.sizeFontButtons);
+            dataGridViewClients.DefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
+            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
+            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataConfig.sizeFontCaptions - 2);
         }
 
         private void InitializeData()
