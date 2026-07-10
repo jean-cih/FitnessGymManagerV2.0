@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Microsoft.Office.Interop.Excel;
 using Shadow;
 using System;
@@ -9,10 +11,10 @@ using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Reflection.Emit;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using GymApplicationV2._0.FormsSplashScreens;
 
 namespace GymApplicationV2._0.FormsSettings
 {
@@ -31,16 +33,39 @@ namespace GymApplicationV2._0.FormsSettings
 
         Panel titlePanel;
 
+        private FadeAnimation _fadeAnimation;
+
         public Import()
         {
             InitializeComponent();
             InitializeComponents();
+
+            SubscribeEvents();
+
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Opacity = 0;
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            ApplySettings();
+        }
+
+        private void ApplySettings()
+        {
+            string[] notChangeableTexts = new string[]
+            {
+                "📤 Импорт данных"
+            };
+
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+        }
+
+        private void SubscribeEvents()
+        {
             titlePanel.MouseDown += Panel_MouseDown;
             titlePanel.MouseMove += Panel_MouseMove;
             titlePanel.MouseUp += Panel_MouseUp;
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
-            SetupAnimation();
         }
 
         private bool isDragging = false;
@@ -98,7 +123,7 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            titlePanel = new System.Windows.Forms.Panel
+            titlePanel = new Panel
             {
                 Size = new Size(874, 50),
                 BackColor = Color.MediumSlateBlue,
@@ -137,9 +162,6 @@ namespace GymApplicationV2._0.FormsSettings
             // Зона перетаскивания
             InitializeDropZone(importCard);
 
-            // Информационная панель
-            InitializeInfoPanel(importCard);
-
             // Кнопки действий
             InitializeActionButtons(importCard);
 
@@ -148,7 +170,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var btnClose = new JeanModernButton
             {
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 ForeColor = Color.FromArgb(120, 120, 120),
                 BackColor = Color.Transparent,
                 FlatStyle = FlatStyle.Flat,
@@ -157,7 +179,7 @@ namespace GymApplicationV2._0.FormsSettings
             };
 
             btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point(834, 10), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
@@ -169,43 +191,6 @@ namespace GymApplicationV2._0.FormsSettings
             this.DragDrop += Import_DragDrop;
         }
 
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new System.Windows.Forms.Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new System.Windows.Forms.Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
         private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, System.Drawing.Point location, Size size)
         {
             var button = new JeanModernButton
@@ -213,25 +198,21 @@ namespace GymApplicationV2._0.FormsSettings
                 Text = text,
                 Location = location,
                 Size = size,
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 BackColor = baseColor,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BorderColor = radiusColor,
+                BackgroundColor = baseColor,
+                TextColor = Color.White,
+                BorderRadius = radius,
+                BorderSize = radiusSize,
             };
 
             button.FlatAppearance.BorderSize = 0;
             button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
             button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.Text = text;
-            button.Font = new System.Drawing.Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
 
             // Эффекты при наведении
             button.MouseEnter += (s, e) =>
@@ -271,8 +252,8 @@ namespace GymApplicationV2._0.FormsSettings
         {
             dropZonePanel = new JeanPanel
             {
-                Size = new Size(400, 150),
-                Location = new System.Drawing.Point(20, 20),
+                Size = new Size(600, 250),
+                Location = new System.Drawing.Point(parent.Width / 2 - 300, 50),
                 BorderStyle = BorderStyle.None,
                 Cursor = Cursors.Hand,
                 BackColor = Color.FromArgb(55, 55, 58),
@@ -286,49 +267,19 @@ namespace GymApplicationV2._0.FormsSettings
                 Text = "📎 Перетащите Excel файл сюда\n\nили нажмите Enter",
                 TextAlign = ContentAlignment.MiddleCenter,
                 Dock = DockStyle.Fill,
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Bold),
                 ForeColor = Color.FromArgb(255, 140, 0)
             };
+
+            var tooltip = new System.Windows.Forms.ToolTip();
+            var line = "📋 Поддерживаемые таблицы:\n    • Clients • Services • Archive \n    • Payments • IssuedMembership";
+            tooltip.SetToolTip(dropZonePanel, line);
+            tooltip.SetToolTip(dropZoneLabel, line);
 
             dropZonePanel.Click += (s, e) => ChooseFile_Click(s, e);
             dropZonePanel.Controls.Add(dropZoneLabel);
 
             parent.Controls.Add(dropZonePanel);
-        }
-
-        private void InitializeInfoPanel(Panel parent)
-        {
-            var infoPanel = new JeanPanel
-            {
-                Size = new Size(400, 80),
-                Location = new System.Drawing.Point(20, 180),
-                Padding = new Padding(15),
-                BackColor = Color.FromArgb(55, 55, 58),
-                GradientBottomColor = Color.FromArgb(55, 55, 58),
-                GradientTapColor = Color.FromArgb(55, 55, 58),
-                BorderRadius = 20
-            };
-
-            infoPanel.Paint += (s, e) =>
-            {
-                // Рамка с свечением
-                using (var pen = new Pen(Color.FromArgb(255, 140, 0), 1))
-                {
-                    e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(0, 0, infoPanel.Width - 1, infoPanel.Height - 1));
-                }
-            };
-
-            var infoText = new System.Windows.Forms.Label
-            {
-                Text = "📋 Поддерживаемые таблицы:\n    • Clients • Services • Archive \n    • Payments • IssuedMembership",
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill,
-                Font = new System.Drawing.Font("Segoe UI", 9),
-                ForeColor = Color.FromArgb(255, 140, 0)
-            };
-
-            infoPanel.Controls.Add(infoText);
-            parent.Controls.Add(infoPanel);
         }
 
         private void InitializeActionButtons(Panel parent)
@@ -342,11 +293,11 @@ namespace GymApplicationV2._0.FormsSettings
             chooseButton = new JeanModernButton
             {
                 Text = "📁 Выбрать файл",
-                Size = new Size(150, 40),
+                Size = new Size(170, 40),
                 Location = new System.Drawing.Point(0, 75),
                 BackColor = Color.FromArgb(0, 122, 204),
                 ForeColor = Color.White,
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 BorderRadius = 8,
             };
             chooseButton.Click += ChooseFile_Click;
@@ -354,11 +305,11 @@ namespace GymApplicationV2._0.FormsSettings
             importButton = new JeanModernButton
             {
                 Text = "🚀 Импортировать",
-                Size = new Size(170, 40),
-                Location = new System.Drawing.Point(170, 75),
+                Size = new Size(190, 40),
+                Location = new System.Drawing.Point(190, 75),
                 BackColor = Color.FromArgb(40, 167, 69),
                 ForeColor = Color.White,
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 BorderRadius = 8,
             };
             importButton.Click += ImportButton_Click;
@@ -370,7 +321,7 @@ namespace GymApplicationV2._0.FormsSettings
                 Location = new System.Drawing.Point(625, 75),
                 BackColor = Color.FromArgb(37, 99, 235),
                 ForeColor = Color.White,
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 BorderRadius = 8,
             };
             documentationButton.Click += DocumentationButton_Click;

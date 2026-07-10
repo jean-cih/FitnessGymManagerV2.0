@@ -1,14 +1,13 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using Shadow;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace GymApplicationV2._0.FormsClients
 {
@@ -26,8 +25,7 @@ namespace GymApplicationV2._0.FormsClients
         private JeanPanel statsPanel;
         private JeanModernButton closeButton;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public Person(ClientData data, Panel panelPerson)
         {
@@ -38,25 +36,9 @@ namespace GymApplicationV2._0.FormsClients
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void CreateControls(ClientData data, Panel personPanel)
@@ -583,22 +565,7 @@ namespace GymApplicationV2._0.FormsClients
 
         private void CloseWithAnimation(Panel personPanel)
         {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.06f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-
+            _fadeAnimation.CloseWithAnimation();
             personPanel.Visible = false;
         }
 

@@ -1,9 +1,8 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.SQLite;
 using System.Drawing;
@@ -11,10 +10,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
 using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace GymApplicationV2._0
 {
@@ -33,8 +29,7 @@ namespace GymApplicationV2._0
         private JeanModernButton printButton;
         private JeanModernButton changePrice;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         private readonly Color CardColor = Color.White;
 
@@ -42,19 +37,29 @@ namespace GymApplicationV2._0
         {
             InitializeComponent();
             InitializeCustomDesign();
+
+            SubscribeEvents();
+
+            InitializeProducts();
+            SetupAdvancedStyling();
+
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Opacity = 0;
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+        }
+
+        private void SubscribeEvents()
+        {
             titlePanel.MouseDown += Panel_MouseDown;
             titlePanel.MouseMove += Panel_MouseMove;
             titlePanel.MouseUp += Panel_MouseUp;
-            InitializeProducts();
-            SetupAdvancedStyling();
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
-            SetupAnimation();
         }
 
         private bool isDragging = false;
-        private System.Drawing.Point lastCursor;
-        private System.Drawing.Point lastForm;
+        private Point lastCursor;
+        private Point lastForm;
 
         private void Panel_MouseDown(object sender, MouseEventArgs e)
         {
@@ -70,8 +75,8 @@ namespace GymApplicationV2._0
         {
             if (isDragging)
             {
-                System.Drawing.Point diff = System.Drawing.Point.Subtract(Cursor.Position, new Size(lastCursor));
-                this.Location = System.Drawing.Point.Add(lastForm, new Size(diff));
+                Point diff = Point.Subtract(Cursor.Position, new Size(lastCursor));
+                this.Location = Point.Add(lastForm, new Size(diff));
             }
         }
 
@@ -103,25 +108,25 @@ namespace GymApplicationV2._0
                 // Рамка с свечением
                 using (var pen = new Pen(Color.FromArgb(80, 120, 200), 1))
                 {
-                    e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(0, 0, Width - 1, Height - 1));
+                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, Width - 1, Height - 1));
                 }
             };
 
-            titlePanel = new System.Windows.Forms.Panel
+            titlePanel = new Panel
             {
                 Size = new Size(1100, 50),
                 BackColor = Color.MediumSlateBlue,
-                Location = new System.Drawing.Point(0, 0),
+                Location = new Point(0, 0),
             };
 
             // Заголовок
-            var titleLabel = new System.Windows.Forms.Label
+            var titleLabel = new Label
             {
                 Text = "💰 Товары",
-                Font = new System.Drawing.Font("Montserrat", 18, FontStyle.Bold),
+                Font = new Font("Montserrat", 18, FontStyle.Bold),
                 ForeColor = ForeColor = Color.FromArgb(220, 220, 255),
                 BackColor = Color.Transparent,
-                Location = new System.Drawing.Point(460, 10),
+                Location = new Point(460, 10),
                 AutoSize = true,
             };
           
@@ -151,7 +156,7 @@ namespace GymApplicationV2._0
             var btnClose = new JeanModernButton
             {
                 Text = "X",
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(180, 70, 70),
                 FlatStyle = FlatStyle.Flat,
@@ -159,10 +164,10 @@ namespace GymApplicationV2._0
                 Cursor = Cursors.Hand,
                 BorderRadius = 0,
                 BorderSize = 0,
-                Location = new System.Drawing.Point(1060, 10),
+                Location = new Point(1060, 10),
             };
 
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
             titlePanel.Controls.Add(btnClose);
         }
 
@@ -448,7 +453,7 @@ namespace GymApplicationV2._0
             this.Controls.Add(changePrice);
         }
 
-        private JeanModernButton CreateStyledButton(string text, Color backColor, System.Drawing.Point location, Size size)
+        private JeanModernButton CreateStyledButton(string text, Color backColor, Point location, Size size)
         {
             var button = new JeanModernButton
             {
@@ -658,43 +663,6 @@ namespace GymApplicationV2._0
 
             font.Dispose();
             titleFont.Dispose();
-        }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
         }
 
         public class Product

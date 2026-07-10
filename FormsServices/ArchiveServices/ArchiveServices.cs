@@ -1,13 +1,9 @@
-﻿using GymApplicationV2._0;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsServices;
+using GymApplicationV2._0.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -15,11 +11,10 @@ namespace GymApplicationV2._0
 {
     public partial class ArchiveServices : Form
     {
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-
         private ToolStripDropDownMenu _menu;
         private string client = "", membership = "", term = "", cost = "", numberCard = "", visits = "";
+
+        private FadeAnimation _fadeAnimation;
 
         public ArchiveServices()
         {
@@ -31,31 +26,15 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void InitializeMenu()
         {
             _menu = new ToolStripDropDownMenu();
-            _menu.Font = new System.Drawing.Font("Arial", 12, FontStyle.Regular);
+            _menu.Font = new Font("Arial", 12, FontStyle.Regular);
             ToolStripMenuItem item1 = new ToolStripMenuItem("Вернуть из архива", Properties.Resources.backToLife);
             ToolStripMenuItem item2 = new ToolStripMenuItem("Изменить параметры", Properties.Resources.change);
             _menu.Items.Add(item1);
@@ -69,6 +48,8 @@ namespace GymApplicationV2._0
         {
             ConfigureFormSize();
             LoadArchiveData();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void ConfigureFormSize()

@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Data.SQLite;
@@ -14,16 +16,21 @@ namespace GymApplicationV2._0
         private bool _isMousePressed;
         private Point _clickPoint;
         private Point _formStartPoint;
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+
+        private FadeAnimation _fadeAnimation;
 
         public FieldForService()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeCustomDesign()
@@ -168,24 +175,6 @@ namespace GymApplicationV2._0
             };
         }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
         #region Form Movement Handlers
         private void FieldForService_MouseDown(object sender, MouseEventArgs e)
         {
@@ -242,7 +231,7 @@ namespace GymApplicationV2._0
             {
                 timer.Stop();
                 Message.MessageWindowOk("Услуга успешно добавлена");
-                CloseWithAnimation();
+                _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();
         }
@@ -314,41 +303,9 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            CloseWithAnimation();
+            _fadeAnimation.CloseWithAnimation();
         }
 
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        // Закрытие по ESC
-        /*
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == Keys.Escape)
-            {
-                CloseWithAnimation();
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-        */
-        // Валидация числовых полей
         private void jeanTextBoxPrice_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))

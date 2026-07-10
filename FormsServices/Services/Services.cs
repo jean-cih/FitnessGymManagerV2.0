@@ -1,14 +1,11 @@
-﻿using System;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
+using System;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Windows.Forms;
 using System.IO;
-using GymApplicationV2._0.Components;
-using GymApplicationV2._0.Connections;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using GymApplicationV2._0.FormsServices;
-using System.Text.RegularExpressions;
-using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace GymApplicationV2._0
 {
@@ -17,11 +14,8 @@ namespace GymApplicationV2._0
         private string _termMembership = string.Empty;
         private string _servicesQuantity = string.Empty;
         private string _servicesCost = string.Empty;
-        private const double FormWidthRatio = 0.65;
-        private const double FormHeightRatio = 0.65;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public Services()
         {
@@ -29,25 +23,11 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void Services_Load(object sender, EventArgs e)

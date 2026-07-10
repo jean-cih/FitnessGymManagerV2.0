@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Data.SQLite;
@@ -14,16 +16,21 @@ namespace GymApplicationV2._0.FormsServices
         private bool _isMousePress;
         private Point _clickPoint;
         private Point _formStartPoint;
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+
+        private FadeAnimation _fadeAnimation;
 
         public BackToLife()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeCustomDesign()
@@ -158,35 +165,6 @@ namespace GymApplicationV2._0.FormsServices
             };
         }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-        /*
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            // Добавление свечения по краям
-            using (var pen = new Pen(Color.FromArgb(40, 80, 160), 2))
-            {
-                e.Graphics.DrawRectangle(pen, new Rectangle(2, 2, Width - 5, Height - 5));
-            }
-        }
-        */
         #region Form Movement Handlers
         private void BackToLife_MouseDown(object sender, MouseEventArgs e)
         {
@@ -245,42 +223,12 @@ namespace GymApplicationV2._0.FormsServices
 
             Message.MessageWindowOk("Абонемент восстановлен");
 
-            // Анимация закрытия
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            // Анимация закрытия
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
+            _fadeAnimation.CloseWithAnimation();
         }
     }
 }

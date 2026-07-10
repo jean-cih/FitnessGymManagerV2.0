@@ -1,10 +1,11 @@
-﻿using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.FormsServices;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using GymApplicationV2._0.FormsServices;
 
 namespace GymApplicationV2._0
 {
@@ -19,35 +20,21 @@ namespace GymApplicationV2._0
         private string _status = string.Empty;
         private string _visits = string.Empty;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public IssuedMembership()
         {
             InitializeComponent();
             InitializeMenu();
             SetupFormLayout();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeMenu()

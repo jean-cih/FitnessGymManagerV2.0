@@ -76,6 +76,7 @@ public static class ConfigManager
             ["headlineSize"] = 10,
             ["sizeKeyName"] = 10,
             ["sizeTableTitle"] = 10,
+            ["textSize"] = 10,
             ["designForm"] = "None",
             ["designBackground"] = "Casual"
         };

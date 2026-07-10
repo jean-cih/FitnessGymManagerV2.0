@@ -60,7 +60,7 @@
             // checkBoxPerson
             // 
             this.checkBoxPerson.AutoSize = true;
-            this.checkBoxPerson.Location = new System.Drawing.Point(23, 50);
+            this.checkBoxPerson.Location = new System.Drawing.Point(23, 39);
             this.checkBoxPerson.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxPerson.Name = "checkBoxPerson";
             this.checkBoxPerson.Size = new System.Drawing.Size(95, 17);

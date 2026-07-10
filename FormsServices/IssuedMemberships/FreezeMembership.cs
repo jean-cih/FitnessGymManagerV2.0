@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Drawing;
@@ -13,40 +15,27 @@ namespace GymApplicationV2._0.FormsServices
         public Label txtClientName;
         public Label txtCardNumber;
         public Label txtFreezeDate;
-        private System.Windows.Forms.ComboBox cmbFreezeReason;
+        private ComboBox cmbFreezeReason;
         private NumericUpDown numFreezeDays;
         private JeanModernButton btnSave;
         private JeanModernButton btnCancel;
         private Label lblTitle;
-        private System.Windows.Forms.Timer _fadeTimer;
-        private float _opacity = 0;
         public string _dateOver;
+
+        private FadeAnimation _fadeAnimation;
 
         public FreezeMembership()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new System.Windows.Forms.Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeCustomDesign()
@@ -153,7 +142,7 @@ namespace GymApplicationV2._0.FormsServices
                 BackColor = Color.Transparent
             };
 
-            cmbFreezeReason = new System.Windows.Forms.ComboBox
+            cmbFreezeReason = new ComboBox
             {
                 Location = new Point(160, 225),
                 Size = new Size(200, 30),
@@ -234,7 +223,7 @@ namespace GymApplicationV2._0.FormsServices
             };
 
             btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(460, 5), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             this.Controls.Add(btnClose);
 
@@ -361,33 +350,7 @@ namespace GymApplicationV2._0.FormsServices
         private void BtnCancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
-            CloseWithAnimation();
-        }
-
-        private void CloseWithAnimation()
-        {
-            using (var closeTimer = new Timer())
-            {
-                closeTimer.Interval = 10;
-                float closeOpacity = 1;
-                closeTimer.Tick += (s, args) =>
-                {
-                    closeOpacity -= 0.05f;
-                    this.Opacity = closeOpacity;
-
-                    if (closeOpacity <= 0)
-                    {
-                        closeTimer.Stop();
-                        this.Close();
-                    }
-                };
-                closeTimer.Start();
-
-                while (closeOpacity > 0 && closeTimer.Enabled)
-                {
-                    Application.DoEvents();
-                }
-            }
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private bool ValidateForm()

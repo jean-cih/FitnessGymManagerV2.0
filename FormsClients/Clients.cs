@@ -1,53 +1,37 @@
-﻿using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Controls;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.FormsClients;
-using Microsoft.Office.Interop.Excel;
+using GymApplicationV2._0.Helpers;
 using System;
-using System.ComponentModel;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
 {
     public partial class Clients : Form
     {
-        private const string PhotosPath = "\\Photos\\";
-        private System.Windows.Forms.Button _cellButton;
+        private Button _cellButton;
         int location;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public Clients()
         {
             InitializeComponent();
 
-            dataGridViewClients.CellMouseEnter += dataGridViewClients_CellMouseEnter;
+            SubscribeEvents();
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
-        private void SetupAnimation()
+        private void SubscribeEvents()
         {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            dataGridViewClients.CellMouseEnter += dataGridViewClients_CellMouseEnter;
         }
 
         private void Clients_Load(object sender, EventArgs e)
@@ -55,7 +39,8 @@ namespace GymApplicationV2._0
             ConfigureFormSize();
             PositionControls();
             LoadClientData();
-            SetFonts();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void ConfigureFormSize()
@@ -67,10 +52,10 @@ namespace GymApplicationV2._0
         private void PositionControls()
         {
             jeanPanel.Size = new Size(this.Width - 40, this.Height - 150);
-            jeanSoftTextBoxSearch.Location = new System.Drawing.Point(this.Width / 2 - 150, 30);
-            jeanModernButtonErase.Location = new System.Drawing.Point(this.Width / 2 - 150 + 260, 35);
-            pictureBoxSearch.Location = new System.Drawing.Point(this.Width / 2 - 140, 35);
-            jeanModernButtonChangeData.Location = new System.Drawing.Point(this.Width - 160, 13);
+            jeanSoftTextBoxSearch.Location = new Point(this.Width / 2 - 150, 30);
+            jeanModernButtonErase.Location = new Point(this.Width / 2 - 150 + 260, 35);
+            pictureBoxSearch.Location = new Point(this.Width / 2 - 140, 35);
+            jeanModernButtonChangeData.Location = new Point(this.Width - 160, 13);
         }
 
         private void LoadClientData()
@@ -89,15 +74,6 @@ namespace GymApplicationV2._0
                 "Сохранено" +
                 " FROM Contacts",
                 ClientsContext.ConnectionStringClients());
-        }
-
-        private void SetFonts()
-        {
-            jeanModernButtonChangeData.Font = new System.Drawing.Font("Изменить данные клиента", DataConfig.sizeFontButtons);
-
-            dataGridViewClients.DefaultCellStyle.Font =
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new System.Drawing.Font("Contacts", DataConfig.sizeFontTables);
         }
 
         private void button_Click(object sender, EventArgs e)
@@ -202,7 +178,7 @@ namespace GymApplicationV2._0
                 _cellButton.Dispose();
             }
 
-            _cellButton = new System.Windows.Forms.Button
+            _cellButton = new Button
             {
                 Text = "Открыть",
                 Size = new Size(80, 30),
@@ -215,10 +191,10 @@ namespace GymApplicationV2._0
             location = e.RowIndex * dataGridViewClients.Rows[e.RowIndex].Height;
         }
 
-        private System.Drawing.Point GetButtonLocation(DataGridViewCellEventArgs e)
+        private Point GetButtonLocation(DataGridViewCellEventArgs e)
         {
             var cellRect = dataGridViewClients.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
-            return new System.Drawing.Point(cellRect.X + dataGridViewClients.Columns[e.ColumnIndex].Width, cellRect.Y);
+            return new Point(cellRect.X + dataGridViewClients.Columns[e.ColumnIndex].Width, cellRect.Y);
         }
 
         private void jeanModernButtonChangeData_Click(object sender, EventArgs e)

@@ -1,6 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
 using System;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
@@ -20,8 +21,7 @@ namespace GymApplicationV2._0
 
         private const string CountQuery = "SELECT COUNT(*) FROM History";
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public HistoryPayment()
         {
@@ -29,25 +29,11 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void HistoryPayment_Load(object sender, EventArgs e)

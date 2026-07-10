@@ -1,4 +1,6 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Data.SQLite;
 using System.Drawing;
@@ -8,8 +10,7 @@ namespace GymApplicationV2._0
 {
     public partial class ChangeData : Form
     {
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public ChangeData()
         {
@@ -17,7 +18,9 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void ChangeData_Load(object sender, EventArgs e)
@@ -25,25 +28,8 @@ namespace GymApplicationV2._0
             ConfigureFormSize();
             PositionControls();
             LoadClientData();
-            SetFonts();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void ConfigureFormSize()
@@ -79,17 +65,6 @@ namespace GymApplicationV2._0
                 " FROM Contacts",
                 ClientsContext.ConnectionStringClients());
         }
-
-        private void SetFonts()
-        {
-            jeanModernButtonDelete.Font = new Font("Удалить", DataConfig.sizeFontButtons);
-            jeanModernButtonChange.Font = new Font("Изменить", DataConfig.sizeFontButtons);
-
-            dataGridViewClients.DefaultCellStyle.Font =
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataConfig.sizeFontTables);
-        }
-
         private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             if (dataGridViewClients.SelectedRows.Count == 0) return;

@@ -1,7 +1,8 @@
-﻿using GymApplicationV2._0.Controls;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -17,21 +18,41 @@ namespace GymApplicationV2._0.FormsSettings
         private JeanPanel indicatorPanel;
         private JeanPanel navigationPanel;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-
         Panel titlePanel;
+
+        private FadeAnimation _fadeAnimation;
 
         public Documentation()
         {
             InitializeComponent();
             InitializeComponents();
+
+            SubscribeEvents();
+
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Opacity = 0;
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            ApplySettings();
+        }
+
+        private void ApplySettings()
+        {
+            string[] notChangeableTexts = new string[]
+            {
+                "📚 Документация и справка"
+            };
+
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+        }
+
+        private void SubscribeEvents()
+        {
             titlePanel.MouseDown += Panel_MouseDown;
             titlePanel.MouseMove += Panel_MouseMove;
             titlePanel.MouseUp += Panel_MouseUp;
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
-            SetupAnimation();
         }
 
         // В вашем классе формы объявляем переменные для хранения состояния перетаскивания
@@ -92,11 +113,11 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            titlePanel = new System.Windows.Forms.Panel
+            titlePanel = new Panel
             {
                 Size = new Size(1048, 50),
                 BackColor = Color.MediumSlateBlue,
-                Location = new System.Drawing.Point(0, 0),
+                Location = new Point(0, 0),
             };
 
             // Заголовок
@@ -153,48 +174,11 @@ namespace GymApplicationV2._0.FormsSettings
             };
 
             btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(1008, 10), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.Add(titlePanel);
-        }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
         }
 
         private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location, Size size)
@@ -264,12 +248,11 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 Text = "📖 Руководство",
                 Dock = DockStyle.Left,
-                Width = 150,
-                Height = 40,
+                Size = new Size(150, 40),
                 Margin = new Padding(10, 5, 0, 5),
                 BackColor = Color.Transparent,
                 ForeColor = Color.FromArgb(255, 140, 0),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12: DataConfig.sizeFontButtons, FontStyle.Regular),
                 BorderRadius = 0,
             };
             userGuideBtn.Click += (s, e) => SwitchTab(0);
@@ -278,12 +261,11 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 Text = "❓ FAQ",
                 Dock = DockStyle.Left,
-                Width = 120,
-                Height = 40,
+                Size = new Size(120, 40),
                 Margin = new Padding(10, 5, 0, 5),
                 BackColor = Color.Transparent,
                 ForeColor = Color.FromArgb(255, 140, 0),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Regular),
                 BorderRadius = 0,
             };
             faqBtn.Click += (s, e) => SwitchTab(1);
@@ -292,12 +274,11 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 Text = "💬 Поддержка",
                 Dock = DockStyle.Left,
-                Width = 150,
-                Height = 40,
+                Size = new Size(150, 40),
                 Margin = new Padding(10, 5, 0, 5),
                 BackColor = Color.Transparent,
                 ForeColor = Color.FromArgb(255, 140, 0),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Regular),
                 BorderRadius = 0,
             };
             supportBtn.Click += (s, e) => SwitchTab(2);
@@ -306,9 +287,6 @@ namespace GymApplicationV2._0.FormsSettings
             indicatorPanel = new JeanPanel
             {
                 Height = 3,
-                //BackColor = Color.FromArgb(55, 55, 58),
-                //GradientBottomColor = Color.FromArgb(55, 55, 58),
-                //GradientTapColor = Color.FromArgb(55, 55, 58),
                 Width = 150,
                 Location = new Point(10, 47),
                 BorderRadius = 20
@@ -582,7 +560,7 @@ namespace GymApplicationV2._0.FormsSettings
             var titleLabel = new Label
             {
                 Text = "💬 Техническая поддержка",
-                Font = new Font("Segoe UI", 16, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = Color.FromArgb(255, 140, 0),
                 AutoSize = true,
                 Location = new Point(15, 15),
@@ -601,7 +579,8 @@ namespace GymApplicationV2._0.FormsSettings
 3. Приложите скриншоты ошибок
 4. Сообщите о шагах воспроизведения",
 
-                Font = new Font("Segoe UI", 11),
+                Tag = "content",
+                Font = new Font("Segoe UI", DataConfig.sizeFontText > 13 ? 13 : DataConfig.sizeFontText),
                 ForeColor = Color.LightGray,
                 AutoSize = true,
                 Location = new Point(35, 55)
@@ -610,13 +589,13 @@ namespace GymApplicationV2._0.FormsSettings
             var emergencyButton = new JeanModernButton
             {
                 Text = "🚨 Экстренная помощь",
-                Size = new Size(200, 40),
+                Size = new Size(200, 50),
+                Location = new Point(supportCard.Width / 2 - 75, 300),
                 BackColor = Color.FromArgb(220, 53, 69),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12: DataConfig.sizeFontButtons, FontStyle.Bold),
                 BorderRadius = 10
             };
-            emergencyButton.Location = new Point(supportCard.Width / 2 - emergencyButton.Width / 2, 270);
             emergencyButton.Click += (s, e) => MessageBox.Show("Экстренная служба поддержки будет доступна в ближайшее время!");
 
             supportCard.Controls.Add(titleLabel);
@@ -655,7 +634,8 @@ namespace GymApplicationV2._0.FormsSettings
             var titleLabel = new Label
             {
                 Text = title,
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Tag = "Title",
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = Color.FromArgb(255, 140, 0),
                 AutoSize = true,
                 Location = new Point(15, 15),
@@ -665,10 +645,11 @@ namespace GymApplicationV2._0.FormsSettings
             var contentLabel = new Label
             {
                 Text = content,
-                Font = new Font("Segoe UI", 11),
+                Tag = "content",
+                Font = new Font("Segoe UI", DataConfig.sizeFontText > 13 ? 13 : DataConfig.sizeFontText),
                 ForeColor = Color.LightGray,
                 AutoSize = true,
-                Location = new Point(35, 45),
+                Location = new Point(35, 50),
                 MaximumSize = new Size(660, 0)
             };
 
@@ -706,7 +687,7 @@ namespace GymApplicationV2._0.FormsSettings
             var questionLabel = new Label
             {
                 Text = "❓ " + question,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = Color.FromArgb(255, 140, 0),
                 AutoSize = true,
                 Location = new Point(15, 15),
@@ -716,10 +697,11 @@ namespace GymApplicationV2._0.FormsSettings
             var answerLabel = new Label
             {
                 Text = "💡 " + answer,
-                Font = new Font("Segoe UI", 11),
+                Tag = "content",
+                Font = new Font("Segoe UI", DataConfig.sizeFontText > 13 ? 13 : DataConfig.sizeFontText),
                 ForeColor = Color.LightGray,
                 AutoSize = true,
-                Location = new Point(35, 45),
+                Location = new Point(35, 50),
                 MaximumSize = new Size(640, 0)
             };
 
@@ -736,9 +718,6 @@ namespace GymApplicationV2._0.FormsSettings
 
             // Анимация перемещения индикатора
             var targetButton = tabIndex == 0 ? userGuideBtn : tabIndex == 1 ? faqBtn : supportBtn;
-
-            //navigationPanel.Height = 40;
-            //indicatorPanel.Location = new Point(targetButton.Left, indicatorPanel.Top);
 
             // Подсветка активной кнопки
             userGuideBtn.BackColor = tabIndex == 0 ? Color.FromArgb(255, 140, 0) : Color.FromArgb(55, 55, 58);

@@ -164,6 +164,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationTools\BackgroundAnimation.cs" />
+    <Compile Include="AnimationTools\FadeAnimation.cs" />
+    <Compile Include="AnimationTools\ScreenAnimation.cs" />
+    <Compile Include="AppColors\AppColor.cs" />
     <Compile Include="Components\Drawer.cs" />
     <Compile Include="Components\JeanFormStyle.cs">
       <SubType>Component</SubType>
@@ -332,6 +336,7 @@
     <Compile Include="FormsSplashScreens\LoadingScreen.Designer.cs">
       <DependentUpon>LoadingScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FontHelper.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="FormsClients\NewClient.cs">
       <SubType>Form</SubType>
@@ -476,6 +481,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Loading.gif" />
     <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
