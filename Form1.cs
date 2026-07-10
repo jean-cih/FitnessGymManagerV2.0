@@ -121,8 +121,8 @@ namespace GymApplicationV2._0
         {
             this.Hide();
 
-            CheckAndCreateDatabases();
             EnsureRequiredDirectoriesExist();
+            CheckAndCreateDatabases();
             CopyPhotosToOutput();
         }
 
@@ -265,7 +265,7 @@ namespace GymApplicationV2._0
             }
         }
 
-        public static void EnsureRequiredDirectoriesExist()
+        public void EnsureRequiredDirectoriesExist()
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
