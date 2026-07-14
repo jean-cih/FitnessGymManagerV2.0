@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Drawing;
@@ -10,19 +12,29 @@ namespace GymApplicationV2._0
 {
     public partial class ChangeService : ShadowedForm
     {
-        private bool _isMousePressed;
-        private Point _clickPoint;
-        private Point _formStartPoint;
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
+
+        Panel titlePanel;
+
+        string[] notChangeableTexts = new string[]
+            {
+                "РЕДАКТИРОВАНИЕ УСЛУГИ"
+            };
 
         public ChangeService()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+
+            this.EnableDrag(this);
         }
 
         private void InitializeCustomDesign()
@@ -34,88 +46,59 @@ namespace GymApplicationV2._0
             this.Padding = new Padding(1);
             this.DoubleBuffered = true;
 
-            // Градиентный фон
-            this.Paint += (s, e) =>
+            titlePanel = new Panel
             {
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(113, 96, 232),
-                    Color.FromArgb(255, 255, 255),
-                    LinearGradientMode.Vertical))
-                {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
-
-                // Рамка с свечением
-                using (var pen = new Pen(Color.FromArgb(80, 120, 200), 1))
-                {
-                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, Width - 1, Height - 1));
-                }
-
-                // Разделительная линия
-                using (var pen = new Pen(Color.FromArgb(60, 60, 100), 1))
-                {
-                    e.Graphics.DrawLine(pen, 0, 40, Width, 40);
-                }
+                Size = new Size(874, 50),
+                BackColor = Color.MediumSlateBlue,
+                Location = new Point(0, 0),
             };
 
-            // Кастомный заголовок
-            titleLabel.Font = new Font("Montserrat", 12, FontStyle.Bold);
-            titleLabel.ForeColor = Color.FromArgb(220, 220, 255);
-            titleLabel.BackColor = Color.Transparent;
-            titleLabel.AutoSize = true;
+            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
+            titlePanel.Controls.Add(titleLabel);
 
-            // Иконка услуги
-            var iconLabel = new Label
-            {
-                Text = "🎯",
-                Font = new Font("Segoe UI Emoji", 16),
-                AutoSize = true,
-                Location = new Point(10, 10),
-                BackColor = Color.Transparent,
-                ForeColor = Color.FromArgb(100, 180, 255)
-            };
-            this.Controls.Add(iconLabel);
-
-            // Стилизация всех меток
-            foreach (Control control in this.Controls)
-            {
-                if (control is Label label && label != titleLabel && label != iconLabel)
-                {
-                    label.Font = new Font("Montserrat", 9, FontStyle.Regular);
-                    label.ForeColor = Color.FromArgb(180, 180, 220);
-                    label.BackColor = Color.Transparent;
-                }
-            }
+            label1.ForeColor = Color.MediumSlateBlue;
 
             // Стилизация текстовых полей
-            StyleTextBox(jeanSoftTextBoxName, "Название услуги");
-            StyleTextBox(jeanSoftTextBoxPrice, "Цена");
-            StyleTextBox(jeanSoftTextBoxTerm, "Срок действия (мес)");
-            StyleTextBox(jeanSoftTextBoxQuantity, "Количество посещений");
+            StyleTextBox(jeanTextBoxName, "Название услуги");
+            StyleTextBox(jeanTextBoxPrice, "Цена");
+            StyleTextBox(jeanTextBoxTerm, "Срок действия (мес)");
+            StyleTextBox(jeanTextBoxVisited, "Количество посещений");
 
             // Стилизация кнопок
-            StyleButton(jeanModernButtonSave, "Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0));
-            StyleButton(jeanModernButton1, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0));
+            StyleButton(jeanModernButtonSave, "Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonSave.Width) / 2, this.Height - jeanModernButtonSave.Height - 50));
 
-            // Добавление подсказки
-            hintLabel.Font = new Font("Montserrat", 8, FontStyle.Italic);
-            hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
-            hintLabel.BackColor = Color.Transparent;
-            hintLabel.AutoSize = true;
+            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
+
+            var btnClose = new JeanModernButton
+            {
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
+                ForeColor = Color.FromArgb(120, 120, 120),
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(30, 28),
+                Cursor = Cursors.Hand
+            };
+
+            StyleButton(btnClose, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, (titlePanel.Height - btnClose.Height) / 2));
+
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
+
+            titlePanel.Controls.Add(btnClose);
+
+            this.Controls.Add(titlePanel);
         }
 
-        private void StyleTextBox(jeanSoftTextBox textBox, string placeholder)
+        private void StyleTextBox(JeanTextBox textBox, string placeholder)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
+            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
+            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
-        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor)
+        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
         {
             button.Text = text;
             button.Font = new Font("Montserrat", 10, FontStyle.Bold);
@@ -125,6 +108,7 @@ namespace GymApplicationV2._0
             button.TextColor = Color.White;
             button.BorderRadius = radius;
             button.BorderSize = radiusSize;
+            button.Location = location;
 
             // Эффекты при наведении
             button.MouseEnter += (s, e) =>
@@ -158,61 +142,12 @@ namespace GymApplicationV2._0
             };
         }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
-        #region Form Movement Handlers
-        private void ChangeService_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Y < 40) // Перетаскивание только за верхнюю панель
-            {
-                _isMousePressed = true;
-                _clickPoint = Cursor.Position;
-                _formStartPoint = Location;
-            }
-        }
-
-        private void ChangeService_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!_isMousePressed) return;
-
-            var cursorOffset = new Point(
-                Cursor.Position.X - _clickPoint.X,
-                Cursor.Position.Y - _clickPoint.Y);
-
-            Location = new Point(
-                _formStartPoint.X + cursorOffset.X,
-                _formStartPoint.Y + cursorOffset.Y);
-        }
-
-        private void ChangeService_MouseUp(object sender, MouseEventArgs e)
-        {
-            _isMousePressed = false;
-            _clickPoint = Point.Empty;
-        }
-        #endregion
-
         private void jeanModernButtonSave_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(jeanSoftTextBoxName.Texts) ||
-                string.IsNullOrWhiteSpace(jeanSoftTextBoxPrice.Texts) ||
-                string.IsNullOrWhiteSpace(jeanSoftTextBoxTerm.Texts) ||
-                string.IsNullOrWhiteSpace(jeanSoftTextBoxQuantity.Texts))
+            if (string.IsNullOrWhiteSpace(jeanTextBoxName.Text) ||
+                string.IsNullOrWhiteSpace(jeanTextBoxPrice.Text) ||
+                string.IsNullOrWhiteSpace(jeanTextBoxTerm.Text) ||
+                string.IsNullOrWhiteSpace(jeanTextBoxVisited.Text))
             {
                 Message.MessageWindowOk("Заполните все поля");
                 return;
@@ -222,10 +157,10 @@ namespace GymApplicationV2._0
                 return;
 
             var updateQuery = $@"UPDATE Descriptions SET 
-                              Абонемент = '{jeanSoftTextBoxName.Texts.Trim()}',
-                              Цена = '{jeanSoftTextBoxPrice.Texts.Trim()}',
-                              Срок_действия = '{jeanSoftTextBoxTerm.Texts.Trim()}',
-                              Посещений = '{jeanSoftTextBoxQuantity.Texts.Trim()}'
+                              Абонемент = '{jeanTextBoxName.Text.Trim()}',
+                              Цена = '{jeanTextBoxPrice.Text.Trim()}',
+                              Срок_действия = '{jeanTextBoxTerm.Text.Trim()}',
+                              Посещений = '{jeanTextBoxVisited.Text.Trim()}'
                               WHERE Id = '{DataConfig.membershipId}'";
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
@@ -241,48 +176,16 @@ namespace GymApplicationV2._0
             {
                 timer.Stop();
                 Message.MessageWindowOk("Услуга изменена");
-                CloseWithAnimation();
+                _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();
         }
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            CloseWithAnimation();
+            _fadeAnimation.CloseWithAnimation();
         }
 
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        // Закрытие по ESC
-        /*
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-        {
-            if (keyData == Keys.Escape)
-            {
-                CloseWithAnimation();
-                return true;
-            }
-            return base.ProcessCmdKey(ref msg, keyData);
-        }
-        */
-        // Подсветка активного поля
         private void JeanSoftTextBox_Enter(object sender, EventArgs e)
         {
             if (sender is jeanSoftTextBox textBox)

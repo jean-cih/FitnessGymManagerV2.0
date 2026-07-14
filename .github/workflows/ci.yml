@@ -41,25 +41,43 @@ jobs:
     - name: Build the solution
       run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }} /p:RestorePackages=false
 
+    - name: Copy Photos folder
+      run: |
+        if (Test-Path "Photos") {
+          Copy-Item -Path "Photos" -Destination "bin\${{ matrix.configuration }}\" -Recurse -Force
+        }
+
+    - name: Copy Assets folder
+      run: |
+        if (Test-Path "Assets") {
+          Copy-Item -Path "Assets" -Destination "bin\${{ matrix.configuration }}\" -Recurse -Force
+        }
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.configuration }}
         path: bin/${{ matrix.configuration }}
 
-    - name: Copy Photos folder
-      run: |
-        if (Test-Path "Photos") {
-          Copy-Item -Path "Photos" -Destination "bin\Debug\" -Recurse -Force
-          Copy-Item -Path "Photos" -Destination "bin\Release\" -Recurse -Force
-        }
+  upload-release:
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download Release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: Release
+        path: bin/Release
+        
     - name: Archive Release Build
-      if: startsWith(github.ref, 'refs/tags/v') && matrix.configuration == 'Release'
       run: Compress-Archive -Path bin/Release/* -DestinationPath GymApplication-${{ github.ref_name }}.zip
 
     - name: Create GitHub Release
-      if: startsWith(github.ref, 'refs/tags/v') && matrix.configuration == 'Release'
       uses: softprops/action-gh-release@v2
       with:
         files: GymApplication-${{ github.ref_name }}.zip

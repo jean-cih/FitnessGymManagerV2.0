@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using System.IO;
+using NAudio.Wave;
 
 public static class ConfigManager
 {
@@ -76,6 +77,7 @@ public static class ConfigManager
             ["headlineSize"] = 10,
             ["sizeKeyName"] = 10,
             ["sizeTableTitle"] = 10,
+            ["textSize"] = 10,
             ["designForm"] = "None",
             ["designBackground"] = "Casual"
         };

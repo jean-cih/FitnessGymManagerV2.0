@@ -1,10 +1,11 @@
-﻿using GymApplicationV2._0.Controls;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static GymApplicationV2._0.Products;
 
 namespace GymApplicationV2._0
 {
@@ -21,12 +22,11 @@ namespace GymApplicationV2._0
         private JeanModernButton _cancelButton;
         private JeanModernButton _addProductButton;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-        private bool _isDragging = false;
-        private Point _lastCursor;
-        private Point _lastForm;
         int count;
+
+        private FadeAnimation _fadeAnimation;
+
+        Panel titlePanel;
 
         public EditProductsForm(Dictionary<string, Products.Product> products)
         {
@@ -41,7 +41,10 @@ namespace GymApplicationV2._0
 
             count = _originalProducts.Count + 1;
 
-            SetupAnimation();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            titlePanel.EnableDrag(this);
         }
 
         private void InitializeDesign()
@@ -69,16 +72,12 @@ namespace GymApplicationV2._0
             };
 
             // Заголовок с панелью перетаскивания
-            var titlePanel = new Panel
+            titlePanel = new Panel
             {
                 Size = new Size(900, 50),
                 BackColor = Color.MediumSlateBlue,
                 Location = new Point(0, 0)
             };
-
-            titlePanel.MouseDown += (s, e) => { _isDragging = true; _lastCursor = Cursor.Position; _lastForm = this.Location; };
-            titlePanel.MouseMove += (s, e) => { if (_isDragging) { var diff = Point.Subtract(Cursor.Position, new Size(_lastCursor)); this.Location = Point.Add(_lastForm, new Size(diff)); } };
-            titlePanel.MouseUp += (s, e) => { if (e.Button == MouseButtons.Left) _isDragging = false; };
 
             _titleLabel = new Label
             {
@@ -103,7 +102,7 @@ namespace GymApplicationV2._0
                 BorderSize = 0,
                 Location = new Point(860, 10)
             };
-            closeButton.Click += (s, e) => CloseWithAnimation();
+            closeButton.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             // Панель продуктов
             _productsPanel = new FlowLayoutPanel
@@ -357,7 +356,7 @@ namespace GymApplicationV2._0
             }
 
             this.DialogResult = DialogResult.OK;
-            CloseWithAnimation();
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private void CancelButton_Click(object sender, EventArgs e)
@@ -368,7 +367,7 @@ namespace GymApplicationV2._0
             }
 
             this.DialogResult = DialogResult.Cancel;
-            CloseWithAnimation();
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private bool HasChanges()
@@ -413,42 +412,6 @@ namespace GymApplicationV2._0
             };
             timer.Start();
         }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer { Interval = 10 };
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer { Interval = 10 };
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, e) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
         public Dictionary<string, Products.Product> GetUpdatedProducts()
         {
             return _editedProducts;

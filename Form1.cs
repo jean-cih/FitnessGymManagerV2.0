@@ -1,32 +1,24 @@
-﻿using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Components;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsSettings;
-using Microsoft.Office.Interop.Excel;
+using GymApplicationV2._0.Helpers;
+using NAudio.MediaFoundation;
+using NAudio.Wave;
 using Shadow;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Media;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using System.Configuration;
+using static GymApplicationV2._0.AppColors.AppColors;
 
 
 namespace GymApplicationV2._0
@@ -35,78 +27,67 @@ namespace GymApplicationV2._0
     {
         private string nameClient = "";
         private string numberCard;
-        private string FontFilePath = Path.Combine("AppFiles", "Font.json");
         private int numberLeft;
 
         private ToolStripDropDownMenu _menu_service;
         private ToolStripDropDownMenu _menu_settings;
 
-        private System.Windows.Forms.Timer _fadeTimer;
-        private float _opacity = 0;
+        private BackgroundAnimation _animBackground;
 
-        private readonly Color PrimaryOrange = Color.FromArgb(255, 140, 0);  
-        private readonly Color PrimaryBlue = Color.MediumSlateBlue;          
-
-        private readonly Color SoftOrange = Color.FromArgb(255, 200, 150);  
-
-        private readonly Color SoftSlateBlue = Color.FromArgb(200, 190, 255); 
-
-        private readonly Color DarkGray = Color.FromArgb(50, 50, 60);        
-        private readonly Color MediumGray = Color.FromArgb(120, 120, 130);   
-        private readonly Color LightGray = Color.FromArgb(240, 240, 245);     
-        private readonly Color White = Color.White;
-
-        private readonly Color BackgroundLight = Color.FromArgb(250, 248, 252); 
-        private readonly Color BackgroundDark = Color.FromArgb(245, 242, 248); 
-
-        private readonly Color CardBackground = Color.White;
-
-        private readonly Color HoverBlue = Color.FromArgb(130, 110, 255);    
-        private readonly Color PressedBlue = Color.FromArgb(110, 90, 230);    
-
-        private readonly Color DarkBlue = Color.FromArgb(83, 69, 190);     
-        private readonly Color LightBlue = Color.FromArgb(147, 132, 255);
-
-        private readonly Color TextColor = Color.FromArgb(33, 33, 33);
-        private readonly Color PrimaryColor = Color.FromArgb(63, 81, 181);
-
-        private System.Windows.Forms.PictureBox backgroundPicture;
-        private System.Windows.Forms.Timer _backgroundAnimationTimer;
-        private List<FloatingElement> _floatingElements = new List<FloatingElement>();
-        private List<System.Drawing.Point> _animatedPoints = new List<System.Drawing.Point>();
-        private Random _random = new Random();
+        private FadeAnimation _fadeAnimation;
 
         private int baseButtonWidth = 150;
         private int baseSpacing = 10;
         private int baseStartX;
         private int baseButtonHeight = 40;
 
-        JeanModernButton btnClose;
-        JeanModernButton btnCollapse;
+        string[] notChangeableTexts = new string[]
+            {
+                "🏋️ СИБИРЯК"
+            };
 
-        private bool isMinimized = false;
-        private int originalHeight;
-        private int originalWidth;
-        private System.Drawing.Point originalLocation;
+        Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public Form1()
         {
             InitializeComponent();
 
-            ConfigManager.Initialize(FontFilePath);
-
             LoadSettings();
-
-            EnsureRequiredDirectoriesExist();
-            CopyPhotosToOutput();
 
             InitializeCustomDesign();
             UpdateButtonLayout();
 
-            jeanModernButtonServices.Click += Button_Click_Services;
+            SubscribeEvents();
 
+            InitializeMenus();
+
+            this.StartPosition = FormStartPosition.CenterScreen;
+            this.Opacity = 0;
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            _animBackground = new BackgroundAnimation(this);
+
+            ApplySettingsToAllControls();
+
+            this.Load += Main_Form_Load;
+            SetBackgroundColor();
+
+            this.EnableDrag(this);
+        }
+
+        private void SubscribeEvents()
+        {
+            jeanModernButtonServices.Click += Button_Click_Services;
+            jeanModernButtonSettings.Click += Button_Click_Settings;
+        }
+
+        private void InitializeMenus()
+        {
+            // Меню "Услуги"
             _menu_service = new ToolStripDropDownMenu();
-            _menu_service.Font = new System.Drawing.Font("Segoe UI", 11, FontStyle.Regular);
+            _menu_service.Font = new Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Regular);
 
             ToolStripMenuItem item1 = new ToolStripMenuItem("Абонементы", Properties.Resources.membership);
             ToolStripMenuItem item2 = new ToolStripMenuItem("Выданные абонементы", Properties.Resources.issuedMembership);
@@ -123,10 +104,9 @@ namespace GymApplicationV2._0
             _menu_service.Items[2].Click += jeanModernButtonArchive_Click;
             _menu_service.Items[3].Click += jeanModernButtonHistoryPayment_Click;
 
-            jeanModernButtonSettings.Click += Button_Click_Settings;
-
+            // Меню "Настройки"
             _menu_settings = new ToolStripDropDownMenu();
-            _menu_settings.Font = new System.Drawing.Font("Segoe UI", 11, FontStyle.Regular);
+            _menu_settings.Font = new Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Regular);
 
             ToolStripMenuItem item5 = new ToolStripMenuItem("Дизайн", Properties.Resources.membership);
             ToolStripMenuItem item6 = new ToolStripMenuItem("Загрузка данных", Properties.Resources.issuedMembership);
@@ -139,14 +119,14 @@ namespace GymApplicationV2._0
             _menu_settings.Items[0].Click += jeanModernButtonDesign_Click;
             _menu_settings.Items[1].Click += jeanModernButtonImport_Click;
             _menu_settings.Items[2].Click += jeanModernButtonDocumentation_Click;
+        }
 
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
+        private void Main_Form_Load(object sender, EventArgs e)
+        {
+            this.Hide();
 
-            
-            SetupAnimation();
-
-            this.Resize += Form_Resize;
+            EnsureRequiredDirectoriesExist();
+            CopyPhotosToOutput();
         }
 
         public static void CopyPhotosToOutput()
@@ -182,7 +162,7 @@ namespace GymApplicationV2._0
             this.Width = Convert.ToInt32(Screen.PrimaryScreen.Bounds.Width * 0.70);
             this.Height = Convert.ToInt32(Screen.PrimaryScreen.Bounds.Height * 0.70);
 
-            System.Drawing.Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             int screenWidth = screenBounds.Width;
 
             baseStartX = this.Width;
@@ -195,12 +175,12 @@ namespace GymApplicationV2._0
             int spacing = (int)(baseSpacing * scaleX);
 
             int startX = this.Width - (buttonWidth * 6) - 40;
-            if ( screenWidth <= 1400)
+            if (screenWidth <= 1400)
             {
                 startX += (int)(1.5 * buttonWidth) - 20;
                 buttonWidth -= 40;
             }
-            else if ( screenWidth <= 1600)
+            else if (screenWidth <= 1600)
             {
                 startX += buttonWidth;
                 buttonWidth -= 30;
@@ -210,70 +190,32 @@ namespace GymApplicationV2._0
 
             jeanModernButtonSettings.Width = buttonWidth;
             jeanModernButtonSettings.Height = buttonHeight;
-            jeanModernButtonSettings.Location = new System.Drawing.Point(startX, 15);
+            jeanModernButtonSettings.Location = new Point(startX, 15);
 
             jeanModernButtonServices.Width = buttonWidth;
             jeanModernButtonServices.Height = buttonHeight;
-            jeanModernButtonServices.Location = new System.Drawing.Point(startX + buttonWidth + spacing, 15);
+            jeanModernButtonServices.Location = new Point(startX + buttonWidth + spacing, 15);
 
             jeanModernButtonPurchase.Width = buttonWidth;
             jeanModernButtonPurchase.Height = buttonHeight;
-            jeanModernButtonPurchase.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 2, 15);
+            jeanModernButtonPurchase.Location = new Point(startX + (buttonWidth + spacing) * 2, 15);
 
             jeanModernButtonClients.Width = buttonWidth;
             jeanModernButtonClients.Height = buttonHeight;
-            jeanModernButtonClients.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 3, 15);
+            jeanModernButtonClients.Location = new Point(startX + (buttonWidth + spacing) * 3, 15);
 
             jeanModernButtonReport.Width = buttonWidth;
             jeanModernButtonReport.Height = buttonHeight;
-
-            jeanModernButtonReport.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 4, 15);
-
-            btnCollapse.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 5 + 10, 20);
-
-            btnClose.Location = new System.Drawing.Point(startX + (buttonWidth + spacing) * 5 + 50, 20);
-
+            jeanModernButtonReport.Location = new Point(startX + (buttonWidth + spacing) * 4, 15);
         }
 
         private void InitializeCustomDesign()
         {
-            btnClose = new JeanModernButton
-            {
-                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand,
-            };
-
-            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, PrimaryOrange, new System.Drawing.Point(jeanModernButtonReport.Location.X + jeanModernButtonReport.Width + 20, 20), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
-            this.Controls.Add(btnClose);
-            btnClose.Visible = false;
-
-            btnCollapse = new JeanModernButton
-            {
-                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand,
-            };
-
-            btnCollapse = CreateStyledButton("—", Color.FromArgb(180, 70, 70), 0, 0, PrimaryOrange, new System.Drawing.Point(jeanModernButtonReport.Location.X + jeanModernButtonReport.Width + 20, 20), new Size(30, 28));
-            btnCollapse.Click += (s, e) => CollapseWithAnimation();
-            this.Controls.Add(btnCollapse);
-            btnCollapse.Visible = false;
-
-            // Основные настройки формы
             this.Text = "GYM MASTER";
             this.ForeColor = Color.Black;
-            this.FormBorderStyle = FormBorderStyle.None;
+            this.FormBorderStyle = FormBorderStyle.Sizable;
             this.Padding = new Padding(20);
 
-            // Градиентный фон с новой цветовой схемой
             this.Paint += (s, e) =>
             {
                 using (var brush = new LinearGradientBrush(
@@ -292,35 +234,31 @@ namespace GymApplicationV2._0
             CreateVisitedCard();
 
             CreateClientPanel();
-
-            SetBackgroundColor();
         }
 
         public void SetBackgroundColor()
         {
+            _animBackground?.RemoveBackground();
+
             if (DataConfig.styleBackground == "Dynamic")
             {
-                CreateDynamicBackground();
+                _animBackground?.CreateDynamicBackground();
             }
             else if (DataConfig.styleBackground == "Casual")
             {
-                CreateBackground();
+                _animBackground?.CreateBackground();
             }
             else if (DataConfig.styleBackground == "Minimal")
             {
-                CreateMinimalBackground();
+                _animBackground?.CreateMinimalBackground();
             }
             else if (DataConfig.styleBackground == "Static")
             {
-                CreateStaticBackground();
-            }
-            else if (DataConfig.styleBackground == "None")
-            {
-                this.BackColor = Color.FromArgb(243, 243, 243);
+                _animBackground?.CreateStaticBackground();
             }
         }
 
-        public static void EnsureRequiredDirectoriesExist()
+        public void EnsureRequiredDirectoriesExist()
         {
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
@@ -348,10 +286,10 @@ namespace GymApplicationV2._0
                 BackColor = PrimaryBlue
             };
 
-            var titleLabel = new System.Windows.Forms.Label
+            var titleLabel = new Label
             {
                 Text = "🏋️ СИБИРЯК",
-                Font = new System.Drawing.Font("Segoe UI", 18, FontStyle.Bold),
+                Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 ForeColor = Color.White,
                 Dock = DockStyle.Left,
                 TextAlign = ContentAlignment.MiddleLeft,
@@ -360,15 +298,16 @@ namespace GymApplicationV2._0
             };
 
             // Стилизуем кнопки навигации в синей гамме
-            StyleButton(jeanModernButtonSettings, "⚙️ Настройки", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 2);
-            StyleButton(jeanModernButtonServices, "🎫 Услуги", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 2);
-            StyleButton(jeanModernButtonPurchase, "🛒 Товары", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 2);
-            StyleButton(jeanModernButtonClients, "👥 Клиенты", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 2);
-            StyleButton(jeanModernButtonReport, "📊 Отчет", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 2);
+            StyleButton(jeanModernButtonSettings, "⚙️ Настройки", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), 2, jeanModernButtonSettings.Location);
+            StyleButton(jeanModernButtonServices, "🎫 Услуги", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), 2, jeanModernButtonServices.Location);
+            StyleButton(jeanModernButtonPurchase, "🛒 Товары", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), 2, jeanModernButtonPurchase.Location);
+            StyleButton(jeanModernButtonClients, "👥 Клиенты", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), 2, jeanModernButtonClients.Location);
+            StyleButton(jeanModernButtonReport, "📊 Отчет", PrimaryBlue, White, HoverBlue, PressedBlue, new Size(120, 40), 2, jeanModernButtonReport.Location);
 
             navPanel.Controls.Add(titleLabel);
             navPanel.Controls.AddRange(new Control[] { jeanModernButtonSettings, jeanModernButtonServices, jeanModernButtonPurchase, jeanModernButtonClients, jeanModernButtonReport });
 
+            navPanel.EnableDrag(this);
             this.Controls.Add(navPanel);
         }
 
@@ -379,20 +318,20 @@ namespace GymApplicationV2._0
                          Color mouseOverBackColor,
                          Color mouseDownBackColor,
                          Size size,
-                         System.Drawing.Font font,
-                         FlatStyle flatStyle,
-                         int borderSize)
+                         int borderSize,
+                         Point point)
         {
             button.Text = text;
             button.BackColor = backColor;
             button.ForeColor = foreColor;
             button.Size = size;
-            button.Font = font;
-            button.FlatStyle = flatStyle;
+            button.Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold);
+            button.FlatStyle = FlatStyle.Flat;
             button.FlatAppearance.BorderSize = borderSize;
             button.FlatAppearance.MouseOverBackColor = mouseOverBackColor;
             button.FlatAppearance.MouseDownBackColor = mouseDownBackColor;
             button.BorderSize = borderSize;
+            button.Location = point;
         }
 
         private void CreateMainCard()
@@ -400,7 +339,7 @@ namespace GymApplicationV2._0
             var mainCard = new JeanPanel
             {
                 Size = new Size(320, 300),
-                Location = new System.Drawing.Point(80, 100),
+                Location = new Point(80, 100),
                 BackColor = White,
                 GradientBottomColor = White,
                 GradientTapColor = White,
@@ -409,31 +348,26 @@ namespace GymApplicationV2._0
                 BorderRadius = 20,
             };
 
-            var titleLabel = new System.Windows.Forms.Label
+            var titleLabel = new Label
             {
                 Text = "🎯 Продажи",
-                Font = new System.Drawing.Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = Color.Black,
-                Location = new System.Drawing.Point(20, 20),
+                Location = new Point(20, 20),
                 AutoSize = true,
                 BackColor = White,
             };
 
             // Стилизуем кнопки продаж в оранжевой гамме
-            StyleButton(jeanModernButtonNewMember, "🆕 Новый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonNewMember.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonNewMember.Size.Width - 10, 75);
+            StyleButton(jeanModernButtonNewMember, "🆕 Новый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), 0, new Point(20, 75));
 
-            StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonSingleTicket.Location = new System.Drawing.Point(mainCard.Size.Width / 2 + 10, 75);
+            StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), 0, new Point(mainCard.Width - 130 - 20, 75));
 
-            StyleButton(jeanModernButtonSell, "💰 Продать", Color.FromArgb(220, 80, 60), White, Color.FromArgb(240, 100, 80), Color.FromArgb(200, 60, 40), new Size(160, 45), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonSell.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonSell.Size.Width / 2, 140);
+            StyleButton(jeanModernButtonSell, "💰 Продать", Color.FromArgb(220, 80, 60), White, Color.FromArgb(240, 100, 80), Color.FromArgb(200, 60, 40), new Size(160, 45), 0, new Point(mainCard.Width / 2 - 160 / 2, 140));
 
-            StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(140, 50), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonChooseClient.Location = new System.Drawing.Point(mainCard.Size.Width / 2 - jeanModernButtonChooseClient.Size.Width / 2, mainCard.Size.Height - jeanModernButtonChooseClient.Height - 40);
+            StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(140, 50), 0, new Point(mainCard.Width / 2 - 140 / 2, mainCard.Height - 50 - 40));
 
-            mainCard.Controls.AddRange(new Control[] { titleLabel, jeanModernButtonNewMember, jeanModernButtonSingleTicket,
-            jeanModernButtonChooseClient, jeanModernButtonSell });
+            mainCard.Controls.AddRange(new Control[] { titleLabel, jeanModernButtonNewMember, jeanModernButtonSingleTicket, jeanModernButtonChooseClient, jeanModernButtonSell });
 
             this.Controls.Add(mainCard);
         }
@@ -443,7 +377,7 @@ namespace GymApplicationV2._0
             var visitedCard = new JeanPanel
             {
                 Size = new Size(420, 150),
-                Location = new System.Drawing.Point(450, 100),
+                Location = new Point(450, 100),
                 BackColor = CardBackground,
                 GradientBottomColor = CardBackground,
                 GradientTapColor = CardBackground,
@@ -452,34 +386,30 @@ namespace GymApplicationV2._0
                 BorderRadius = 20,
             };
 
-            var titleLabel = new System.Windows.Forms.Label
+            var titleLabel = new Label
             {
                 Text = "👣 Посещение",
-                Font = new System.Drawing.Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = DarkGray,
-                Location = new System.Drawing.Point(20, 20),
+                Location = new Point(20, 20),
                 AutoSize = true
             };
 
-            //var tooltip = new System.Windows.Forms.ToolTip();
-            //tooltip.SetToolTip(handleMode, "Кликните 'Ручной режим' и введите нужные данные,\nпосле нажмите Enter");
-
-            jeanTextBoxNumberCard.Location = new System.Drawing.Point(40, 60);
+            jeanTextBoxNumberCard.Location = new Point(40, 60);
             jeanTextBoxNumberCard.Size = new Size(300, 40);
-            jeanTextBoxNumberCard.Font = new System.Drawing.Font("Segoe UI", 11, FontStyle.Bold);
+            jeanTextBoxNumberCard.Font = new Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Bold); 
             jeanTextBoxNumberCard.BackColor = White;
             jeanTextBoxNumberCard.BorderColor = MediumGray;
 
-            StyleButton(jeanModernButtonReturn, "↩️ Возврат", Color.FromArgb(220, 53, 69), White, Color.FromArgb(220, 220, 225), MediumGray, new Size(150, 35), new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold), FlatStyle.Flat, 0);
-            jeanModernButtonReturn.Location = new System.Drawing.Point(45, 105);
+            StyleButton(jeanModernButtonReturn, "↩️ Возврат", Color.FromArgb(220, 53, 69), White, Color.FromArgb(220, 220, 225), MediumGray, new Size(150, 35), 0, new Point(45, 105));
 
             // Стилизуем кнопку очистки
             var eraseButton = new JeanModernButton
             {
-                Location = new System.Drawing.Point(345, 65),
+                Location = new Point(345, 65),
                 Size = new Size(35, 35),
                 Text = "✕",
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Bold),
                 FlatStyle = FlatStyle.Flat,
                 BorderRadius = 0,
                 BorderColor = White,
@@ -506,7 +436,7 @@ namespace GymApplicationV2._0
             var clientPanel = new JeanPanel
             {
                 Size = new Size(790, 2 * jeanModernButtonSettings.Width),
-                Location = new System.Drawing.Point(450, 270),
+                Location = new Point(450, 270),
                 BackColor = CardBackground,
                 GradientBottomColor = CardBackground,
                 GradientTapColor = CardBackground,
@@ -515,25 +445,25 @@ namespace GymApplicationV2._0
                 BorderRadius = 20,
             };
 
-            System.Drawing.Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+            Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
             int screenWidth = screenBounds.Width;
 
             if (screenWidth <= 1600)
             {
-                clientPanel.Location = new System.Drawing.Point(80, 420);
+                clientPanel.Location = new Point(80, 420);
             }
 
-            var titleLabel = new System.Windows.Forms.Label
+            var titleLabel = new Label
             {
                 Text = "👥 Информация о клиенте",
-                Font = new System.Drawing.Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
                 ForeColor = DarkGray,
-                Location = new System.Drawing.Point(20, 20),
+                Location = new Point(20, 20),
                 AutoSize = true
             };
 
             // Стилизуем DataGridView с новой цветовой схемой
-            dataGridViewClient.Location = new System.Drawing.Point(20, 60);
+            dataGridViewClient.Location = new Point(20, 60);
             dataGridViewClient.Size = new Size(750, 2 * jeanModernButtonSettings.Width);
             dataGridViewClient.BackgroundColor = White;
             dataGridViewClient.BorderStyle = BorderStyle.None;
@@ -542,11 +472,11 @@ namespace GymApplicationV2._0
             // Заголовки столбцов - MediumSlateBlue
             dataGridViewClient.ColumnHeadersDefaultCellStyle.BackColor = PrimaryBlue;
             dataGridViewClient.ColumnHeadersDefaultCellStyle.ForeColor = White;
-            dataGridViewClient.ColumnHeadersDefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold);
+            dataGridViewClient.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", DataConfig.sizeFontTables, FontStyle.Bold);
             dataGridViewClient.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
             // Основные ячейки
-            dataGridViewClient.DefaultCellStyle.Font = new System.Drawing.Font("Segoe UI", 9);
+            dataGridViewClient.DefaultCellStyle.Font = new Font("Segoe UI", DataConfig.sizeFontTables - 2);
             dataGridViewClient.DefaultCellStyle.BackColor = White;
             dataGridViewClient.DefaultCellStyle.ForeColor = DarkGray;
             dataGridViewClient.DefaultCellStyle.SelectionBackColor = SoftSlateBlue;
@@ -563,20 +493,17 @@ namespace GymApplicationV2._0
 
         private void Button_Click_Services(object sender, EventArgs e)
         {
-            _menu_service.Show(jeanModernButtonServices, new System.Drawing.Point(0, jeanModernButtonServices.Height));
+            _menu_service.Show(jeanModernButtonServices, new Point(0, jeanModernButtonServices.Height));
         }
 
         private void Button_Click_Settings(object sender, EventArgs e)
         {
-            _menu_settings.Show(jeanModernButtonSettings, new System.Drawing.Point(0, jeanModernButtonSettings.Height));
+            _menu_settings.Show(jeanModernButtonSettings, new Point(0, jeanModernButtonSettings.Height));
         }
 
 
         private void ApplyFormStyle()
         {
-            btnClose.Visible = false;
-            btnCollapse.Visible = false;
-
             JeanFormStyle.fStyle style;
             if (DataConfig.styleForm == "UserStyle")
             {
@@ -593,252 +520,9 @@ namespace GymApplicationV2._0
             else
             {
                 style = JeanFormStyle.fStyle.None;
-                btnClose.Visible = true;
-                btnCollapse.Visible = true;
             }
 
             jeanFormStyle.FormStyle = style;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            this.Hide();
-
-            ApplySettingsToAllControls();
-
-            CheckIfDataExistsClients();
-            CheckIfDataExistsServices();
-            CheckIfDataExistsPayment();
-            CheckIfDataExistsArchive();
-            CheckIfDataExistsIssued();
-            CheckIfDataExistsProducts();
-        }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new System.Windows.Forms.Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        private void Form_Resize(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Minimized)
-            {
-                isMinimized = true;
-            }
-            else if (this.WindowState == FormWindowState.Normal && isMinimized)
-            {
-                ExpandWithAnimation();
-                isMinimized = false;
-            }
-        }
-
-        private void CollapseWithAnimation()
-        {
-            originalWidth = this.Width;
-            originalHeight = this.Height;
-
-            var collapseTimer = new System.Windows.Forms.Timer();
-            collapseTimer.Interval = 10;
-
-            float opacity = 1.0f;
-            int currentHeight = originalHeight;
-            int step = Math.Max(2, originalHeight / 10);
-
-            collapseTimer.Tick += (s, args) =>
-            {
-                // Эффект затухания
-                opacity -= 0.07f;
-                if (opacity < 0) opacity = 0;
-                this.Opacity = opacity;
-
-                // Эффект сжатия
-                currentHeight -= step;
-                if (currentHeight <= 0)
-                {
-                    currentHeight = 0;
-                    collapseTimer.Stop();
-                    this.Opacity = 1;
-                    this.WindowState = FormWindowState.Minimized;
-                }
-                this.Height = Math.Max(1, currentHeight);
-            };
-            collapseTimer.Start();
-        }
-
-        private void ExpandWithAnimation()
-        {
-            var expandTimer = new System.Windows.Forms.Timer();
-            expandTimer.Interval = 10;
-
-            float opacity = 0f;
-            int currentHeight = 1;
-            int targetHeight = originalHeight;
-            int step = Math.Max(2, targetHeight / 10);
-
-            // Восстанавливаем размеры
-            this.Height = 1;
-            this.Width = originalWidth;
-            this.Location = originalLocation;
-            this.Opacity = 0;
-
-            expandTimer.Tick += (s, args) =>
-            {
-                opacity += 0.07f;
-                if (opacity > 1) opacity = 1;
-                this.Opacity = opacity;
-
-                currentHeight += step;
-                if (currentHeight >= targetHeight)
-                {
-                    currentHeight = targetHeight;
-                    expandTimer.Stop();
-                    this.Opacity = 1;
-                }
-                this.Height = currentHeight;
-            };
-            expandTimer.Start();
-        }
-
-        private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, System.Drawing.Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = baseColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.Text = text;
-            button.Font = new System.Drawing.Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            return button;
-        }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new System.Windows.Forms.Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
-        private void CheckIfDataExistsClients()
-        {
-            if (!File.Exists("Databases\\Clients.db"))
-            {
-                ClientsContext.CreatingDatabase();
-            }
-        }
-
-
-        private void CheckIfDataExistsServices()
-        {
-            if (!File.Exists("Databases\\Services.db"))
-            {
-                ServicesContext.CreatingDatabase();
-            }
-        }
-
-        private void CheckIfDataExistsPayment()
-        {
-            if (!File.Exists("Databases\\Payments.db"))
-            {
-                HistoryPaymentContext.CreatingDatabase();
-            }
-        }
-
-        private void CheckIfDataExistsArchive()
-        {
-            if (!File.Exists("Databases\\Archive.db"))
-            {
-                ArchiveServicesContext.CreatingDatabase();
-            }
-        }
-
-        private void CheckIfDataExistsIssued()
-        {
-            if (!File.Exists("Databases\\IssuedMembership.db"))
-            {
-                IssuedMembershipContext.CreatingDatabase();
-            }
-        }
-
-        private void CheckIfDataExistsProducts()
-        {
-            if (!File.Exists("Databases\\Products.db"))
-            {
-                ProductsContext.CreatingDatabase();
-            }
         }
 
         private bool isProgrammaticChange = false;
@@ -896,7 +580,7 @@ namespace GymApplicationV2._0
                     if (!ValidateMembershipStatus(numberCard))
                         return;
 
-                    
+
                     ProcessClientVisit(numberCard);
                 }
             }
@@ -925,13 +609,47 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        // Вспомогательные методы
+        private WaveOutEvent outputDevice;
+        private MediaFoundationReader audioFile;
         private void PlayErrorSound()
         {
-            using (SoundPlayer soundPlayerError = new SoundPlayer(Properties.Resources.error))
+            string soundPath = Properties.Settings.Default.ErrorSoundPath;
+
+            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
             {
-                soundPlayerError.Play();
+                try
+                {
+                    MediaFoundationApi.Startup();
+
+                    StopErrorSound();
+
+                    outputDevice = new WaveOutEvent();
+
+                    audioFile = new MediaFoundationReader(soundPath);
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                }
+                catch (Exception ex)
+                {
+                    SystemSounds.Beep.Play();
+                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    StopErrorSound();
+                }
             }
+            else
+            {
+                SystemSounds.Beep.Play();
+            }
+        }
+
+        private void StopErrorSound()
+        {
+            outputDevice?.Stop();
+            outputDevice?.Dispose();
+            outputDevice = null;
+            audioFile?.Dispose();
+            audioFile = null;
         }
 
         private void ShowMessage(string message)
@@ -999,6 +717,7 @@ namespace GymApplicationV2._0
             {
                 PlayErrorSound();
                 ShowMessage("Этот номер не существует");
+                userStatus.Add(cardNumber, "Абонемент закончился ");
                 ClearCardNumber();
                 return false;
             }
@@ -1025,8 +744,10 @@ namespace GymApplicationV2._0
             if (DateTime.Compare(Convert.ToDateTime(endDate), DateTime.Now) < 0)
             {
                 ShowMessage("Заморозка закончилась");
+                userStatus.Add(cardNumber, "Заморозка закончилась");
                 ClearCardNumber();
                 return true;
+                //return false;
             }
 
             string visitsQuery = "SELECT Посещений_осталось FROM Issued WHERE №Карты = @cardNumber";
@@ -1036,8 +757,10 @@ namespace GymApplicationV2._0
 
             UnfreezeMembership(cardNumber, endDate, visitsLeft);
             ShowMessage("Заморозка снята");
+            userStatus.Add(cardNumber, "Заморозка снята");
 
             return true;
+            //return false;
         }
 
         // Разморозка абонемента
@@ -1054,7 +777,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateIssuedQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@status", "активирован"),
-                new SQLiteParameter("@visitDate", DateTime.Now.ToShortDateString()),
+                new SQLiteParameter("@visitDate", DateTime.Now),
                 new SQLiteParameter("@endDate", endDate),
                 new SQLiteParameter("@visitsLeft", visitsLeft),
                 new SQLiteParameter("@cardNumber", cardNumber));
@@ -1090,6 +813,7 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился по времени");
+            userStatus.Add(cardNumber, "Абонемент закончился по времени");
 
             ResetClientMembership(cardNumber);
         }
@@ -1163,12 +887,12 @@ namespace GymApplicationV2._0
         private void ProcessUnlimitedVisit(string cardNumber)
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
-                "Посетил = '" + DateTime.Now.ToShortDateString() + "' " +
+                "Посетил = '" + DateTime.Now + "' " +
                 "WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@cardNumber", cardNumber));
 
-            ShowMessage("Клиент отмечен");
+            userStatus.Add(cardNumber, "Активен");
             DisplayClientData(cardNumber);
             ClearCardNumber();
         }
@@ -1184,6 +908,7 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился. Посещений осталось 0");
+            userStatus.Add(cardNumber, "Абонемент закончился. Посещений осталось 0");
             ClearCardNumber();
         }
 
@@ -1192,14 +917,13 @@ namespace GymApplicationV2._0
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посещений_осталось = '" + (remainingVisits - 1).ToString() + "', " +
-                "Посетил = '" + DateTime.Now.ToShortDateString() + "' " +
+                "Посетил = '" + DateTime.Now + "' " +
                 "WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            ShowMessage("Клиент отмечен");
             DisplayClientData(cardNumber);
-
+            userStatus.Add(cardNumber, "Активен");
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
             ClearCardNumber();
@@ -1249,38 +973,9 @@ namespace GymApplicationV2._0
         private void jeanModernButtonPurchase_Click(object sender, EventArgs e)
         {
             Products products = new Products();
-            products.Show();
+            products.ShowDialog();
         }
 
-        private void jeanModernButtonClients_Click(object sender, EventArgs e)
-        {
-            Clients clients = new Clients();
-            clients.Show();
-        }
-
-        private void jeanModernButtonReport_Click(object sender, EventArgs e)
-        {
-            Report report = new Report();
-            report.Show();
-        }
-
-        private void jeanModernButtonNewMember_Click(object sender, EventArgs e)
-        {
-            NewClient newClient = new NewClient();
-            newClient.Show();
-        }
-
-        private void jeanModernButtonSingleTicket_Click(object sender, EventArgs e)
-        {
-            SingleTicket singleTicket = new SingleTicket();
-            singleTicket.Show();
-        }
-
-        private void jeanModernButtonChooseClient_Click(object sender, EventArgs e)
-        {
-            ChooseClient chooseClient = new ChooseClient();
-            chooseClient.Show();
-        }
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
@@ -1312,6 +1007,7 @@ namespace GymApplicationV2._0
                 DataConfig.sizeFontCaptions = ConfigManager.GetSetting<int>("headlineSize");
                 DataConfig.sizeFontButtons = ConfigManager.GetSetting<int>("sizeKeyName");
                 DataConfig.sizeFontTables = ConfigManager.GetSetting<int>("sizeTableTitle");
+                DataConfig.sizeFontText = ConfigManager.GetSetting<int>("textSize");
                 DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
                 DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
             }
@@ -1322,130 +1018,158 @@ namespace GymApplicationV2._0
             }
         }
 
-        private void RemoveBackgroundControls()
-        {
-            // Удаляем все PictureBox, которые были добавлены как фон
-            var toRemove = new List<Control>();
-            foreach (Control control in this.Controls)
-            {
-                if (control is PictureBox pb && pb.Tag?.ToString() == "Background")
-                {
-                    toRemove.Add(control);
-                }
-            }
-
-            foreach (var control in toRemove)
-            {
-                this.Controls.Remove(control);
-                control.Dispose();
-            }
-
-            // Сбрасываем BackColor на стандартный, чтобы не было конфликтов
-            if (toRemove.Count > 0)
-            {
-                this.BackColor = Color.FromArgb(243, 243, 243);
-            }
-        }
-
         private void ApplySettingsToAllControls()
         {
-            // Обходим все элементы управления на форме
-            foreach (Control control in GetAllControls(this))
-            {
-                // Обновляем кнопки
-                if (control is JeanModernButton button)
-                {
-                    button.Font = new System.Drawing.Font(button.Font.FontFamily, DataConfig.sizeFontButtons, button.Font.Style);
-                }
-                // Обновляем метки
-                else if (control is System.Windows.Forms.Label label)
-                {
-                    if (label.Text != "🏋️ СИБИРЯК")
-                    {
-                        label.Font = new System.Drawing.Font(label.Font.FontFamily, DataConfig.sizeFontCaptions, label.Font.Style);
-                    }
-                }
-                // Обновляем TextBox
-                else if (control is jeanSoftTextBox textBox)
-                {
-                    textBox.Font = new System.Drawing.Font(textBox.Font.FontFamily, DataConfig.sizeFontCaptions, textBox.Font.Style);
-                }
-                // Обновляем ComboBox
-                else if (control is ComboBox comboBox)
-                {
-                    comboBox.Font = new System.Drawing.Font(comboBox.Font.FontFamily, DataConfig.sizeFontCaptions, comboBox.Font.Style);
-                }
-                else if (control is DataGridView dataGrid)
-                {
-                    dataGrid.Font = new System.Drawing.Font(dataGrid.Font.FontFamily, DataConfig.sizeFontTables, dataGrid.Font.Style);
-                }
-            }
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
             ApplyFormStyle();
-
-            //RemoveBackgroundControls();
-            //SetBackgroundColor();
         }
 
-        private IEnumerable<Control> GetAllControls(Control parent)
+        private void ShowOrActivateForm<T>() where T : Form, new()
         {
-            foreach (Control control in parent.Controls)
-            {
-                yield return control;
+            T existingForm = Application.OpenForms.OfType<T>().FirstOrDefault();
 
-                // Рекурсивно обходим вложенные элементы
-                if (control.HasChildren)
-                {
-                    foreach (Control child in GetAllControls(control))
-                    {
-                        yield return child;
-                    }
-                }
+            if (existingForm != null && !existingForm.IsDisposed)
+            {
+                existingForm.WindowState = FormWindowState.Normal;
+                existingForm.BringToFront();
+                existingForm.Focus();
             }
+            else
+            {
+                T newForm = new T();
+                newForm.Show();
+            }
+        }
+
+        private void jeanModernButtonClients_Click(object sender, EventArgs e)
+        {
+            ShowOrActivateForm<Clients>();
+        }
+
+        private void jeanModernButtonReport_Click(object sender, EventArgs e)
+        {
+            using (var report = new Report())
+            {
+                report.userStatus = userStatus;
+                report.ShowDialog();
+            }
+        }
+
+        private void jeanModernButtonNewMember_Click(object sender, EventArgs e)
+        {
+            ShowOrActivateForm<NewClient>();
+        }
+
+        private void jeanModernButtonSingleTicket_Click(object sender, EventArgs e)
+        {
+            ShowOrActivateForm<SingleTicket>();
+        }
+
+        private void jeanModernButtonChooseClient_Click(object sender, EventArgs e)
+        {
+            ShowOrActivateForm<ChooseClient>();
         }
 
         private void jeanModernButtonService_Click(object sender, EventArgs e)
         {
-            Services services = new Services();
-            services.Show();
+            ShowOrActivateForm<Services>();
         }
 
         private void jeanModernButtonChange_Click(object sender, EventArgs e)
         {
-            IssuedMembership issued = new IssuedMembership();
-            issued.Show();
+            ShowOrActivateForm<IssuedMembership>();
         }
 
         private void jeanModernButtonArchive_Click(object sender, EventArgs e)
         {
-            ArchiveServices archiveServices = new ArchiveServices();
-            archiveServices.Show();
+            ShowOrActivateForm<ArchiveServices>();
         }
 
         private void jeanModernButtonHistoryPayment_Click(object sender, EventArgs e)
         {
-            HistoryPayment historyPayment = new HistoryPayment();
-            historyPayment.Show();
+            ShowOrActivateForm<HistoryPayment>();
+        }
+
+        private void ApplyAllSettings()
+        {
+            ApplySettingsToAllControls();
+            //SetBackgroundColor();
+            //_animBackground?.RemoveBackground();
+
+            UpdateDataGridViewFont(dataGridViewClient);
+        }
+
+        private void UpdateDataGridViewFont(DataGridView dataGrid)
+        {
+            string sortColumn = dataGrid.SortedColumn?.Name;
+            SortOrder sortOrder = dataGrid.SortOrder;
+
+            dataGrid.Font = new Font(dataGrid.Font.FontFamily, DataConfig.sizeFontTables, dataGrid.Font.Style);
+
+            dataGrid.ColumnHeadersDefaultCellStyle.Font = new Font(
+                dataGrid.ColumnHeadersDefaultCellStyle.Font.FontFamily,
+                DataConfig.sizeFontTables,
+                dataGrid.ColumnHeadersDefaultCellStyle.Font.Style
+            );
+
+            dataGrid.DefaultCellStyle.Font = new Font(
+                dataGrid.DefaultCellStyle.Font.FontFamily,
+                DataConfig.sizeFontTables - 1,
+                dataGrid.DefaultCellStyle.Font.Style
+            );
+
+            dataGrid.RowHeadersDefaultCellStyle.Font = new Font(
+                dataGrid.RowHeadersDefaultCellStyle.Font.FontFamily,
+                DataConfig.sizeFontTables - 1,
+                dataGrid.RowHeadersDefaultCellStyle.Font.Style
+            );
+
+            dataGrid.Refresh();
+            dataGrid.Invalidate();
+
+            if (!string.IsNullOrEmpty(sortColumn) && dataGrid.Columns.Contains(sortColumn))
+            {
+                var direction = sortOrder == SortOrder.Ascending ?
+                    System.ComponentModel.ListSortDirection.Ascending :
+                    System.ComponentModel.ListSortDirection.Descending;
+
+                dataGrid.Sort(dataGrid.Columns[sortColumn], direction);
+            }
+
+            foreach (DataGridViewRow row in dataGrid.Rows)
+            {
+                if (!row.IsNewRow)
+                {
+                    row.Height = dataGrid.RowTemplate.Height;
+                }
+            }
+
+            if (dataGrid.DataSource is BindingSource bindingSource)
+            {
+                bindingSource.ResetBindings(false);
+            }
+
+            Application.DoEvents();
         }
 
         private void jeanModernButtonDesign_Click(object sender, EventArgs e)
         {
             Design design = new Design();
-            design.SetRefreshAction(ApplySettingsToAllControls);
+            design.SetRefreshAction(ApplyAllSettings);
             design.ShowDialog();
-            design.Show();
         }
 
         private void jeanModernButtonImport_Click(object sender, EventArgs e)
         {
             Import import = new Import();
-            import.Show();
+            import.ShowDialog();
         }
 
         private void jeanModernButtonDocumentation_Click(object sender, EventArgs e)
         {
             Documentation documentation = new Documentation();
-            documentation.Show();
+            documentation.ShowDialog();
         }
 
         private void jeanModernButtonReturn_Click(object sender, EventArgs e)
@@ -1485,7 +1209,8 @@ namespace GymApplicationV2._0
                 {
                     MessageBox.Show("Некорректный формат данных клиента.");
                     return;
-                };
+                }
+                ;
 
                 GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                         "Посещений_осталось = '" + numberLeft.ToString() + "' " +
@@ -1495,10 +1220,10 @@ namespace GymApplicationV2._0
                         new SQLiteParameter("@name", nameParts[1]));
 
                 selectQuery = @"SELECT Клиент, №Карты, Абонемент, Дата_окончания AS 'Дата окончания', Посещений_осталось AS 'Посещений осталось' FROM Issued WHERE LOWER(Клиент) LIKE LOWER(@surname) || '%' || LOWER(@name) OR LOWER(Клиент) LIKE LOWER(@name) || '%' || LOWER(@surname)";
-                    
+
 
                 dataGridViewClient.DataSource = GeneralContext.GetDataFromDatabase(selectQuery,
-                    IssuedMembershipContext.ConnectionStringIssued(), 
+                    IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@surname", nameParts[0]),
                     new SQLiteParameter("@name", nameParts[1]));
 
@@ -1513,596 +1238,11 @@ namespace GymApplicationV2._0
             jeanTextBoxNumberCard.Text = "";
         }
 
-        private void CreateDynamicBackground()
-        {
-            backgroundPicture = new System.Windows.Forms.PictureBox
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.Transparent,
-                Tag = "Background"
-            };
-
-            backgroundPicture.Paint += (s, e) =>
-            {
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(240, 240, 245),
-                    Color.FromArgb(220, 220, 230),
-                    LinearGradientMode.Vertical))
-                {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
-
-                DrawBackgroundPattern(e.Graphics);
-                DrawAnimatedElements(e.Graphics);
-            };
-
-            this.Controls.Add(backgroundPicture);
-            backgroundPicture.SendToBack();
-
-            StartBackgroundAnimation();
-        }
-
-        private void DrawBackgroundPattern(Graphics g)
-        {
-            string[] gymIcons = { "🏋️", "🤸", "🚴", "🏃", "🧘" };
-
-            for (int i = 0; i < 20; i++)
-            {
-                int x = _random.Next(this.Width);
-                int y = _random.Next(this.Height);
-                float size = _random.Next(20, 40);
-                float opacity = _random.Next(20, 60) / 100f;
-
-                using (var brush = new SolidBrush(Color.FromArgb((int)(opacity * 255), Color.LightGray)))
-                using (var font = new System.Drawing.Font("Segoe UI Emoji", size))
-                {
-                    string icon = gymIcons[_random.Next(gymIcons.Length)];
-                    g.DrawString(icon, font, brush, x, y);
-                }
-            }
-
-            using (var pen = new Pen(Color.FromArgb(30, PrimaryBlue), 1))
-            {
-                for (int x = 0; x < this.Width; x += 50)
-                {
-                    g.DrawLine(pen, x, 0, x, this.Height);
-                }
-                for (int y = 0; y < this.Height; y += 50)
-                {
-                    g.DrawLine(pen, 0, y, this.Width, y);
-                }
-            }
-        }
-
-        private void DrawAnimatedElements(Graphics g)
-        {
-            foreach (var point in _animatedPoints)
-            {
-                float size = 3 + (float)Math.Sin(DateTime.Now.Millisecond * 0.01) * 2;
-                using (var brush = new SolidBrush(Color.FromArgb(150, PrimaryBlue)))
-                {
-                    g.FillEllipse(brush, point.X - size / 2, point.Y - size / 2, size, size);
-                }
-            }
-        }
-
-        private void StartBackgroundAnimation()
-        {
-            for (int i = 0; i < 30; i++)
-            {
-                _animatedPoints.Add(new System.Drawing.Point(
-                    _random.Next(this.Width),
-                    _random.Next(this.Height)
-                ));
-            }
-
-            _backgroundAnimationTimer = new System.Windows.Forms.Timer();
-            _backgroundAnimationTimer.Interval = 50;
-            _backgroundAnimationTimer.Tick += (s, e) =>
-            {
-                for (int i = 0; i < _animatedPoints.Count; i++)
-                {
-                    var point = _animatedPoints[i];
-                    _animatedPoints[i] = new System.Drawing.Point(
-                        (point.X + _random.Next(-2, 3)) % this.Width,
-                        (point.Y + _random.Next(-2, 3)) % this.Height
-                    );
-                }
-
-                backgroundPicture.Invalidate();
-            };
-            _backgroundAnimationTimer.Start();
-        }
-
-        private void CreateStaticBackground()
-        {
-            try
-            {
-                var backgroundImage = new System.Windows.Forms.PictureBox
-                {
-                    Dock = DockStyle.Fill,
-                    SizeMode = PictureBoxSizeMode.Zoom,
-                    BackColor = Color.Transparent,
-                    Tag = "Background"
-                };
-
-                // Создаем программное изображение с спортивной тематикой
-                var bitmap = new Bitmap(this.Width, this.Height);
-                using (var g = Graphics.FromImage(bitmap))
-                using (var brush = new LinearGradientBrush(
-                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                    Color.FromArgb(245, 248, 252), // Более светлый градиент
-                    Color.FromArgb(235, 238, 248),
-                    LinearGradientMode.Vertical))
-                {
-                    g.FillRectangle(brush, 0, 0, bitmap.Width, bitmap.Height);
-
-                    // Добавляем абстрактные спортивные элементы
-                    DrawAbstractSportsElements(g, bitmap.Width, bitmap.Height);
-
-                    // Добавляем геометрический паттерн
-                    DrawGeometricPattern(g, bitmap.Width, bitmap.Height);
-
-                    // Добавляем легкий branding
-                    DrawSubtleBranding(g, bitmap.Width, bitmap.Height);
-                }
-
-                backgroundImage.Image = bitmap;
-                this.Controls.Add(backgroundImage);
-                backgroundImage.SendToBack();
-            }
-            catch
-            {
-                // Резервный вариант - простой градиент
-                this.Paint += (s, e) =>
-                {
-                    using (var brush = new LinearGradientBrush(
-                        this.ClientRectangle,
-                        Color.FromArgb(240, 240, 245),
-                        Color.FromArgb(220, 220, 230),
-                        LinearGradientMode.Vertical))
-                    {
-                        e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                    }
-                };
-            }
-        }
-
-        private void DrawAbstractSportsElements(Graphics g, int width, int height)
-        {
-            // Цвета для спортивных элементов
-            var sportColors = new[]
-            {
-        Color.FromArgb(25, 65, 150, 220),  // Синий
-        Color.FromArgb(20, 80, 200, 180),  // Бирюзовый
-        Color.FromArgb(18, 140, 100, 220), // Фиолетовый
-        Color.FromArgb(15, 230, 100, 80)   // Оранжевый
-    };
-
-            var random = new Random(42); // Фиксированное seed для статичности
-
-            // Абстрактные круги (гантели, мячи)
-            for (int i = 0; i < 12; i++)
-            {
-                int size = random.Next(40, 120);
-                int x = random.Next(-size / 3, width - size * 2 / 3);
-                int y = random.Next(-size / 3, height - size * 2 / 3);
-
-                using (var brush = new SolidBrush(sportColors[random.Next(sportColors.Length)]))
-                {
-                    g.FillEllipse(brush, x, y, size, size);
-
-                    // Внутренний круг для объема
-                    if (size > 60)
-                    {
-                        using (var innerBrush = new SolidBrush(Color.FromArgb(40, Color.White)))
-                        {
-                            g.FillEllipse(innerBrush, x + size / 4, y + size / 4, size / 2, size / 2);
-                        }
-                    }
-                }
-            }
-
-            // Абстрактные линии (траектории движения)
-            using (var linePen = new Pen(Color.FromArgb(30, 100, 140, 200), 2f))
-            {
-                linePen.EndCap = LineCap.Round;
-
-                for (int i = 0; i < 8; i++)
-                {
-                    int startX = random.Next(width);
-                    int startY = random.Next(height);
-                    int endX = startX + random.Next(-100, 100);
-                    int endY = startY + random.Next(-100, 100);
-
-                    g.DrawLine(linePen, startX, startY, endX, endY);
-
-                    // Стрелочка на конце
-                    DrawArrowhead(g, linePen, startX, startY, endX, endY);
-                }
-            }
-        }
-
-        private void DrawArrowhead(Graphics g, Pen pen, int startX, int startY, int endX, int endY)
-        {
-            float angle = (float)Math.Atan2(endY - startY, endX - startX);
-            int size = 8;
-
-            PointF[] arrowPoints =
-            {
-        new PointF(endX, endY),
-        new PointF(endX - size * (float)Math.Cos(angle - Math.PI/6),
-                  endY - size * (float)Math.Sin(angle - Math.PI/6)),
-        new PointF(endX - size * (float)Math.Cos(angle + Math.PI/6),
-                  endY - size * (float)Math.Sin(angle + Math.PI/6))
-    };
-
-            g.FillPolygon(new SolidBrush(pen.Color), arrowPoints);
-        }
-
-        private void DrawGeometricPattern(Graphics g, int width, int height)
-        {
-            // Шестиугольный паттерн (соты)
-            using (var hexagonPen = new Pen(Color.FromArgb(15, 80, 120, 180), 1f))
-            {
-                int hexSize = 60;
-                for (int y = -hexSize; y < height + hexSize; y += (int)(hexSize * 1.5))
-                {
-                    for (int x = -hexSize; x < width + hexSize; x += (int)(hexSize * Math.Sqrt(3)))
-                    {
-                        DrawHexagon(g, hexagonPen, x + ((y / hexSize) % 2 == 0 ? (int)(hexSize * Math.Sqrt(3) / 2) : 0), y, hexSize);
-                    }
-                }
-            }
-
-            // Точки в узлах сетки
-            using (var dotBrush = new SolidBrush(Color.FromArgb(20, 120, 160, 220)))
-            {
-                for (int x = 30; x < width; x += 50)
-                {
-                    for (int y = 30; y < height; y += 50)
-                    {
-                        g.FillEllipse(dotBrush, x - 1, y - 1, 3, 3);
-                    }
-                }
-            }
-        }
-
-        private void DrawHexagon(Graphics g, Pen pen, int centerX, int centerY, int size)
-        {
-            PointF[] points = new PointF[6];
-            for (int i = 0; i < 6; i++)
-            {
-                double angle = 2 * Math.PI / 6 * i;
-                points[i] = new PointF(
-                    centerX + size * (float)Math.Cos(angle),
-                    centerY + size * (float)Math.Sin(angle)
-                );
-            }
-            g.DrawPolygon(pen, points);
-        }
-
-        private void DrawSubtleBranding(Graphics g, int width, int height)
-        {
-            // Логотип в углу
-            using (var font = new System.Drawing.Font("Segoe UI", 24, FontStyle.Bold))
-            using (var brush = new SolidBrush(Color.FromArgb(40, 60, 100, 160)))
-            {
-                g.DrawString("СИБИРЯК", font, brush, width - 170, 30);
-            }
-
-            // Спортивные иконки по углам
-            string[] sportsIcons = { "🏋️", "🤸", "🚴", "🏃" };
-            using (var iconFont = new System.Drawing.Font("Segoe UI Emoji", 32))
-            using (var iconBrush = new SolidBrush(Color.FromArgb(25, 80, 140, 200)))
-            {
-                // Левый верхний
-                g.DrawString(sportsIcons[0], iconFont, iconBrush, 30, 30);
-                // Правый верхний
-                g.DrawString(sportsIcons[1], iconFont, iconBrush, width - 70, 30);
-                // Левый нижний
-                g.DrawString(sportsIcons[2], iconFont, iconBrush, 30, height - 70);
-                // Правый нижний
-                g.DrawString(sportsIcons[3], iconFont, iconBrush, width - 70, height - 70);
-            }
-
-            // Тонкая надпись по центру
-            using (var textFont = new System.Drawing.Font("Segoe UI", 36, FontStyle.Bold))
-            using (var textBrush = new SolidBrush(Color.FromArgb(12, 70, 130, 190)))
-            {
-                string text = "ФИТНЕС КЛУБ";
-                var size = g.MeasureString(text, textFont);
-                g.DrawString(text, textFont, textBrush,
-                    (width - size.Width) / 2,
-                    Convert.ToInt32((height - size.Height) / 1.5));
-            }
-        }
-
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             base.OnFormClosed(e);
-            _backgroundAnimationTimer?.Stop();
-            _backgroundAnimationTimer?.Dispose();
-        }
-
-        private class FloatingElement
-        {
-            public PointF Position { get; set; }
-            public float Size { get; set; }
-            public float Speed { get; set; }
-            public float Angle { get; set; }
-            public Color Color { get; set; }
-            public float Opacity { get; set; }
-            public int Type { get; set; } // 0 - круг, 1 - линия, 2 - иконка
-        }
-
-        private void CreateBackground()
-        {
-            backgroundPicture = new System.Windows.Forms.PictureBox
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.Transparent,
-                Tag = "Background"
-            };
-
-            backgroundPicture.Paint += (s, e) =>
-            {
-                // Основной градиентный фон
-                DrawMainGradient(e.Graphics);
-
-                // Тонкий узор
-                DrawSubtlePattern(e.Graphics);
-
-                // Плавающие элементы
-                DrawFloatingElements(e.Graphics);
-            };
-
-            this.Controls.Add(backgroundPicture);
-            backgroundPicture.SendToBack();
-
-            // Инициализируем плавающие элементы
-            InitializeFloatingElements();
-
-            // Запускаем плавную анимацию
-            StartCalmAnimation();
-        }
-
-        private void DrawMainGradient(Graphics g)
-        {
-            using (var brush = new LinearGradientBrush(
-                this.ClientRectangle,
-                Color.FromArgb(248, 248, 252), // Очень светлый сиреневый
-                Color.FromArgb(240, 240, 250), // Еще светлее
-                LinearGradientMode.Vertical))
-            {
-                g.FillRectangle(brush, this.ClientRectangle);
-            }
-        }
-
-        private void DrawSubtlePattern(Graphics g)
-        {
-            // Очень тонкая сетка
-            using (var pen = new Pen(Color.FromArgb(15, PrimaryBlue), 0.5f))
-            {
-                for (int x = 0; x < this.Width; x += 80)
-                {
-                    g.DrawLine(pen, x, 0, x, this.Height);
-                }
-                for (int y = 0; y < this.Height; y += 80)
-                {
-                    g.DrawLine(pen, 0, y, this.Width, y);
-                }
-            }
-
-            // Еле заметные точки в углах
-            using (var brush = new SolidBrush(Color.FromArgb(10, PrimaryBlue)))
-            {
-                int cornerSize = 150;
-                g.FillEllipse(brush, -cornerSize / 2, -cornerSize / 2, cornerSize, cornerSize);
-                g.FillEllipse(brush, this.Width - cornerSize / 2, -cornerSize / 2, cornerSize, cornerSize);
-                g.FillEllipse(brush, -cornerSize / 2, this.Height - cornerSize / 2, cornerSize, cornerSize);
-                g.FillEllipse(brush, this.Width - cornerSize / 2, this.Height - cornerSize / 2, cornerSize, cornerSize);
-            }
-        }
-
-        private void InitializeFloatingElements()
-        {
-            _floatingElements.Clear();
-
-            // Создаем круги
-            for (int i = 0; i < 12; i++)
-            {
-                _floatingElements.Add(new FloatingElement
-                {
-                    Position = new PointF(
-                        _random.Next(this.Width),
-                        _random.Next(this.Height)
-                    ),
-                    Size = _random.Next(3, 8),
-                    Speed = (float)_random.NextDouble() * 0.3f + 0.1f,
-                    Angle = (float)(_random.NextDouble() * Math.PI * 2),
-                    Color = Color.FromArgb(120,
-                        Color.FromArgb(_random.Next(180, 220),
-                        _random.Next(180, 220),
-                        _random.Next(200, 240))),
-                    Opacity = (float)_random.Next(30, 70) / 100f,
-                    Type = 0
-                });
-            }
-
-            // Создаем линии
-            for (int i = 0; i < 8; i++)
-            {
-                _floatingElements.Add(new FloatingElement
-                {
-                    Position = new PointF(
-                        _random.Next(this.Width),
-                        _random.Next(this.Height)
-                    ),
-                    Size = _random.Next(20, 60),
-                    Speed = (float)_random.NextDouble() * 0.2f + 0.05f,
-                    Angle = (float)(_random.NextDouble() * Math.PI * 2),
-                    Color = Color.FromArgb(80, PrimaryBlue),
-                    Opacity = (float)_random.Next(20, 40) / 100f,
-                    Type = 1
-                });
-            }
-        }
-
-        private void DrawFloatingElements(Graphics g)
-        {
-            foreach (var element in _floatingElements)
-            {
-                int alpha = (int)(element.Opacity * 255);
-                using (var brush = new SolidBrush(Color.FromArgb(alpha, element.Color)))
-                {
-                    switch (element.Type)
-                    {
-                        case 0: // Круги
-                            float circleSize = element.Size + (float)Math.Sin(DateTime.Now.Millisecond * 0.002) * 1f;
-                            g.FillEllipse(brush,
-                                element.Position.X - circleSize / 2,
-                                element.Position.Y - circleSize / 2,
-                                circleSize, circleSize);
-                            break;
-
-                        case 1: // Линии
-                            float length = element.Size;
-                            float endX = element.Position.X + (float)Math.Cos(element.Angle) * length;
-                            float endY = element.Position.Y + (float)Math.Sin(element.Angle) * length;
-
-                            using (var pen = new Pen(brush, 0.8f))
-                            {
-                                g.DrawLine(pen, element.Position.X, element.Position.Y, endX, endY);
-                            }
-                            break;
-                    }
-                }
-            }
-        }
-
-        private void StartCalmAnimation()
-        {
-            _backgroundAnimationTimer = new System.Windows.Forms.Timer();
-            _backgroundAnimationTimer.Interval = 1; // 25 FPS - плавно но не быстро
-            _backgroundAnimationTimer.Tick += (s, e) =>
-            {
-                // Медленно обновляем позиции элементов
-                foreach (var element in _floatingElements)
-                {
-                    // Очень медленное движение
-                    float moveX = (float)Math.Cos(element.Angle) * element.Speed;
-                    float moveY = (float)Math.Sin(element.Angle) * element.Speed;
-
-                    element.Position = new PointF(
-                        (element.Position.X + moveX + this.Width) % this.Width,
-                        (element.Position.Y + moveY + this.Height) % this.Height
-                    );
-
-                    // Очень плавное изменение прозрачности
-                    element.Opacity = 0.3f + 0.2f * (float)Math.Sin(DateTime.Now.Millisecond * 0.001 + element.Position.X * 0.01f);
-
-                    // Медленное вращение для линий
-                    if (element.Type == 1)
-                    {
-                        element.Angle += 0.001f;
-                    }
-                }
-
-                backgroundPicture.Invalidate();
-            };
-            _backgroundAnimationTimer.Start();
-        }
-
-        private void CreateMinimalBackground()
-        {
-            backgroundPicture = new System.Windows.Forms.PictureBox
-            {
-                Dock = DockStyle.Fill,
-                BackColor = Color.Transparent,
-                Tag = "Background"
-            };
-
-            backgroundPicture.Paint += (s, e) =>
-            {
-                // Градиентный фон
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(250, 250, 255),
-                    Color.FromArgb(245, 245, 250),
-                    LinearGradientMode.Vertical))
-                {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
-
-                // Еле заметные волны
-                DrawSubtleWaves(e.Graphics);
-            };
-
-            this.Controls.Add(backgroundPicture);
-            backgroundPicture.SendToBack();
-
-            StartWaveAnimation();
-        }
-
-        private void DrawSubtleWaves(Graphics g)
-        {
-            float time = DateTime.Now.Millisecond * 0.001f;
-
-            using (var pen = new Pen(Color.FromArgb(20, PrimaryBlue), 1f))
-            {
-                for (int y = 0; y < this.Height; y += 40)
-                {
-                    for (int x = 0; x < this.Width; x += 2)
-                    {
-                        float wave = (float)Math.Sin(x * 0.02f + time) * 2f;
-                        g.DrawLine(pen, x, y + wave, x + 1, y + wave);
-                    }
-                }
-            }
-        }
-
-        private void StartWaveAnimation()
-        {
-            _backgroundAnimationTimer = new System.Windows.Forms.Timer();
-            _backgroundAnimationTimer.Interval = 100; // Очень медленно
-            _backgroundAnimationTimer.Tick += (s, e) =>
-            {
-                backgroundPicture.Invalidate();
-            };
-            _backgroundAnimationTimer.Start();
-        }
-
-        private bool dragging = false;
-        private System.Drawing.Point dragCursorPoint;
-        private System.Drawing.Point dragFormPoint;
-
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-            if (e.Button == MouseButtons.Left && e.Y <= 40)
-            {
-                dragging = true;
-                dragCursorPoint = Cursor.Position;
-                dragFormPoint = this.Location;
-            }
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-            if (dragging)
-            {
-                System.Drawing.Point dif = System.Drawing.Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
-                this.Location = System.Drawing.Point.Add(dragFormPoint, new Size(dif));
-            }
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            dragging = false;
+            _animBackground?.RemoveBackground();
+            _animBackground = null;
         }
     }
 }

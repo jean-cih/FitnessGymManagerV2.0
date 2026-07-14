@@ -1,28 +1,19 @@
-﻿using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.FormsServices;
+using GymApplicationV2._0.Helpers;
 using Microsoft.Office.Interop.Excel;
 using Shadow;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Data.Entity.Infrastructure;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Xml.Linq;
-using static System.Net.Mime.MediaTypeNames;
+using static GymApplicationV2._0.AppColors.AppColors;
 
 namespace GymApplicationV2._0
 {
@@ -36,10 +27,8 @@ namespace GymApplicationV2._0
         JeanModernButton jeanModernButtonExport;
         JeanModernButton jeanModernButtonChooseFile;
 
-        System.Windows.Forms.CheckBox checkBoxHistoryPayment;
         System.Windows.Forms.CheckBox checkBoxSellServices;
         System.Windows.Forms.CheckBox checkBoxClientsForPeriod;
-        System.Windows.Forms.CheckBox checkBoxAllClients;
 
         System.Windows.Forms.CheckBox checkBoxTSV;
         System.Windows.Forms.CheckBox checkBoxJSON;
@@ -55,61 +44,34 @@ namespace GymApplicationV2._0
         JeanDateTimePicker jeanDateTimePickerBegin;
         JeanDateTimePicker jeanDateTimePickerEnd;
 
-        // Цветовая схема
-        private readonly Color PrimaryColor = Color.FromArgb(63, 81, 181);
-        private readonly Color SecondaryColor = Color.FromArgb(103, 58, 183);
-        private readonly Color AccentColor = Color.FromArgb(0, 150, 136);
-        private readonly Color BackgroundColor = Color.FromArgb(245, 245, 245);
-        private readonly Color CardColor = Color.White;
-        private readonly Color TextColor = Color.FromArgb(33, 33, 33);
-        private readonly Color LightTextColor = Color.FromArgb(117, 117, 117);
-
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-
         Panel titlePanel;
+
+        private FadeAnimation _fadeAnimation;
+
+        public Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public Report()
         {
             InitializeComponent();
             InitializeCustomDesign();
-            titlePanel.MouseDown += Panel_MouseDown;
-            titlePanel.MouseMove += Panel_MouseMove;
-            titlePanel.MouseUp += Panel_MouseUp;
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            titlePanel.EnableDrag(this);
         }
 
-        private bool isDragging = false;
-        private System.Drawing.Point lastCursor;
-        private System.Drawing.Point lastForm;
-
-        private void Panel_MouseDown(object sender, MouseEventArgs e)
+        private void Report_Load(object sender, EventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            string[] notChangeableTexts = new string[]
             {
-                isDragging = true;
-                lastCursor = Cursor.Position;
-                lastForm = this.Location;
-            }
-        }
+                "📊 Отчёт"
+            };
 
-        private void Panel_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                System.Drawing.Point diff = System.Drawing.Point.Subtract(Cursor.Position, new Size(lastCursor));
-                this.Location = System.Drawing.Point.Add(lastForm, new Size(diff));
-            }
-        }
-
-        private void Panel_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = false;
-            }
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
         }
 
         private void InitializeCustomDesign()
@@ -136,9 +98,9 @@ namespace GymApplicationV2._0
                 }
             };
 
-            titlePanel = new System.Windows.Forms.Panel
+            titlePanel = new Panel
             {
-                Size = new Size(918, 50),
+                Size = new Size(1000, 50),
                 BackColor = Color.MediumSlateBlue,
                 Location = new System.Drawing.Point(0,0),
             };
@@ -150,8 +112,8 @@ namespace GymApplicationV2._0
                 Font = new System.Drawing.Font("Montserrat", 18, FontStyle.Bold),
                 ForeColor = ForeColor = Color.FromArgb(220, 220, 255),
                 BackColor = Color.Transparent,
-                Location = new System.Drawing.Point(380, 10),
-                AutoSize = true,
+                Size = new Size(150, 25),
+                Location = new System.Drawing.Point((this.Width - 150) / 2, 10),
             };
             titlePanel.Controls.Add(titleLabel);
             this.Controls.Add(titlePanel);
@@ -167,7 +129,7 @@ namespace GymApplicationV2._0
         {
             var card = new JeanPanel
             {
-                Size = new Size(250, 280),
+                Size = new Size(275, 280),
                 Location = new System.Drawing.Point(30, 80),
                 BackColor = CardColor,
                 GradientBottomColor = CardColor,
@@ -180,38 +142,18 @@ namespace GymApplicationV2._0
             var title = new System.Windows.Forms.Label
             {
                 Text = "📈 Тип отчёта",
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new System.Drawing.Point(60, 5),
-                AutoSize = true
+                Size = new Size(150, 25),
+                Location = new System.Drawing.Point((card.Width - 150) / 2, 20),
             };
 
-            var visitsLabel = new System.Windows.Forms.Label
-            {
-                Text = "Посещения",
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = TextColor,
-                Location = new System.Drawing.Point(10, 45),
-                AutoSize = true
-            };
+            checkBoxClientsForPeriod = CreateStyledCheckBox("Посещаемость", new System.Drawing.Point((card.Width - 130) / 2, 95));
+            checkBoxClientsForPeriod.Checked = true;
 
-            checkBoxAllClients = CreateStyledCheckBox("Все клиенты", new System.Drawing.Point(10, 75));
-            checkBoxClientsForPeriod = CreateStyledCheckBox("Посещаемость по дням", new System.Drawing.Point(10, 105));
 
-            var servicesLabel = new System.Windows.Forms.Label
-            {
-                Text = "Абонементы и услуги",
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
-                ForeColor = TextColor,
-                Location = new System.Drawing.Point(10, 145),
-                AutoSize = true
-            };
+            checkBoxSellServices = CreateStyledCheckBox("Количество проданных\nабонементов", new System.Drawing.Point((card.Width - 130) / 2, 175));
 
-            checkBoxSellServices = CreateStyledCheckBox("Количество проданных", new System.Drawing.Point(10, 175));
-            checkBoxHistoryPayment = CreateStyledCheckBox("История платежей", new System.Drawing.Point(10, 205));
-
-            card.Controls.AddRange(new Control[] { title, visitsLabel, checkBoxAllClients, checkBoxClientsForPeriod,
-                servicesLabel, checkBoxSellServices, checkBoxHistoryPayment });
+            card.Controls.AddRange(new Control[] { title, checkBoxClientsForPeriod, checkBoxSellServices });
 
             this.Controls.Add(card);
         }
@@ -220,8 +162,8 @@ namespace GymApplicationV2._0
         {
             var card = new JeanPanel
             {
-                Size = new Size(320, 210),
-                Location = new System.Drawing.Point(300, 80),
+                Size = new Size(345, 230),
+                Location = new System.Drawing.Point(325, 80),
                 BackColor = CardColor,
                 GradientBottomColor = CardColor,
                 GradientTapColor = CardColor,
@@ -233,19 +175,18 @@ namespace GymApplicationV2._0
             var title = new System.Windows.Forms.Label
             {
                 Text = "📅 Период",
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new System.Drawing.Point(100, 5),
-                AutoSize = true
+                Size = new Size(120, 25),
+                Location = new System.Drawing.Point((card.Width - 120) / 2 , 20),
             };
 
-            radioForMonth = CreateStyledRadioButton("За месяц", new System.Drawing.Point(10, 45));
-            radioForWeek = CreateStyledRadioButton("За неделю", new System.Drawing.Point(10, 75));
-            radioForDay = CreateStyledRadioButton("За день", new System.Drawing.Point(10, 105));
-            radioOtherPeriod = CreateStyledRadioButton("Другой период", new System.Drawing.Point(10, 135));
+            radioForMonth = CreateStyledRadioButton("За месяц", new System.Drawing.Point(card.Width / 3 + 5, 55));
+            radioForWeek = CreateStyledRadioButton("За неделю", new System.Drawing.Point(card.Width / 3 + 5, 85));
+            radioForDay = CreateStyledRadioButton("За день", new System.Drawing.Point(card.Width / 3 + 5,115), true);
+            radioOtherPeriod = CreateStyledRadioButton("Другой период", new System.Drawing.Point(card.Width / 3 + 5, 145));
 
-            jeanDateTimePickerBegin = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(10, 165));
-            jeanDateTimePickerEnd = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(170, 165));
+            jeanDateTimePickerBegin = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
+            jeanDateTimePickerEnd = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
 
             card.Controls.AddRange(new Control[] { title, radioForMonth, radioForWeek, radioForDay, radioOtherPeriod, jeanDateTimePickerBegin, jeanDateTimePickerEnd });
             this.Controls.Add(card);
@@ -257,7 +198,6 @@ namespace GymApplicationV2._0
             {
                 Size = size,
                 Location = location,
-                Font = new System.Drawing.Font("Segoe UI", 8),
                 TextColor = Color.Black,
                 BorderColor = Color.MediumSlateBlue,
                 SkinColor = Color.Transparent,
@@ -272,8 +212,8 @@ namespace GymApplicationV2._0
         {
             var card = new JeanPanel
             {
-                Size = new Size(250, 200),
-                Location = new System.Drawing.Point(640, 80),
+                Size = new Size(275, this.Height / 2 + 30),
+                Location = new System.Drawing.Point(690, 80),
                 BackColor = CardColor,
                 GradientBottomColor = CardColor,
                 GradientTapColor = CardColor,
@@ -285,40 +225,38 @@ namespace GymApplicationV2._0
             var title = new System.Windows.Forms.Label
             {
                 Text = "💾 Формат экспорта",
-                Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
                 ForeColor = PrimaryColor,
-                Location = new System.Drawing.Point(35, 5),
-                AutoSize = true
+                Size = new Size(130, 25),
+                Location = new System.Drawing.Point((card.Width - 130) / 2, 20),
             };
 
-            checkBoxXLS = CreateStyledCheckBox("Excel (.xls)", new System.Drawing.Point(10, 45));
-            checkBoxCSV = CreateStyledCheckBox("CSV (.csv)", new System.Drawing.Point(10, 75));
-            checkBoxTXT = CreateStyledCheckBox("Text (.txt)", new System.Drawing.Point(10, 105));
-            checkBoxJSON = CreateStyledCheckBox("JSON (.json)", new System.Drawing.Point(10, 135));
-            checkBoxTSV = CreateStyledCheckBox("TSV (.tsv)", new System.Drawing.Point(120, 45));
+            checkBoxXLS = CreateStyledCheckBox("Excel (.xls)", new System.Drawing.Point(card.Width / 3 + 5, 55), true);
+            checkBoxCSV = CreateStyledCheckBox("CSV (.csv)", new System.Drawing.Point(card.Width / 3 + 5, 85));
+            checkBoxTXT = CreateStyledCheckBox("Text (.txt)", new System.Drawing.Point(card.Width / 3 + 5, 115));
+            checkBoxJSON = CreateStyledCheckBox("JSON (.json)", new System.Drawing.Point(card.Width / 3 + 5, 145));
+            checkBoxTSV = CreateStyledCheckBox("TSV (.tsv)", new System.Drawing.Point(card.Width / 3 + 5, 175));
 
-            card.Controls.AddRange(new Control[] { title, checkBoxXLS, checkBoxCSV, checkBoxTXT, checkBoxJSON, checkBoxTSV });
+            // Кнопка выбора файла
+            jeanModernButtonChooseFile = CreateStyledButton("📁 Выбрать файл", PrimaryColor, new System.Drawing.Point((card.Width - 150) / 2, 205), new Size(150, 45));
+            jeanModernButtonChooseFile.Click += jeanModernButtonChooseFile_Click;
+
+            // Кнопка экспорта
+            jeanModernButtonExport = CreateStyledButton("🚀 Экспорт", AccentColor, new System.Drawing.Point((card.Width - 180) / 2, 260), new Size(180, 50));
+            jeanModernButtonExport.Click += jeanModernButtonExport_Click;
+
+            card.Controls.AddRange(new Control[] { title, checkBoxXLS, checkBoxCSV, checkBoxTXT, checkBoxJSON, checkBoxTSV, jeanModernButtonChooseFile, jeanModernButtonExport });
             this.Controls.Add(card);
         }
 
         private void CreateButtons()
         {
-            // Кнопка выбора файла
-            jeanModernButtonChooseFile = CreateStyledButton("📁 Выбрать файл", PrimaryColor, new System.Drawing.Point(695, 365));
-            jeanModernButtonChooseFile.Click += jeanModernButtonChooseFile_Click;
-
-            // Кнопка экспорта
-            jeanModernButtonExport = CreateStyledButton("🚀 Экспорт", AccentColor, new System.Drawing.Point(695, 315));
-            jeanModernButtonExport.Click += jeanModernButtonExport_Click;
-
             // Кнопка показа
-            jeanModernButtonShow = CreateStyledButton("👁️ Показать", SecondaryColor, new System.Drawing.Point(395, 315));
+            jeanModernButtonShow = CreateStyledButton("👁️ Показать", SecondaryColor, new System.Drawing.Point((this.Width - 200) / 2, 335), new Size(200, 60));
             jeanModernButtonShow.Click += buttonShow_Click;
 
             var btnClose = new JeanModernButton
             {
                 Text = "X",
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
                 ForeColor = Color.White,
                 BackColor = Color.FromArgb(180, 70, 70),
                 FlatStyle = FlatStyle.Flat,
@@ -326,44 +264,24 @@ namespace GymApplicationV2._0
                 Cursor = Cursors.Hand,
                 BorderRadius = 0,
                 BorderSize = 0,
-                Location = new System.Drawing.Point(878, 10),
+                Location = new System.Drawing.Point(958, 10),
             };
 
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
             titlePanel.Controls.Add(btnClose);
 
-            this.Controls.AddRange(new Control[] { jeanModernButtonChooseFile, jeanModernButtonExport, jeanModernButtonShow });
+            this.Controls.AddRange(new Control[] { jeanModernButtonShow });
         }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new System.Windows.Forms.Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
-        }
-
-        private System.Windows.Forms.CheckBox CreateStyledCheckBox(string text, System.Drawing.Point location)
+        private System.Windows.Forms.CheckBox CreateStyledCheckBox(string text, System.Drawing.Point location, bool flag = false)
         {
             var checkBox = new System.Windows.Forms.CheckBox
             {
                 Text = text,
                 Location = location,
-                Font = new System.Drawing.Font("Segoe UI", 9),
                 ForeColor = TextColor,
-                AutoSize = true,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Checked = flag,
+                AutoSize = true
             };
 
             checkBox.CheckedChanged += (s, e) =>
@@ -374,17 +292,17 @@ namespace GymApplicationV2._0
             return checkBox;
         }
 
-        private RadioButton CreateStyledRadioButton(string text, System.Drawing.Point location)
+        private RadioButton CreateStyledRadioButton(string text, System.Drawing.Point location, bool flag = false)
         {
             var radio = new RadioButton
 
             {
                 Text = text,
                 Location = location,
-                Font = new System.Drawing.Font("Segoe UI", 9),
                 ForeColor = TextColor,
                 AutoSize = true,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                Checked = flag
             };
 
             radio.CheckedChanged += (s, e) =>
@@ -395,14 +313,13 @@ namespace GymApplicationV2._0
             return radio;
         }
 
-        private JeanModernButton CreateStyledButton(string text, Color backColor, System.Drawing.Point location)
+        private JeanModernButton CreateStyledButton(string text, Color backColor, System.Drawing.Point location, Size size)
         {
             var button = new JeanModernButton
             {
                 Text = text,
                 Location = location,
-                Size = new Size(150, 40),
-                Font = new System.Drawing.Font("Segoe UI", 10, FontStyle.Bold),
+                Size = size,
                 BackColor = Color.Transparent,
                 BackgroundColor = backColor,
                 TextColor = Color.White,
@@ -431,36 +348,9 @@ namespace GymApplicationV2._0
             return path;
         }
 
-        private void Report_Load(object sender, EventArgs e)
-        {
-            SetFonts();
-        }
-
-        private void SetFonts()
-        {
-            jeanModernButtonChooseFile.Font = new System.Drawing.Font("Выбрать", DataConfig.sizeFontButtons);
-            jeanModernButtonExport.Font = new System.Drawing.Font("Экспортировать", DataConfig.sizeFontButtons);
-            jeanModernButtonShow.Font = new System.Drawing.Font("Показать", DataConfig.sizeFontButtons);
-
-            checkBoxAllClients.Font = new System.Drawing.Font("Все клиенты", DataConfig.sizeFontCaptions);
-            checkBoxClientsForPeriod.Font = new System.Drawing.Font("Посещаемость по дням", DataConfig.sizeFontCaptions);
-            checkBoxSellServices.Font = new System.Drawing.Font("Количество проданных", DataConfig.sizeFontCaptions);
-
-            radioForMonth.Font = new System.Drawing.Font("За месяц", DataConfig.sizeFontCaptions - 2);
-            radioForWeek.Font = new System.Drawing.Font("За неделю", DataConfig.sizeFontCaptions - 2);
-            radioForDay.Font = new System.Drawing.Font("За день", DataConfig.sizeFontCaptions - 2);
-            radioOtherPeriod.Font = new System.Drawing.Font("Другой период", DataConfig.sizeFontCaptions - 2);
-
-            checkBoxXLS.Font = new System.Drawing.Font(".xls", DataConfig.sizeFontCaptions);
-            checkBoxTXT.Font = new System.Drawing.Font("txt", DataConfig.sizeFontCaptions);
-            checkBoxJSON.Font = new System.Drawing.Font(".json", DataConfig.sizeFontCaptions);
-            checkBoxCSV.Font = new System.Drawing.Font(".csv", DataConfig.sizeFontCaptions);
-            checkBoxTSV.Font = new System.Drawing.Font(".tsv", DataConfig.sizeFontCaptions);
-        }
-
         private void buttonShow_Click(object sender, EventArgs e)
         {
-            System.Windows.Forms.CheckBox[] otherCheckBoxe = { checkBoxAllClients, checkBoxClientsForPeriod, checkBoxSellServices, checkBoxHistoryPayment };
+            System.Windows.Forms.CheckBox[] otherCheckBoxe = { checkBoxClientsForPeriod, checkBoxSellServices };
             bool checkBoxOn = false;
             foreach (var checkBox in otherCheckBoxe)
             {
@@ -477,24 +367,6 @@ namespace GymApplicationV2._0
                 return;
             }
 
-            if (checkBoxHistoryPayment.Checked)
-            {
-                using (var history = new HistoryPayment())
-                {
-                    history.radioForMonth.Checked = radioForMonth.Checked;
-                    history.radioForWeek.Checked = radioForWeek.Checked;
-                    history.radioForDay.Checked = radioForDay.Checked;
-                    history.radioOtherPeriod.Checked = radioOtherPeriod.Checked;
-
-                    history.jeanDateTimePickerBegin.Value = jeanDateTimePickerBegin.Value;
-                    history.jeanDateTimePickerEnd.Value = jeanDateTimePickerEnd.Value;
-
-                    history.ShowDialog();
-                }
-
-                return;
-            }
-
             using (var infoReport = new InformationReport())
             {
                 infoReport.periodForMonth = radioForMonth.Checked;
@@ -505,10 +377,10 @@ namespace GymApplicationV2._0
                 infoReport.dateBegin = jeanDateTimePickerBegin.Value;
                 infoReport.dateEnd = jeanDateTimePickerEnd.Value;
 
-                infoReport.allClient = checkBoxAllClients.Checked;
                 infoReport.forPeriod = checkBoxClientsForPeriod.Checked;
                 infoReport.sellServices = checkBoxSellServices.Checked;
-                infoReport.historyPayment = checkBoxHistoryPayment.Checked;
+
+                infoReport.userStatus = userStatus;
 
                 infoReport.ShowDialog();
             }
@@ -521,8 +393,11 @@ namespace GymApplicationV2._0
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     dbFilePath = openFileDialog.FileName;
+
+                    jeanModernButtonExport.Text = "🚀 Экспортировать\n" + Path.GetFileName(dbFilePath);
                 }
             }
+
         }
         private async void jeanModernButtonExport_Click(object sender, EventArgs e)
         {
@@ -559,16 +434,16 @@ namespace GymApplicationV2._0
         }
 
         private void checkBoxClientsForPeriod_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxAllClients, checkBoxSellServices, checkBoxHistoryPayment);
+            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
 
         private void checkBoxAllClients_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxAllClients, checkBoxClientsForPeriod, checkBoxSellServices, checkBoxHistoryPayment);
+            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
 
         private void checkBoxSellServices_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxSellServices, checkBoxClientsForPeriod, checkBoxAllClients, checkBoxHistoryPayment);
+            HandleCheckBoxChanged(checkBoxSellServices, checkBoxClientsForPeriod);
 
         private void checkBoxHistoryPayment_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxHistoryPayment, checkBoxClientsForPeriod, checkBoxAllClients, checkBoxSellServices);
+            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
 
         private void checkBoxXLS_CheckedChanged(object sender, EventArgs e) =>
             HandleCheckBoxChanged(checkBoxXLS, checkBoxTXT, checkBoxJSON, checkBoxCSV, checkBoxTSV);
@@ -850,24 +725,6 @@ namespace GymApplicationV2._0
                     }
                 }
             }
-        }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
         }
     }
 }

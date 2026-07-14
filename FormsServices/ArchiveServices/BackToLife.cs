@@ -1,5 +1,7 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Data.SQLite;
@@ -11,19 +13,29 @@ namespace GymApplicationV2._0.FormsServices
 {
     public partial class BackToLife : ShadowedForm
     {
-        private bool _isMousePress;
-        private Point _clickPoint;
-        private Point _formStartPoint;
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
+
+        Panel titlePanel;
+
+        string[] notChangeableTexts = new string[]
+            {
+                "⚡ ВОЗВРАТ ИЗ АРХИВА"
+            };
 
         public BackToLife()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+
+            this.EnableDrag(this);
         }
 
         private void InitializeCustomDesign()
@@ -32,90 +44,59 @@ namespace GymApplicationV2._0.FormsServices
             this.BackColor = Color.White;
             this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Padding = new Padding(1);
+            this.Padding = new Padding(10);
             this.DoubleBuffered = true;
 
-            // Градиентный фон
-            this.Paint += (s, e) =>
+            titlePanel = new Panel
             {
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(113, 96, 232),
-                    Color.FromArgb(255, 255, 255),
-                    LinearGradientMode.Vertical))
-                {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
-
-                // Рамка с свечением
-                using (var pen = new Pen(Color.FromArgb(80, 120, 200), 1))
-                {
-                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, Width - 1, Height - 1));
-                }
-
-                // Разделительная линия
-                using (var pen = new Pen(Color.FromArgb(60, 60, 100), 1))
-                {
-                    e.Graphics.DrawLine(pen, 0, 40, Width, 40);
-                }
+                Size = new Size(this.Width, 50),
+                BackColor = Color.MediumSlateBlue,
+                Location = new Point(0, 0),
             };
 
-            // Настройка заголовка
-            titleLabel.Font = new Font("Montserrat", 14, FontStyle.Bold);
-            titleLabel.ForeColor = Color.FromArgb(220, 220, 255);
-            titleLabel.BackColor = Color.Transparent;
-            titleLabel.AutoSize = true;
-
-            // Добавление иконок
-            var iconLabel = new Label
-            {
-                Text = "⚡",
-                Font = new Font("Segoe UI Emoji", 34),
-                AutoSize = true,
-                Location = new Point(20, 10),
-                BackColor = Color.Transparent,
-                ForeColor = Color.FromArgb(100, 150, 255)
-            };
-            this.Controls.Add(iconLabel);
-
-            // Стилизация меток
-            foreach (Control control in this.Controls)
-            {
-                if (control is Label label && label != titleLabel)
-                {
-                    label.Font = new Font("Montserrat", 9, FontStyle.Regular);
-                    label.ForeColor = Color.FromArgb(180, 180, 220);
-                    label.BackColor = Color.Transparent;
-                }
-            }
+            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
+            titlePanel.Controls.Add(titleLabel);
 
             // Стилизация текстовых полей
-            StyleTextBox(jeanSoftTextBoxMembership);
-            StyleTextBox(jeanSoftTextBoxTerm);
-            StyleTextBox(jeanSoftTextBoxVisits);
+            StyleTextBox(jeanTextBoxMembership);
+            StyleTextBox(jeanTextBoxTerm);
+            StyleTextBox(jeanTextBoxVisits);
 
             // Стилизация кнопок
-            StyleButton(jeanModernButtonBackToLife, "Вернуть", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0));
-            StyleButton(jeanModernButton1, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0));
+            StyleButton(jeanModernButtonBackToLife, "Вернуть", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonBackToLife.Width) / 2, this.Height - jeanModernButtonBackToLife.Height - 50));
 
-            // Добавление подсказки внизу формы
-            hintLabel.Font = new Font("Montserrat", 8, FontStyle.Italic);
-            hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
-            hintLabel.BackColor = Color.Transparent;
-            hintLabel.AutoSize = true;
+            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
+
+            var btnClose = new JeanModernButton
+            {
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
+                ForeColor = Color.FromArgb(120, 120, 120),
+                BackColor = Color.Transparent,
+                FlatStyle = FlatStyle.Flat,
+                Size = new Size(30, 28),
+                Cursor = Cursors.Hand
+            };
+
+            StyleButton(btnClose, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, (titlePanel.Height - btnClose.Height) / 2));
+
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
+
+            titlePanel.Controls.Add(btnClose);
+
+            this.Controls.Add(titlePanel);
         }
 
-        private void StyleTextBox(jeanSoftTextBox textBox)
+        private void StyleTextBox(JeanTextBox textBox)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
+            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
+            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
-        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor)
+        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
         {
             button.Text = text;
             button.Font = new Font("Montserrat", 10, FontStyle.Bold);
@@ -125,6 +106,7 @@ namespace GymApplicationV2._0.FormsServices
             button.TextColor = Color.White;
             button.BorderRadius = radius;
             button.BorderSize = radiusSize;
+            button.Location = location;
 
             // Эффекты при наведении
             button.MouseEnter += (s, e) =>
@@ -158,66 +140,6 @@ namespace GymApplicationV2._0.FormsServices
             };
         }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-        /*
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            // Добавление свечения по краям
-            using (var pen = new Pen(Color.FromArgb(40, 80, 160), 2))
-            {
-                e.Graphics.DrawRectangle(pen, new Rectangle(2, 2, Width - 5, Height - 5));
-            }
-        }
-        */
-        #region Form Movement Handlers
-        private void BackToLife_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Y < 50) // Перетаскивание только за верхнюю часть
-            {
-                _isMousePress = true;
-                _clickPoint = Cursor.Position;
-                _formStartPoint = Location;
-            }
-        }
-
-        private void BackToLife_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!_isMousePress) return;
-
-            var cursorOffset = new Point(
-                Cursor.Position.X - _clickPoint.X,
-                Cursor.Position.Y - _clickPoint.Y);
-
-            Location = new Point(
-                _formStartPoint.X + cursorOffset.X,
-                _formStartPoint.Y + cursorOffset.Y);
-        }
-
-        private void BackToLife_MouseUp(object sender, MouseEventArgs e)
-        {
-            _isMousePress = false;
-            _clickPoint = Point.Empty;
-        }
-        #endregion
-
         private void jeanModernButtonBackToLife_Click(object sender, EventArgs e)
         {
             if (Message.MessageWindowYesNo("Вы уверены что хотите восстановить абонемент?") != DialogResult.Yes)
@@ -232,9 +154,9 @@ namespace GymApplicationV2._0.FormsServices
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ArchiveServicesContext.ConnectionStringArchive(),
-                new SQLiteParameter("@membership", jeanSoftTextBoxMembership.Texts),
-                new SQLiteParameter("@term", jeanSoftTextBoxTerm.Texts),
-                new SQLiteParameter("@visits", jeanSoftTextBoxVisits.Texts),
+                new SQLiteParameter("@membership", jeanTextBoxMembership.Text),
+                new SQLiteParameter("@term", jeanTextBoxTerm.Text),
+                new SQLiteParameter("@visits", jeanTextBoxVisits.Text),
                 new SQLiteParameter("@cardNumber", labelNubmerCard.Text));
 
             string deleteQuery = "DELETE FROM Archive WHERE №Карты = @cardNumber;";
@@ -245,42 +167,12 @@ namespace GymApplicationV2._0.FormsServices
 
             Message.MessageWindowOk("Абонемент восстановлен");
 
-            // Анимация закрытия
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            // Анимация закрытия
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
+            _fadeAnimation.CloseWithAnimation();
         }
     }
 }

@@ -1,29 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Data.Entity;
-using System.Data.SQLite;
-using System.IO;
-using System.Drawing.Text;
-using System.Text.RegularExpressions;
-using System.Globalization;
-using System.Data.Entity.Infrastructure;
-using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
-using System.Runtime.Remoting.Contexts;
+using GymApplicationV2._0.Helpers;
+using System;
+using System.Data.SQLite;
+using System.Drawing;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace GymApplicationV2._0
 {
     public partial class NewClient : Form
     {
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public NewClient()
         {
@@ -34,31 +24,15 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void NewClient_Load(object sender, EventArgs e)
         {
             LoadServicesData();
-            SetFonts();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void LoadServicesData()
@@ -66,19 +40,6 @@ namespace GymApplicationV2._0
             dataGridViewServices.DataSource = GeneralContext.GetDataFromDatabase(
                 "SELECT Абонемент, Цена, Срок_действия, Посещений FROM Descriptions",
                 ServicesContext.ConnectionStringServices());
-        }
-
-        private void SetFonts()
-        {
-            jeanModernButtonAdd.Font = new Font("Добавить", DataConfig.sizeFontButtons);
-
-            dataGridViewServices.DefaultCellStyle.Font =
-            dataGridViewServices.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataConfig.sizeFontTables);
-
-            radioButtonMan.Font = new Font("муж", DataConfig.sizeFontCaptions - 2);
-            radioButtonWoman.Font = new Font("жен", DataConfig.sizeFontCaptions - 2);
-            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataConfig.sizeFontCaptions - 2);
         }
 
         string lefts = "", price = "", termMembership = "";

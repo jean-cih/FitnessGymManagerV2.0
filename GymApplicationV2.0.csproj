@@ -106,6 +106,30 @@
       <HintPath>packages\Microsoft.Office.Interop.Excel.15.0.4795.1001\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.2.3.0\lib\net472\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Asio, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.Asio.2.3.0\lib\netstandard2.0\NAudio.Asio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Core, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.Core.2.3.0\lib\netstandard2.0\NAudio.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Midi, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.Midi.2.3.0\lib\netstandard2.0\NAudio.Midi.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Wasapi, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.Wasapi.2.3.0\lib\netstandard2.0\NAudio.Wasapi.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WinForms, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.WinForms.2.3.0\lib\net472\NAudio.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WinMM, Version=2.3.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>packages\NAudio.WinMM.2.3.0\lib\netstandard2.0\NAudio.WinMM.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
@@ -138,8 +162,17 @@
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Resources.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>packages\System.Resources.Extensions.8.0.0\lib\net462\System.Resources.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.AccessControl, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.AccessControl.4.7.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>packages\System.Security.Principal.Windows.4.7.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
     </Reference>
     <Reference Include="System.Text.Encodings.Web, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.Text.Encodings.Web.8.0.0\lib\net462\System.Text.Encodings.Web.dll</HintPath>
@@ -164,6 +197,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationTools\BackgroundAnimation.cs" />
+    <Compile Include="AnimationTools\FadeAnimation.cs" />
+    <Compile Include="AnimationTools\ScreenAnimation.cs" />
+    <Compile Include="AppColors\AppColor.cs" />
     <Compile Include="Components\Drawer.cs" />
     <Compile Include="Components\JeanFormStyle.cs">
       <SubType>Component</SubType>
@@ -252,12 +289,6 @@
     <Compile Include="Connections\HistoryPaymentContext.cs" />
     <Compile Include="Controls\Animation.cs" />
     <Compile Include="Controls\Animator.cs" />
-    <Compile Include="FormsClients\ChangeData.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormsClients\ChangeData.Designer.cs">
-      <DependentUpon>ChangeData.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormsClients\ChooseClient.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -332,6 +363,8 @@
     <Compile Include="FormsSplashScreens\LoadingScreen.Designer.cs">
       <DependentUpon>LoadingScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FontHelper.cs" />
+    <Compile Include="Helpers\FormDragHelper.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="FormsClients\NewClient.cs">
       <SubType>Form</SubType>
@@ -380,9 +413,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormsServices\ArchiveServices\ArchiveServices.resx">
       <DependentUpon>ArchiveServices.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormsClients\ChangeData.resx">
-      <DependentUpon>ChangeData.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormsServices\ArchiveServices\BackToLife.resx">
       <DependentUpon>BackToLife.cs</DependentUpon>
@@ -476,6 +506,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Loading.gif" />
+    <Content Include="Assets\Buttons\AdjustingFont.png" />
+    <Content Include="Assets\Buttons\cross.png" />
+    <Content Include="Assets\Buttons\ImportingData.png" />
+    <Content Include="Assets\Buttons\manual-book.png" />
+    <Content Include="Assets\Buttons\SystemSounds.png" />
+    <Content Include="Assets\Buttons\user.jpg" />
     <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -490,7 +527,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Buttons\AdjustingFont.png" />
     <Content Include="Resources\bearFront.ico" />
     <None Include="Resources\pow.png" />
     <None Include="Resources\Person.jpg" />
@@ -511,13 +547,8 @@
     <Resource Include="Resources\calendarWhite.png" />
     <Resource Include="Resources\calendarTwo.png" />
     <Resource Include="Resources\calendarOne.png" />
-    <Content Include="Assets\Buttons\cross.png" />
-    <Content Include="Assets\Buttons\ImportingData.png" />
-    <Content Include="Assets\Buttons\manual-book.png" />
-    <Content Include="Assets\Buttons\SystemSounds.png" />
     <Content Include="Assets\search.png" />
     <Content Include="Assets\Sounds\SoundError.wav" />
-    <Content Include="Assets\Buttons\user.jpg" />
     <Content Include="Assets\bearFront.ico" />
   </ItemGroup>
   <ItemGroup>

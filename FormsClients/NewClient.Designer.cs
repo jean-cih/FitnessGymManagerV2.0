@@ -51,10 +51,11 @@
             // radioButtonWoman
             // 
             this.radioButtonWoman.AutoSize = true;
-            this.radioButtonWoman.Location = new System.Drawing.Point(80, 282);
+            this.radioButtonWoman.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButtonWoman.Location = new System.Drawing.Point(82, 279);
             this.radioButtonWoman.Margin = new System.Windows.Forms.Padding(2);
             this.radioButtonWoman.Name = "radioButtonWoman";
-            this.radioButtonWoman.Size = new System.Drawing.Size(45, 17);
+            this.radioButtonWoman.Size = new System.Drawing.Size(56, 24);
             this.radioButtonWoman.TabIndex = 30;
             this.radioButtonWoman.Text = "жен";
             this.radioButtonWoman.UseVisualStyleBackColor = true;
@@ -62,10 +63,11 @@
             // radioButtonMan
             // 
             this.radioButtonMan.AutoSize = true;
-            this.radioButtonMan.Location = new System.Drawing.Point(34, 282);
+            this.radioButtonMan.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.radioButtonMan.Location = new System.Drawing.Point(24, 279);
             this.radioButtonMan.Margin = new System.Windows.Forms.Padding(2);
             this.radioButtonMan.Name = "radioButtonMan";
-            this.radioButtonMan.Size = new System.Drawing.Size(46, 17);
+            this.radioButtonMan.Size = new System.Drawing.Size(56, 24);
             this.radioButtonMan.TabIndex = 29;
             this.radioButtonMan.Text = "муж";
             this.radioButtonMan.UseVisualStyleBackColor = true;
@@ -240,7 +242,7 @@
             this.jeanTextBoxBirthday.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxBirthday.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxBirthday.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxBirthday.Location = new System.Drawing.Point(129, 270);
+            this.jeanTextBoxBirthday.Location = new System.Drawing.Point(141, 270);
             this.jeanTextBoxBirthday.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxBirthday.Name = "jeanTextBoxBirthday";
             this.jeanTextBoxBirthday.SelectionStart = 0;

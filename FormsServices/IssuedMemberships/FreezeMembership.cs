@@ -1,9 +1,10 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0.FormsServices
@@ -13,119 +14,100 @@ namespace GymApplicationV2._0.FormsServices
         public Label txtClientName;
         public Label txtCardNumber;
         public Label txtFreezeDate;
-        private System.Windows.Forms.ComboBox cmbFreezeReason;
+        private ComboBox cmbFreezeReason;
         private NumericUpDown numFreezeDays;
         private JeanModernButton btnSave;
         private JeanModernButton btnCancel;
         private Label lblTitle;
-        private System.Windows.Forms.Timer _fadeTimer;
-        private float _opacity = 0;
         public string _dateOver;
+
+        private FadeAnimation _fadeAnimation;
+
+        Panel titlePanel;
+
+        string[] notChangeableTexts = new string[]
+            {
+                "❄️ ЗАМОРОЗКА АБОНЕМЕНТА"
+            };
 
         public FreezeMembership()
         {
             InitializeComponent();
+            InitializeCustomDesign();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            InitializeCustomDesign();
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new System.Windows.Forms.Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+
+            this.EnableDrag(this);
         }
 
         private void InitializeCustomDesign()
         {
             // Основные настройки формы
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(240, 240, 245);
+            this.BackColor = Color.FromArgb(255, 255, 255);
+            this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.None;
             this.Padding = new Padding(10);
+            this.DoubleBuffered = true;
 
-            // Градиентный фон
-            this.Paint += (s, e) =>
+            titlePanel = new Panel
             {
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(113, 96, 232),
-                    Color.FromArgb(255, 255, 255),
-                    LinearGradientMode.Vertical))
-                {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
-
-                // Рамка с свечением
-                using (var pen = new Pen(Color.FromArgb(80, 120, 200), 1))
-                {
-                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, Width - 1, Height - 1));
-                }
-
-                // Разделительная линия
-                using (var pen = new Pen(Color.FromArgb(60, 60, 100), 1))
-                {
-                    e.Graphics.DrawLine(pen, 0, 40, Width, 40);
-                }
+                Size = new Size(this.Width, 50),
+                BackColor = Color.MediumSlateBlue,
+                Location = new Point(0, 0),
             };
 
             // Заголовок
             lblTitle = new Label
             {
                 Text = "❄️ ЗАМОРОЗКА АБОНЕМЕНТА",
-                Font = new Font("Montserrat", 14, FontStyle.Bold),
+                Font = new Font("Montserrat", 13, FontStyle.Bold),
                 ForeColor = Color.FromArgb(220, 220, 255),
-                Location = new Point(70, 9),
-                AutoSize = true,
+                Size = new Size(400, 25),
                 TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.Transparent
             };
+
+            lblTitle.Location = new Point((this.Width - lblTitle.Width) / 2, (titlePanel.Height - lblTitle.Height) / 2);
+            titlePanel.Controls.Add(lblTitle);
 
             // Информация о клиенте
             Label lblClientInfo = new Label
             {
                 Text = "Информация о клиенте:",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = Color.FromArgb(220, 220, 255),
-                Location = new Point(10, 50),
+                ForeColor = Color.MediumSlateBlue,
+                Location = new Point(20, 60),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
 
-            txtClientName = CreateStyledTextBox(new Point(10, 80), 400);
+            txtClientName = CreateStyledTextBox(new Point(30, 90), 400);
 
             Label lblCard = new Label
             {
                 Text = "Номер карты:",
                 Font = new Font("Segoe UI", 11, FontStyle.Regular),
                 ForeColor = Color.Black,
-                Location = new Point(10, 120),
+                Location = new Point(30, 130),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
 
-            txtCardNumber = CreateStyledTextBox(new Point(110, 120), 200);
+            txtCardNumber = CreateStyledTextBox(new Point(130, 130), 200);
 
             // Детали заморозки
             Label lblFreezeDetails = new Label
             {
                 Text = "Детали заморозки:",
                 Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = Color.FromArgb(220, 220, 255),
-                Location = new Point(10, 160),
+                ForeColor = Color.MediumSlateBlue,
+                Location = new Point(20, 170),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
@@ -136,26 +118,26 @@ namespace GymApplicationV2._0.FormsServices
                 Text = "Дата заморозки:",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.Black,
-                Location = new Point(10, 190),
+                Location = new Point(30, 200),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
 
-            txtFreezeDate = CreateStyledTextBox(new Point(160, 192), 180);
+            txtFreezeDate = CreateStyledTextBox(new Point(180, 202), 180);
 
             Label lblFreezeReason = new Label
             {
                 Text = "Причина заморозки:",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.Black,
-                Location = new Point(10, 225),
+                Location = new Point(30, 235),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
 
-            cmbFreezeReason = new System.Windows.Forms.ComboBox
+            cmbFreezeReason = new ComboBox
             {
-                Location = new Point(160, 225),
+                Location = new Point(180, 235),
                 Size = new Size(200, 30),
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -179,14 +161,14 @@ namespace GymApplicationV2._0.FormsServices
                 Text = "Срок заморозки (дней):",
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 ForeColor = Color.Black,
-                Location = new Point(10, 260),
+                Location = new Point(30, 270),
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
 
             numFreezeDays = new NumericUpDown
             {
-                Location = new Point(170, 260),
+                Location = new Point(190, 270),
                 Size = new Size(60, 30),
                 Font = new Font("Segoe UI", 9),
                 Minimum = 1,
@@ -207,7 +189,6 @@ namespace GymApplicationV2._0.FormsServices
             // Добавляем все элементы на главную панель
             this.Controls.AddRange(new Control[]
             {
-                lblTitle,
                 lblClientInfo,
                 txtClientName,
                 lblCard,
@@ -225,7 +206,7 @@ namespace GymApplicationV2._0.FormsServices
 
             var btnClose = new JeanModernButton
             {
-                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                 ForeColor = Color.FromArgb(120, 120, 120),
                 BackColor = Color.Transparent,
                 FlatStyle = FlatStyle.Flat,
@@ -233,16 +214,19 @@ namespace GymApplicationV2._0.FormsServices
                 Cursor = Cursors.Hand
             };
 
-            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(460, 5), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
-
-            this.Controls.Add(btnClose);
+            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(460, 10), new Size(30, 28));
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             // Добавление подсказки внизу формы
-            hintLabel.Font = new Font("Montserrat", 8, FontStyle.Italic);
+            hintLabel.Font = new Font("Montserrat", 7, FontStyle.Italic);
             hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
             hintLabel.BackColor = Color.Transparent;
-            hintLabel.AutoSize = true;
+            hintLabel.Size = new Size(250, 25);
+            hintLabel.Location = new Point((this.Width - 250) / 2, this.Height - hintLabel.Height - 10);
+
+            titlePanel.Controls.Add(btnClose);
+
+            this.Controls.Add(titlePanel);
         }
 
         private Label CreateStyledTextBox(Point location, int width)
@@ -361,33 +345,7 @@ namespace GymApplicationV2._0.FormsServices
         private void BtnCancel_Click(object sender, EventArgs e)
         {
             this.DialogResult = DialogResult.Cancel;
-            CloseWithAnimation();
-        }
-
-        private void CloseWithAnimation()
-        {
-            using (var closeTimer = new Timer())
-            {
-                closeTimer.Interval = 10;
-                float closeOpacity = 1;
-                closeTimer.Tick += (s, args) =>
-                {
-                    closeOpacity -= 0.05f;
-                    this.Opacity = closeOpacity;
-
-                    if (closeOpacity <= 0)
-                    {
-                        closeTimer.Stop();
-                        this.Close();
-                    }
-                };
-                closeTimer.Start();
-
-                while (closeOpacity > 0 && closeTimer.Enabled)
-                {
-                    Application.DoEvents();
-                }
-            }
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private bool ValidateForm()
@@ -413,37 +371,6 @@ namespace GymApplicationV2._0.FormsServices
         {
             txtClientName.Text = clientName;
             txtCardNumber.Text = cardNumber;
-        }
-
-        private bool dragging = false;
-        private Point dragCursorPoint;
-        private Point dragFormPoint;
-
-        protected override void OnMouseDown(MouseEventArgs e)
-        {
-            base.OnMouseDown(e);
-            if (e.Button == MouseButtons.Left && e.Y <= 40)
-            {
-                dragging = true;
-                dragCursorPoint = Cursor.Position;
-                dragFormPoint = this.Location;
-            }
-        }
-
-        protected override void OnMouseMove(MouseEventArgs e)
-        {
-            base.OnMouseMove(e);
-            if (dragging)
-            {
-                Point dif = Point.Subtract(Cursor.Position, new Size(dragCursorPoint));
-                this.Location = Point.Add(dragFormPoint, new Size(dif));
-            }
-        }
-
-        protected override void OnMouseUp(MouseEventArgs e)
-        {
-            base.OnMouseUp(e);
-            dragging = false;
         }
     }
 }

@@ -1,7 +1,11 @@
-﻿using System;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Windows.Forms;
-using GymApplicationV2._0.Connections;
 
 namespace GymApplicationV2._0
 {
@@ -11,8 +15,7 @@ namespace GymApplicationV2._0
         private string _surname = "";
         private string _numberCard = "";
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public ChooseClient()
         {
@@ -20,33 +23,18 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
-
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
+        
         private void ChooseClient_Load(object sender, EventArgs e)
         {
             ConfigureFormSize();
             PositionControls();
             LoadClientData();
-            SetFonts();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void ConfigureFormSize()
@@ -64,9 +52,11 @@ namespace GymApplicationV2._0
             jeanModernButtonChoose.Location = new Point(this.Width / 2 - 60, this.Height - 130);
         }
 
+        private DataTable _currentDataTable;
+
         private void LoadClientData()
         {
-            dataGridViewClients.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
+            string query = "SELECT " +
                 "Фамилия," +
                 "Имя," +
                 "Пол," +
@@ -78,17 +68,82 @@ namespace GymApplicationV2._0
                 "Дата_рождения AS 'Дата рождения'," +
                 "Скидка," +
                 "Сохранено" +
-                " FROM Contacts",
+                " FROM Contacts";
+
+            _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 ClientsContext.ConnectionStringClients());
+
+            dataGridViewClients.DataSource = _currentDataTable;
+
+            dataGridViewClients.ColumnHeaderMouseClick += DataGridViewClients_ColumnHeaderMouseClick;
         }
 
-        private void SetFonts()
+        private void DataGridViewClients_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-            jeanModernButtonChoose.Font = new Font("Выбрать", DataConfig.sizeFontButtons);
+            if (_currentDataTable == null) return;
 
-            dataGridViewClients.DefaultCellStyle.Font =
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new Font("Contacts", DataConfig.sizeFontTables);
+            string columnName = dataGridViewClients.Columns[e.ColumnIndex].Name;
+            bool ascending = dataGridViewClients.Tag == null || !((bool)dataGridViewClients.Tag);
+
+            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
+            dataGridViewClients.DataSource = sortedTable;
+
+            dataGridViewClients.Tag = ascending;
+        }
+
+        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
+        {
+            DataTable sortedTable = table.Clone();
+
+            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("рождения") ||
+                                columnName.Contains("Сохранено");
+
+            IEnumerable<DataRow> sortedRows;
+
+            if (isDateColumn)
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+            }
+            else if (columnName == "Покупки")
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+            }
+            else
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
+                }
+            }
+
+            foreach (DataRow row in sortedRows)
+            {
+                sortedTable.ImportRow(row);
+            }
+
+            return sortedTable;
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
