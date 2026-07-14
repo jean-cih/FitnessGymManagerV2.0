@@ -17,17 +17,17 @@ namespace GymApplicationV2._0
         public bool otherPeriond;
 
         public bool sellServices;
-        public bool historyPayment;
 
         public DateTime dateBegin;
         public DateTime dateEnd;
 
-        public bool allClient;
         public bool forPeriod;
 
         private FadeAnimation _fadeAnimation;
 
         private DataTable _currentDataTable;
+
+        public Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public InformationReport()
         {
@@ -43,40 +43,17 @@ namespace GymApplicationV2._0
         private void Attendance_Load(object sender, EventArgs e)
         {
             dataGridViewShowReport.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            LoadReportData();
 
-            FontHelper.ApplyFontSettings(this, null);
-        }
-
-        private void LoadReportData()
-        {
-            if (allClient)
-            {
-                LoadAllClientsReport();
-            }
-            else if (forPeriod)
+            if (forPeriod)
             {
                 LoadPeriodClientsReport();
             }
-            else
+            else if (sellServices)
             {
                 LoadServicesReport();
             }
-        }
 
-        private void LoadAllClientsReport()
-        {
-            _currentDataTable = GeneralContext.GetDataFromDatabase("SELECT * FROM Contacts",
-                ClientsContext.ConnectionStringClients());
-
-            labelQuantity.Text = GeneralContext.GetElementFromDatabase("SELECT COUNT(*) FROM Contacts",
-                ClientsContext.ConnectionStringClients()).ToString();
-            labelShowPeriod.Text = "Клиенты за все время";
-
-
-            dataGridViewShowReport.DataSource = _currentDataTable;
-
-            dataGridViewShowReport.ColumnHeaderMouseClick += DataGridViewClients_ColumnHeaderMouseClick;
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void DataGridViewClients_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -154,21 +131,31 @@ namespace GymApplicationV2._0
 
             if (periodForMonth)
             {
-                startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{DateTime.Now}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {DateTime.Now.ToShortDateString()}";
+                DateTime today = DateTime.Now.Date;
+                startDate = new DateTime(today.Year, today.Month, 1);
+                DateTime endDate = today.AddDays(1).AddSeconds(-1);
+
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForWeek)
             {
-                startDate = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + 1);
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{DateTime.Now}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {DateTime.Now.ToShortDateString()}";
+                DateTime today = DateTime.Now.Date;
+                int daysOffset = (int)today.DayOfWeek - 1;
+                if (daysOffset < 0) daysOffset = 6;
+
+                startDate = today.AddDays(-daysOffset);
+                DateTime endDate = today.AddDays(1).AddSeconds(-1);
+
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForDay)
             {
                 startDate = DateTime.Now.Date;
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{DateTime.Now}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {startDate.AddDays(1).ToShortDateString()}";
+                DateTime endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                labelShowPeriod.Text = $"Посещения за {startDate.ToShortDateString()}";
             }
             else if (otherPeriond)
             {
@@ -176,8 +163,53 @@ namespace GymApplicationV2._0
                 labelShowPeriod.Text = $"Посещения с {dateBegin.ToShortDateString()} по {dateEnd.ToShortDateString()}";
             }
 
-            dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase(query,
+            DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
+
+            dataTable.Columns.Add("Статус", typeof(string));
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                string cardNumber = row["№Карты"].ToString();
+
+                if (userStatus.TryGetValue(cardNumber, out string status))
+                {
+                    row["Статус"] = status;
+                }
+                else
+                {
+                    row["Статус"] = "Неизвестно";
+                }
+            }
+
+            dataGridViewShowReport.DataSource = dataTable;
+
+            dataGridViewShowReport.Columns["Статус"].DefaultCellStyle.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+
+            foreach (DataGridViewRow row in dataGridViewShowReport.Rows)
+            {
+                if (row.Cells["Статус"].Value != null)
+                {
+                    string status = row.Cells["Статус"].Value.ToString();
+
+                    switch (status)
+                    {
+                        case "Активен":
+                            row.Cells["Статус"].Style.ForeColor = Color.Green;
+                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+                            break;
+                        case "Неизвестно":
+                            row.Cells["Статус"].Style.ForeColor = Color.Black;
+                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+                            break;
+                        default:
+                            row.Cells["Статус"].Style.ForeColor = Color.Red;
+                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+                            break;
+                    }
+                }
+            }
+
             labelQuantity.Text = dataGridViewShowReport.Rows.Count.ToString();
         }
 
@@ -186,26 +218,12 @@ namespace GymApplicationV2._0
             DateTime startDate = DateTime.Now;
             string query = string.Empty;
 
-            if (sellServices)
-            {
-                labelShowPeriod.Text = $"Абонементы";
-                labelAllClients.Text = "Всего продано:";
-                labelQuantity.Text = GeneralContext.GetElementFromDatabase($"SELECT SUM(Проданных_за_месяц) FROM Descriptions",
-                ServicesContext.ConnectionStringServices()).ToString();
-                dataGridViewShowReport.DataSource = GeneralContext.GetElementFromDatabase("SELECT * FROM Descriptions",
-                ServicesContext.ConnectionStringServices());
-            }
-            else if (historyPayment)
-            {
-                startDate = DateTime.Now.AddDays(-(int)DateTime.Now.DayOfWeek + 1);
-                //query = $"SELECT Посетил, Фамилия, Имя, Телефон, №Карты, Абонемент FROM Contacts WHERE Посетил BETWEEN '{startDate}' AND '{DateTime.Now}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Платежи с {startDate.ToShortDateString()} по {DateTime.Now.ToShortDateString()}";
-                dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase("SELECT * FROM History",
-                HistoryPaymentContext.ConnectionStringPayment());
-                //labelQuantity.Text = ClientsContext.GetElementClient($"SELECT COUNT(*) FROM History WHERE Посетил BETWEEN '{startDate}' AND '{DateTime.Now}'").ToString();
-                labelQuantity.Visible = false;
-                labelAllClients.Visible = false;
-            }
+            labelShowPeriod.Text = $"Абонементы";
+            labelAllClients.Text = "Всего продано:";
+            labelQuantity.Text = GeneralContext.GetElementFromDatabase($"SELECT SUM(Проданных_за_месяц) FROM Descriptions",
+            ServicesContext.ConnectionStringServices()).ToString();
+            dataGridViewShowReport.DataSource = GeneralContext.GetElementFromDatabase("SELECT * FROM Descriptions",
+            ServicesContext.ConnectionStringServices());
         }
     }
 }

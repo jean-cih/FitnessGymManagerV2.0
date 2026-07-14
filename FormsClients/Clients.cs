@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -124,14 +125,32 @@ namespace GymApplicationV2._0
                 }
                 else
                 {
-                    var personForm = new Person(clientData, panelPerson);
-                    personForm.Show();
+                    OpenOrActivatePersonForm(clientData);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка при открытии клиента: {ex.Message}", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void OpenOrActivatePersonForm(ClientData clientData)
+        {
+            var existingForm = Application.OpenForms
+                .OfType<Person>()
+                .FirstOrDefault(p => p.CardNumber == clientData.CardNumber);
+
+            if (existingForm != null && !existingForm.IsDisposed)
+            {
+                existingForm.WindowState = FormWindowState.Normal;
+                existingForm.BringToFront();
+                existingForm.Focus();
+            }
+            else
+            {
+                var personForm = new Person(clientData, panelPerson);
+                personForm.Show(this);
             }
         }
 

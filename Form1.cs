@@ -4,8 +4,11 @@ using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Helpers;
+using NAudio.MediaFoundation;
+using NAudio.Wave;
 using Shadow;
 using System;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -42,6 +45,8 @@ namespace GymApplicationV2._0
             {
                 "🏋️ СИБИРЯК"
             };
+
+        Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public Form1()
         {
@@ -604,13 +609,47 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        // Вспомогательные методы
+        private WaveOutEvent outputDevice;
+        private MediaFoundationReader audioFile;
         private void PlayErrorSound()
         {
-            using (SoundPlayer soundPlayerError = new SoundPlayer(Properties.Resources.error))
+            string soundPath = Properties.Settings.Default.ErrorSoundPath;
+
+            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
             {
-                soundPlayerError.Play();
+                try
+                {
+                    MediaFoundationApi.Startup();
+
+                    StopErrorSound();
+
+                    outputDevice = new WaveOutEvent();
+
+                    audioFile = new MediaFoundationReader(soundPath);
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                }
+                catch (Exception ex)
+                {
+                    SystemSounds.Beep.Play();
+                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    StopErrorSound();
+                }
             }
+            else
+            {
+                SystemSounds.Beep.Play();
+            }
+        }
+
+        private void StopErrorSound()
+        {
+            outputDevice?.Stop();
+            outputDevice?.Dispose();
+            outputDevice = null;
+            audioFile?.Dispose();
+            audioFile = null;
         }
 
         private void ShowMessage(string message)
@@ -678,6 +717,7 @@ namespace GymApplicationV2._0
             {
                 PlayErrorSound();
                 ShowMessage("Этот номер не существует");
+                userStatus.Add(cardNumber, "Абонемент закончился ");
                 ClearCardNumber();
                 return false;
             }
@@ -704,8 +744,10 @@ namespace GymApplicationV2._0
             if (DateTime.Compare(Convert.ToDateTime(endDate), DateTime.Now) < 0)
             {
                 ShowMessage("Заморозка закончилась");
+                userStatus.Add(cardNumber, "Заморозка закончилась");
                 ClearCardNumber();
                 return true;
+                //return false;
             }
 
             string visitsQuery = "SELECT Посещений_осталось FROM Issued WHERE №Карты = @cardNumber";
@@ -715,8 +757,10 @@ namespace GymApplicationV2._0
 
             UnfreezeMembership(cardNumber, endDate, visitsLeft);
             ShowMessage("Заморозка снята");
+            userStatus.Add(cardNumber, "Заморозка снята");
 
             return true;
+            //return false;
         }
 
         // Разморозка абонемента
@@ -733,7 +777,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateIssuedQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@status", "активирован"),
-                new SQLiteParameter("@visitDate", DateTime.Now.ToShortDateString()),
+                new SQLiteParameter("@visitDate", DateTime.Now),
                 new SQLiteParameter("@endDate", endDate),
                 new SQLiteParameter("@visitsLeft", visitsLeft),
                 new SQLiteParameter("@cardNumber", cardNumber));
@@ -769,6 +813,7 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился по времени");
+            userStatus.Add(cardNumber, "Абонемент закончился по времени");
 
             ResetClientMembership(cardNumber);
         }
@@ -842,12 +887,12 @@ namespace GymApplicationV2._0
         private void ProcessUnlimitedVisit(string cardNumber)
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
-                "Посетил = '" + DateTime.Now.ToShortDateString() + "' " +
+                "Посетил = '" + DateTime.Now + "' " +
                 "WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@cardNumber", cardNumber));
 
-            ShowMessage("Клиент отмечен");
+            userStatus.Add(cardNumber, "Активен");
             DisplayClientData(cardNumber);
             ClearCardNumber();
         }
@@ -863,6 +908,7 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился. Посещений осталось 0");
+            userStatus.Add(cardNumber, "Абонемент закончился. Посещений осталось 0");
             ClearCardNumber();
         }
 
@@ -871,14 +917,13 @@ namespace GymApplicationV2._0
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посещений_осталось = '" + (remainingVisits - 1).ToString() + "', " +
-                "Посетил = '" + DateTime.Now.ToShortDateString() + "' " +
+                "Посетил = '" + DateTime.Now + "' " +
                 "WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            ShowMessage("Клиент отмечен");
             DisplayClientData(cardNumber);
-
+            userStatus.Add(cardNumber, "Активен");
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
             ClearCardNumber();
@@ -1004,8 +1049,11 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonReport_Click(object sender, EventArgs e)
         {
-            Report report = new Report();
-            report.ShowDialog();
+            using (var report = new Report())
+            {
+                report.userStatus = userStatus;
+                report.ShowDialog();
+            }
         }
 
         private void jeanModernButtonNewMember_Click(object sender, EventArgs e)

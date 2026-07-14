@@ -27,9 +27,13 @@ namespace GymApplicationV2._0.FormsClients
 
         private FadeAnimation _fadeAnimation;
 
+        public string CardNumber { get; private set; }
+
         public Person(ClientData data, Panel panelPerson)
         {
             InitializeComponent();
+
+            CardNumber = data.CardNumber;
 
             CreateControls(data, panelPerson);
             InitializeCustomDesign(data, panelPerson);

@@ -33,6 +33,7 @@ namespace GymApplicationV2._0
                 splash.Close();
 
                 Application.Run(new Form1());
+                //Application.Run(new Design());
             }
             catch (Exception ex)
             {

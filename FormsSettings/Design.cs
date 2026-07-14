@@ -1,11 +1,16 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
+using NAudio.MediaFoundation;
+using NAudio.Wave;
+using NAudio.MediaFoundation;
 using Shadow;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Media;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -34,6 +39,9 @@ namespace GymApplicationV2._0.FormsSettings
                 "Пример",
                 "🎨 Настройки дизайна"
             };
+
+        private WaveOutEvent outputDevice;
+        private MediaFoundationReader audioFile;
 
         public Design()
         {
@@ -158,6 +166,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             AddFormStyleSetting();
             AddBackgroundStyleSetting();
+            AddErrorSetting();
 
             titlePanel.Controls.Add(titleLabel);
 
@@ -321,6 +330,142 @@ namespace GymApplicationV2._0.FormsSettings
             settingCard.Controls.Add(formStyleComboBox);
             settingCard.Controls.Add(previewPanel);
             flowLayout.Controls.Add(settingCard);
+        }
+
+        private void AddErrorSetting()
+        {
+            var settingCard = new JeanPanel
+            {
+                Size = new Size(500, 100),
+                Margin = new Padding(0, 0, 0, 20),
+                BackColor = Color.FromArgb(55, 55, 58),
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
+            };
+
+            settingCard.Paint += (s, e) =>
+            {
+                using (var pen = new Pen(Color.FromArgb(255, 140, 0), 1))
+                {
+                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, settingCard.Width - 1, settingCard.Height - 1));
+                }
+            };
+
+            var label = new Label
+            {
+                Text = "🔊 Звук ошибки",
+                Location = new Point(15, 15),
+                Size = new Size(300, 70),
+                ForeColor = Color.FromArgb(255, 140, 0),
+            };
+
+            var choose = CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
+            choose.Click += (s, e) => SelectErrorSoundFile(s, e);
+
+            var tooltip = new ToolTip();
+            tooltip.SetToolTip(choose, "Выберите файл для звука ошибки");
+
+            settingCard.Controls.Add(label);
+            settingCard.Controls.Add(choose);
+            flowLayout.Controls.Add(settingCard);
+        }
+
+
+        private void PlayErrorSound()
+        {
+            string soundPath = Properties.Settings.Default.ErrorSoundPath;
+
+            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
+            {
+                try
+                {
+                    MediaFoundationApi.Startup();
+
+                    StopErrorSound();
+
+                    outputDevice = new WaveOutEvent();
+
+                    audioFile = new MediaFoundationReader(soundPath);
+                    outputDevice.Init(audioFile);
+                    outputDevice.Play();
+                }
+                catch (Exception ex)
+                {
+                    SystemSounds.Beep.Play();
+                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    StopErrorSound();
+                }
+            }
+            else
+            {
+                SystemSounds.Beep.Play();
+            }
+        }
+
+        private void StopErrorSound()
+        {
+            outputDevice?.Stop();
+            outputDevice?.Dispose();
+            outputDevice = null;
+            audioFile?.Dispose();
+            audioFile = null;
+        }
+
+        public void SelectErrorSoundFile(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Title = "Выберите звуковой файл для ошибки";
+                openFileDialog.Filter = "Аудио файлы|*.wav;*.mp3;*.wma;*.aac|WAV файлы|*.wav|MP3 файлы|*.mp3|Все файлы|*.*";
+                openFileDialog.FilterIndex = 1;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string selectedFile = openFileDialog.FileName;
+
+                    if (File.Exists(selectedFile))
+                    {
+                        try
+                        {
+                            MediaFoundationApi.Startup();
+                            using (var testReader = new MediaFoundationReader(selectedFile))
+                            {
+                            }
+
+                            Properties.Settings.Default.ErrorSoundPath = selectedFile;
+                            Properties.Settings.Default.Save();
+
+                            MessageBox.Show("Звук ошибки успешно установлен!", "Успех",
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                            PlayErrorSound();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Выбранный файл не является корректным аудио файлом: {ex.Message}",
+                                "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void ResetErrorSound()
+        {
+            StopErrorSound();
+            Properties.Settings.Default.ErrorSoundPath = string.Empty;
+            Properties.Settings.Default.Save();
+            MessageBox.Show("Звук ошибки сброшен на стандартный", "Информация",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public bool HasCustomErrorSound()
+        {
+            string soundPath = Properties.Settings.Default.ErrorSoundPath;
+            return !string.IsNullOrEmpty(soundPath) && File.Exists(soundPath);
         }
 
         private void AddBackgroundStyleSetting()
