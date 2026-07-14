@@ -41,18 +41,24 @@ jobs:
     - name: Build the solution
       run: msbuild GymApplicationV2.0.sln /p:Configuration=${{ matrix.configuration }} /p:RestorePackages=false
 
+    - name: Copy Photos folder
+      run: |
+        if (Test-Path "Photos") {
+          Copy-Item -Path "Photos" -Destination "bin\${{ matrix.configuration }}\" -Recurse -Force
+        }
+
+    - name: Copy Assets folder
+      run: |
+        if (Test-Path "Assets") {
+          Copy-Item -Path "Assets" -Destination "bin\${{ matrix.configuration }}\" -Recurse -Force
+        }
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.configuration }}
         path: bin/${{ matrix.configuration }}
 
-    - name: Copy Photos folder
-      run: |
-        if (Test-Path "Photos") {
-          Copy-Item -Path "Photos" -Destination "bin\Debug\" -Recurse -Force
-          Copy-Item -Path "Photos" -Destination "bin\Release\" -Recurse -Force
-        }
   upload-release:
     needs: build
     runs-on: windows-latest
