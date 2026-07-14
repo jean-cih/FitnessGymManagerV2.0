@@ -46,6 +46,10 @@ namespace GymApplicationV2._0
             splash.UpdateProgress("Создание структуры папок...", "Инициализация", 5);
             Thread.Sleep(50);
 
+            splash.UpdateProgress("Создание ресурсов", "Ресурсы", 10);
+            EnsureRequiredDirectoriesExist();
+            CopyPhotosToOutput();
+
             CheckIfConfigExists(splash);
 
             CheckIfDataExistsClients(splash);
@@ -59,9 +63,56 @@ namespace GymApplicationV2._0
             Thread.Sleep(300);
         }
 
+        public static void CopyPhotosToOutput()
+        {
+            string repoRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
+            string sourcePath = Path.Combine(repoRoot, "Photos");
+            string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
+
+            if (Directory.Exists(sourcePath))
+            {
+                CopyDirectory(sourcePath, targetPath);
+            }
+        }
+
+        private static void CopyDirectory(string sourceDir, string targetDir)
+        {
+            if (!Directory.Exists(targetDir))
+                Directory.CreateDirectory(targetDir);
+
+            foreach (string file in Directory.GetFiles(sourceDir))
+            {
+                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)), true);
+            }
+
+            foreach (string subDir in Directory.GetDirectories(sourceDir))
+            {
+                CopyDirectory(subDir, Path.Combine(targetDir, Path.GetFileName(subDir)));
+            }
+        }
+
+        public static void EnsureRequiredDirectoriesExist()
+        {
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Создаем папку Databases
+            string databasesPath = Path.Combine(appDirectory, "Databases");
+            if (!Directory.Exists(databasesPath))
+            {
+                Directory.CreateDirectory(databasesPath);
+            }
+
+            // Создаем папку AppFiles
+            string appFilesPath = Path.Combine(appDirectory, "AppFiles");
+            if (!Directory.Exists(appFilesPath))
+            {
+                Directory.CreateDirectory(appFilesPath);
+            }
+        }
+
         private static void CheckIfConfigExists(LoadingScreen splash)
         {
-            splash.UpdateProgress("Загрузка конфигурации...", "Инициализация", 10);
+            splash.UpdateProgress("Загрузка конфигурации...", "Инициализация", 20);
 
             string fontFilePath = Path.Combine("AppFiles", "Font.json");
             ConfigManager.Initialize(fontFilePath);
@@ -71,7 +122,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsClients(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД клиентов...", "Базы данных", 20);
+            splash.UpdateProgress("Проверка БД клиентов...", "Базы данных", 30);
 
             if (!File.Exists("Databases\\Clients.db"))
             {
@@ -83,7 +134,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsServices(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД услуг...", "Базы данных", 35);
+            splash.UpdateProgress("Проверка БД услуг...", "Базы данных", 40);
 
             if (!File.Exists("Databases\\Services.db"))
             {
@@ -94,7 +145,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsPayment(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД платежей...", "Базы данных", 50);
+            splash.UpdateProgress("Проверка БД платежей...", "Базы данных", 60);
 
             if (!File.Exists("Databases\\Payments.db"))
             {
@@ -105,7 +156,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsArchive(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД архива...", "Базы данных", 65);
+            splash.UpdateProgress("Проверка БД архива...", "Базы данных", 70);
 
             if (!File.Exists("Databases\\Archive.db"))
             {

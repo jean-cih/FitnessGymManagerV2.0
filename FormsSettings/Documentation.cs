@@ -498,8 +498,7 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 BorderStyle = BorderStyle.None,
                 Padding = new Padding(30),
-                MaximumSize = new Size(500, 0),
-                AutoSize = true,
+                Size = new Size(400, 400),
                 Location = new Point(0, 0),
                 BackColor = Color.FromArgb(55, 55, 58),
                 GradientBottomColor = Color.FromArgb(55, 55, 58),
@@ -549,7 +548,7 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 Text = "🚨 Экстренная помощь",
                 Size = new Size(200, 50),
-                Location = new Point(supportCard.Width / 2 - 75, 300),
+                Location = new Point((supportCard.Width - 200) / 2, 300),
                 BackColor = Color.FromArgb(220, 53, 69),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12: DataConfig.sizeFontButtons, FontStyle.Bold),
@@ -560,7 +559,6 @@ namespace GymApplicationV2._0.FormsSettings
             supportCard.Controls.Add(titleLabel);
             supportCard.Controls.Add(contactInfo);
             supportCard.Controls.Add(emergencyButton);
-            supportCard.Height = titleLabel.Height + contactInfo.Height + emergencyButton.Height + 100;
 
             mainPanel.Controls.Add(supportCard);
             tabPage.Controls.Add(mainPanel);
