@@ -507,6 +507,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Loading.gif" />
+    <Content Include="Assets\Buttons\AdjustingFont.png" />
+    <Content Include="Assets\Buttons\cross.png" />
+    <Content Include="Assets\Buttons\ImportingData.png" />
+    <Content Include="Assets\Buttons\manual-book.png" />
+    <Content Include="Assets\Buttons\SystemSounds.png" />
+    <Content Include="Assets\Buttons\user.jpg" />
     <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -521,7 +527,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\Buttons\AdjustingFont.png" />
     <Content Include="Resources\bearFront.ico" />
     <None Include="Resources\pow.png" />
     <None Include="Resources\Person.jpg" />
@@ -542,13 +547,8 @@
     <Resource Include="Resources\calendarWhite.png" />
     <Resource Include="Resources\calendarTwo.png" />
     <Resource Include="Resources\calendarOne.png" />
-    <Content Include="Assets\Buttons\cross.png" />
-    <Content Include="Assets\Buttons\ImportingData.png" />
-    <Content Include="Assets\Buttons\manual-book.png" />
-    <Content Include="Assets\Buttons\SystemSounds.png" />
     <Content Include="Assets\search.png" />
     <Content Include="Assets\Sounds\SoundError.wav" />
-    <Content Include="Assets\Buttons\user.jpg" />
     <Content Include="Assets\bearFront.ico" />
   </ItemGroup>
   <ItemGroup>
