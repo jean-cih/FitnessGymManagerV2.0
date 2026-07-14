@@ -43,9 +43,9 @@
             this.hintLabel.Location = new System.Drawing.Point(83, 402);
             this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.hintLabel.Name = "hintLabel";
-            this.hintLabel.Size = new System.Drawing.Size(312, 13);
+            this.hintLabel.Size = new System.Drawing.Size(195, 13);
             this.hintLabel.TabIndex = 36;
-            this.hintLabel.Text = "Выберите причину и срок заморозки и нажмите \'Сохранить\'";
+            this.hintLabel.Text = "Выберите причину и срок заморозки";
             this.hintLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // jeanFormStyle1

@@ -1,10 +1,13 @@
-﻿using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.FormsServices;
+using GymApplicationV2._0.Helpers;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using GymApplicationV2._0.FormsServices;
 
 namespace GymApplicationV2._0
 {
@@ -19,35 +22,21 @@ namespace GymApplicationV2._0
         private string _status = string.Empty;
         private string _visits = string.Empty;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public IssuedMembership()
         {
             InitializeComponent();
             InitializeMenu();
             SetupFormLayout();
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
 
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeMenu()
@@ -102,21 +91,100 @@ namespace GymApplicationV2._0
                 ShowChangeDialog();
         }
 
-        private void RefreshDataGrid() =>
-            dataGridViewIssued.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
-                "Клиент," +
-                "№Карты," +
-                "Дата_окончания AS 'Дата окончания'," +
-                "Дата_оформления AS 'Дата оформления'," +
-                "Абонемент," +
-                "Посетил," +
-                "Оплата," +
-                "Статус," +
-                "Посещений_осталось AS 'Посещений осталось'," +
-                "Окончание_заморозки AS 'Окончание заморозки'" +
-                "FROM Issued",
-                IssuedMembershipContext.ConnectionStringIssued()
-            );
+        private DataTable _currentDataTable;
+
+        private void RefreshDataGrid()
+        {
+            string query = @"
+        SELECT 
+            Клиент,
+            №Карты,
+            Дата_окончания AS 'Дата окончания',
+            Дата_оформления AS 'Дата оформления',
+            Абонемент,
+            Посетил,
+            Оплата,
+            Статус,
+            Посещений_осталось AS 'Посещений осталось',
+            Окончание_заморозки AS 'Окончание заморозки'
+        FROM Issued";
+
+            _currentDataTable = GeneralContext.GetDataFromDatabase(query,
+                IssuedMembershipContext.ConnectionStringIssued());
+
+            dataGridViewIssued.DataSource = _currentDataTable;
+
+            dataGridViewIssued.ColumnHeaderMouseClick += DataGridViewIssued_ColumnHeaderMouseClick;
+        }
+
+        private void DataGridViewIssued_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (_currentDataTable == null) return;
+
+            string columnName = dataGridViewIssued.Columns[e.ColumnIndex].Name;
+            bool ascending = dataGridViewIssued.Tag == null || !((bool)dataGridViewIssued.Tag);
+
+            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
+            dataGridViewIssued.DataSource = sortedTable;
+
+            dataGridViewIssued.Tag = ascending;
+        }
+
+        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
+        {
+            DataTable sortedTable = table.Clone();
+
+            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("окончания") ||
+                                columnName.Contains("оформления") || columnName == "Посетил" ||
+                                columnName == "Окончание заморозки";
+
+            IEnumerable<DataRow> sortedRows;
+
+            if (isDateColumn)
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+            }
+            else if (columnName == "Оплата")
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+            }
+            else
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
+                }
+            }
+
+            foreach (DataRow row in sortedRows)
+            {
+                sortedTable.ImportRow(row);
+            }
+
+            return sortedTable;
+        }
 
         private void jeanModernButtonRefresh_Click(object sender, EventArgs e) =>
             RefreshDataGrid();
@@ -233,12 +301,12 @@ namespace GymApplicationV2._0
 
             using (var changeDialog = new ChangeIssuedMembership())
             {
-                changeDialog.jeanSoftTextBoxClient.Texts = _client;
-                changeDialog.jeanSoftTextBoxStatus.Texts = _status;
-                changeDialog.jeanSoftTextBoxMembership.Texts = _membership;
-                changeDialog.jeanSoftTextBoxTerm.Texts = _dateOver;
-                changeDialog.jeanSoftTextBoxCost.Texts = _cost;
-                changeDialog.jeanSoftTextBoxVisits.Texts = _visits;
+                changeDialog.jeanTextBoxClient.Text = _client;
+                changeDialog.jeanTextBoxStatus.Text = _status;
+                changeDialog.jeanTextBoxMembership.Text = _membership;
+                changeDialog.jeanTextBoxTerm.Text = _dateOver;
+                changeDialog.jeanTextBoxCost.Text = _cost;
+                changeDialog.jeanTextBoxVisits.Text = _visits;
                 changeDialog._numberCard = _numberCard;
 
                 if (changeDialog.ShowDialog() == DialogResult.OK)

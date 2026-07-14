@@ -27,14 +27,14 @@ namespace GymApplicationV2._0.Connections
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
                         Клиент TEXT(100) NOT NULL,
                         №Карты TEXT(20) NOT NULL,
-                        Дата_окончания TEXT(20) NOT NULL,
-                        Дата_оформления TEXT(20) NOT NULL,
+                        Дата_окончания TEXT(20) NOT NULL,   -- YYYY-MM-DD
+                        Дата_оформления TEXT(20) NOT NULL,  -- YYYY-MM-DD
                         Абонемент TEXT(100) NOT NULL,
-                        Посетил TEXT(20),
+                        Посетил TEXT(20),                   -- YYYY-MM-DD
                         Оплата INTEGER NOT NULL,
                         Статус TEXT(20) NOT NULL,
                         Посещений_осталось TEXT(5),
-                        Окончание_заморозки TEXT(20) 
+                        Окончание_заморозки TEXT(20)        -- YYYY-MM-DD
                 )";
 
                 using (SQLiteCommand cmd = new SQLiteCommand(commandString, conn))

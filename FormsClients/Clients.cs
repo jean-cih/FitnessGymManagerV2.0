@@ -1,81 +1,76 @@
-﻿using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Controls;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.FormsClients;
-using Microsoft.Office.Interop.Excel;
+using GymApplicationV2._0.Helpers;
 using System;
-using System.ComponentModel;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
 {
     public partial class Clients : Form
     {
-        private const string PhotosPath = "\\Photos\\";
-        private System.Windows.Forms.Button _cellButton;
-        int location;
+        private FadeAnimation _fadeAnimation;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private DataTable _currentDataTable;
 
         public Clients()
         {
             InitializeComponent();
 
-            dataGridViewClients.CellMouseEnter += dataGridViewClients_CellMouseEnter;
+            SubscribeEvents();
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
-        private void SetupAnimation()
+        private void SubscribeEvents()
         {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            dataGridViewClients.ColumnHeaderMouseClick += DataGridViewClients_ColumnHeaderMouseClick;
         }
 
         private void Clients_Load(object sender, EventArgs e)
         {
-            ConfigureFormSize();
             PositionControls();
             LoadClientData();
-            SetFonts();
-        }
 
-        private void ConfigureFormSize()
-        {
-            this.Width = (int)(Screen.PrimaryScreen.Bounds.Width * 0.85);
-            this.Height = (int)(Screen.PrimaryScreen.Bounds.Height * 0.85);
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void PositionControls()
         {
-            jeanPanel.Size = new Size(this.Width - 40, this.Height - 150);
-            jeanSoftTextBoxSearch.Location = new System.Drawing.Point(this.Width / 2 - 150, 30);
-            jeanModernButtonErase.Location = new System.Drawing.Point(this.Width / 2 - 150 + 260, 35);
-            pictureBoxSearch.Location = new System.Drawing.Point(this.Width / 2 - 140, 35);
-            jeanModernButtonChangeData.Location = new System.Drawing.Point(this.Width - 160, 13);
+            this.Width = (int)(Screen.PrimaryScreen.Bounds.Width * 0.85);
+            this.Height = (int)(Screen.PrimaryScreen.Bounds.Height * 0.85);
+
+            jeanSoftTextBoxSearch.Location = new Point(this.Width / 2 - 150, 30);
+            jeanModernButtonErase.Location = new Point(this.Width / 2 - 150 + 260, 35);
+            pictureBoxSearch.Location = new Point(this.Width / 2 - 140, 35);
+
+            jeanModernButtonDelete.Location = new Point(this.Width / 2 + jeanModernButtonDelete.Width / 2 + 20, this.Height - 3 * jeanModernButtonDelete.Height);
+            jeanModernButtonChange.Location = new Point(this.Width / 2 - jeanModernButtonChange.Width / 2 - 20, this.Height - 3 * jeanModernButtonChange.Height);
+
+            checkBoxPerson.Location = new Point(this.Width / 2 + 2 * jeanModernButtonDelete.Width, this.Height - 3 * jeanModernButtonChange.Height);
+
+            this.Location = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - this.Width / 2,
+                Screen.PrimaryScreen.Bounds.Height / 2 - this.Height / 2);
+            
+            panelPerson.Location = new Point(dataGridViewClients.Location.X + dataGridViewClients.Width - 430, panelPerson.Location.Y);
+            panelPerson.Width = 450;
+            panelPerson.Height = jeanPanel.Height;
         }
+
 
         private void LoadClientData()
         {
-            dataGridViewClients.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
+            string query = "SELECT " +
                 "Фамилия," +
                 "Имя," +
                 "Пол," +
@@ -87,48 +82,82 @@ namespace GymApplicationV2._0
                 "Дата_рождения AS 'Дата рождения'," +
                 "Скидка," +
                 "Сохранено" +
-                " FROM Contacts",
+                " FROM Contacts";
+
+            _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 ClientsContext.ConnectionStringClients());
+
+            dataGridViewClients.DataSource = _currentDataTable;
+
+            if (dataGridViewClients.Columns.Count > 0)
+            {
+                dataGridViewClients.Columns[0].DefaultCellStyle.ForeColor = Color.FromArgb(30, 41, 59);
+                dataGridViewClients.Columns[0].DefaultCellStyle.Font = new Font(
+            dataGridViewClients.DefaultCellStyle.Font, FontStyle.Bold);
+                dataGridViewClients.CellClick += DataGridViewClients_CellClick;
+            }
         }
 
-        private void SetFonts()
+        private void DataGridViewClients_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            jeanModernButtonChangeData.Font = new System.Drawing.Font("Изменить данные клиента", DataConfig.sizeFontButtons);
+            if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
 
-            dataGridViewClients.DefaultCellStyle.Font =
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font =
-                new System.Drawing.Font("Contacts", DataConfig.sizeFontTables);
+            if (e.ColumnIndex == 0)
+            {
+                OpenClient(e.RowIndex);
+            }
         }
 
-        private void button_Click(object sender, EventArgs e)
+        private void OpenClient(int rowIndex)
         {
-            if (dataGridViewClients.CurrentRow == null) return;
+            try
+            {
+                if (rowIndex < 0 || rowIndex >= dataGridViewClients.Rows.Count) return;
 
-            int rowIndex = location / dataGridViewClients.Rows[0].Height;
-            var row = dataGridViewClients.CurrentRow;
+                var row = dataGridViewClients.Rows[rowIndex];
 
+                var clientData = LoadClientData(row);
+
+                if (!checkBoxPerson.Checked)
+                {
+                    ImportPersonFormToPanel(clientData);
+                }
+                else
+                {
+                    var personForm = new Person(clientData, panelPerson);
+                    personForm.Show();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при открытии клиента: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private ClientData LoadClientData(DataGridViewRow row)
+        {
             var clientData = new ClientData
             {
-                 FullName = $"{dataGridViewClients.Rows[rowIndex].Cells[0].Value} {dataGridViewClients.Rows[rowIndex].Cells[1].Value}",
-                 Phone = dataGridViewClients.Rows[rowIndex].Cells[3].Value.ToString(),
-                 CardNumber = dataGridViewClients.Rows[rowIndex].Cells[4].Value.ToString(),
-                 Birthday = dataGridViewClients.Rows[rowIndex].Cells[8].Value.ToString(),
-                 Saved = dataGridViewClients.Rows[rowIndex].Cells[10].Value.ToString(),
-                 Discount = dataGridViewClients.Rows[rowIndex].Cells[9].Value.ToString(),
-                 Email = dataGridViewClients.Rows[rowIndex].Cells[7].Value.ToString(),
-                 Gender = dataGridViewClients.Rows[rowIndex].Cells[2].Value.ToString(),
+                FullName = $"{row.Cells[0].Value} {row.Cells[1].Value}",
+                Phone = row.Cells[3].Value?.ToString() ?? "",
+                CardNumber = row.Cells[4].Value?.ToString() ?? "",
+                Birthday = row.Cells[8].Value?.ToString() ?? "",
+                Saved = row.Cells[10].Value?.ToString() ?? "",
+                Discount = row.Cells[9].Value?.ToString() ?? "",
+                Email = row.Cells[7].Value?.ToString() ?? "",
+                Gender = row.Cells[2].Value?.ToString() ?? "",
             };
 
             string query = @"
-                  SELECT Абонемент, 
-                         Дата_окончания AS 'Дата окончания', 
-                         Посещений_осталось AS 'Посещений осталось',
-                         Посетил
-                  FROM Issued 
-                  WHERE №Карты = @cardNumber";
+          SELECT Абонемент, 
+                 Дата_окончания AS 'Дата окончания', 
+                 Посещений_осталось AS 'Посещений осталось',
+                 Посетил
+          FROM Issued 
+          WHERE №Карты = @cardNumber";
 
-            System.Data.DataTable table = new System.Data.DataTable();
-            table = GeneralContext.GetDataFromDatabase(query,
+            DataTable table = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", clientData.CardNumber));
 
@@ -138,34 +167,86 @@ namespace GymApplicationV2._0
                 clientData.VisitsLeft = table.Rows[0]["Посещений осталось"] != DBNull.Value ? table.Rows[0]["Посещений осталось"].ToString() : "";
                 clientData.Membership = table.Rows[0]["Абонемент"] != DBNull.Value ? table.Rows[0]["Абонемент"].ToString() : "";
                 clientData.Visits = table.Rows[0]["Дата окончания"] != DBNull.Value ? table.Rows[0]["Дата окончания"].ToString() : "";
+            }
 
+            return clientData;
+        }
+
+        private void DataGridViewClients_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (_currentDataTable == null) return;
+
+            string columnName = dataGridViewClients.Columns[e.ColumnIndex].Name;
+            bool ascending = dataGridViewClients.Tag == null || !((bool)dataGridViewClients.Tag);
+
+            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
+            dataGridViewClients.DataSource = sortedTable;
+
+            dataGridViewClients.Tag = ascending;
+        }
+
+        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
+        {
+            DataTable sortedTable = table.Clone();
+
+            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("рождения") ||
+                                columnName.Contains("Сохранено");
+
+            IEnumerable<DataRow> sortedRows;
+
+            if (isDateColumn)
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+            }
+            else if (columnName == "Покупки")
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
             }
             else
             {
-                clientData.Visits = "";
-                clientData.VisitsLeft = "";
-                clientData.Membership = "";
-                clientData.VisitDate = "";
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
+                }
             }
 
-            if (!checkBoxPerson.Checked)
+            foreach (DataRow row in sortedRows)
             {
-                ImportPersonFormToPanel(clientData);
+                sortedTable.ImportRow(row);
             }
-            else
-            {
-                var personForm = new Person(clientData, panelPerson);
-                personForm.Show();
-            }
+
+            return sortedTable;
         }
 
         private void ImportPersonFormToPanel(ClientData data)
         {
-            panelPerson.Visible = true;
-
+            panelPerson.Visible = false;
             panelPerson.Controls.Clear();
-            var personForm = new Person(data, panelPerson);
 
+            var personForm = new Person(data, panelPerson);
+            personForm.Visible = false;
             personForm.TopLevel = false;
             personForm.AutoScroll = true;
             personForm.FormBorderStyle = FormBorderStyle.None;
@@ -173,58 +254,8 @@ namespace GymApplicationV2._0
 
             panelPerson.Controls.Add(personForm);
 
-            personForm.Show();
-
-            panelPerson.Refresh();
-        }
-
-        private void dataGridViewClients_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.RowIndex < 0 || e.ColumnIndex < 0 ||
-                e.RowIndex >= dataGridViewClients.Rows.Count ||
-                e.ColumnIndex >= dataGridViewClients.Columns.Count)
-                return;
-
-            if (e.ColumnIndex != 0)
-            {
-                if (_cellButton != null)
-                {
-                    dataGridViewClients.Controls.Remove(_cellButton);
-                    _cellButton.Dispose();
-                    _cellButton = null;
-                }
-                return;
-            }
-
-            if (_cellButton != null)
-            {
-                dataGridViewClients.Controls.Remove(_cellButton);
-                _cellButton.Dispose();
-            }
-
-            _cellButton = new System.Windows.Forms.Button
-            {
-                Text = "Открыть",
-                Size = new Size(80, 30),
-                Location = GetButtonLocation(e)
-            };
-
-            _cellButton.Click += button_Click;
-            dataGridViewClients.Controls.Add(_cellButton);
-
-            location = e.RowIndex * dataGridViewClients.Rows[e.RowIndex].Height;
-        }
-
-        private System.Drawing.Point GetButtonLocation(DataGridViewCellEventArgs e)
-        {
-            var cellRect = dataGridViewClients.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, true);
-            return new System.Drawing.Point(cellRect.X + dataGridViewClients.Columns[e.ColumnIndex].Width, cellRect.Y);
-        }
-
-        private void jeanModernButtonChangeData_Click(object sender, EventArgs e)
-        {
-            new ChangeData().Show();
-            this.Close();
+            panelPerson.Visible = true;
+            personForm.Visible = true;
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
@@ -303,6 +334,134 @@ namespace GymApplicationV2._0
         private void jeanModernButtonErase_Click(object sender, EventArgs e)
         {
             jeanSoftTextBoxSearch.Texts = "";
+        }
+
+        private void jeanModernButtonChange_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
+            {
+                Message.MessageWindowOk("Клиент не выбран");
+                return;
+            }
+
+            if (Message.MessageWindowYesNo("Вы действительно хотите изменить данные клиента?") != DialogResult.Yes)
+                return;
+
+            string[] fullName = jeanTextBoxClient.Text.Split(' ');
+
+            if (fullName.Length < 2)
+            {
+                MessageBox.Show("Введите имя и фамилию");
+                return;
+            }
+
+            string middleName = fullName.Length > 2 ? fullName[2].Trim() : "";
+
+            var updateQuery = @"UPDATE Contacts SET 
+              Фамилия = @LastName,
+              Имя = @FirstName,
+              Пол = @Gender,
+              Телефон = @Phone,
+              №Карты = @CardNumber,
+              Покупки = @Purchases,
+              Отчество = @MiddleName,
+              Email = @Email,
+              Дата_рождения = @BirthDate,
+              Скидка = @Discount
+              WHERE (Фамилия = @LastName AND Имя = @FirstName) 
+                 OR (Телефон = @Phone AND NULLIF(@Phone, '') IS NOT NULL) 
+                 OR (№Карты = @CardNumber AND NULLIF(@CardNumber, '') IS NOT NULL)";
+
+            var parameters = new SQLiteParameter[]
+            {
+              new SQLiteParameter("@LastName", fullName[0].Trim()),
+              new SQLiteParameter("@FirstName", fullName[1].Trim()),
+              new SQLiteParameter("@Gender", jeanTextBoxGender.Text.Trim()),
+              new SQLiteParameter("@Phone", jeanTextBoxPhone.Text.Trim()),
+              new SQLiteParameter("@CardNumber", jeanTextBoxNumberCard.Text.Trim()),
+              new SQLiteParameter("@Purchases", jeanTextBoxPurchase.Text.Trim()),
+              new SQLiteParameter("@MiddleName", middleName),
+              new SQLiteParameter("@Email", jeanTextBoxEmail.Text.Trim()),
+              new SQLiteParameter("@BirthDate", jeanTextBoxBirthday.Text.Trim()),
+              new SQLiteParameter("@Discount", jeanTextBoxDiscount.Text.Trim()),
+              new SQLiteParameter("@WhereCardNumber", jeanTextBoxNumberCard.Text.Trim())
+            };
+
+            GeneralContext.CommandDataFromDatabase(updateQuery,
+                ClientsContext.ConnectionStringClients(), parameters);
+
+            Message.MessageWindowOk("Данные клиента обновлены");
+            RefreshDataAndClearFields();
+            jeanTextBoxClient.Text = "";
+        }
+
+        private void jeanModernButtonDelete_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
+            {
+                Message.MessageWindowOk("Клиент не выбран");
+                return;
+            }
+
+            if (Message.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
+                return;
+
+            string[] fullName = jeanTextBoxClient.Text.Split(' ');
+
+            string lastName = fullName.Length > 0 ? fullName[0].Trim() : "";
+            string firstName = fullName.Length > 1 ? fullName[1].Trim() : "";
+
+            var deleteQuery = @"DELETE FROM Contacts 
+              WHERE (Фамилия = @LastName AND Имя = @FirstName) 
+                 OR (@Phone != '' AND Телефон = @Phone) 
+                 OR (@CardNumber != '' AND №Карты = @CardNumber)";
+
+            var parameters = new SQLiteParameter[]
+            {
+              new SQLiteParameter("@LastName", lastName),
+              new SQLiteParameter("@FirstName", firstName),
+              new SQLiteParameter("@Phone", jeanTextBoxPhone.Text.Trim()),
+              new SQLiteParameter("@CardNumber", jeanTextBoxNumberCard.Text.Trim())
+            };
+
+            GeneralContext.CommandDataFromDatabase(deleteQuery,
+                ClientsContext.ConnectionStringClients(), parameters);
+            Message.MessageWindowOk("Клиент удален");
+            RefreshDataAndClearFields();
+        }
+
+        private void RefreshDataAndClearFields()
+        {
+            LoadClientData();
+            ClearAllFields();
+        }
+
+        private void ClearAllFields()
+        {
+            jeanTextBoxClient.Text =
+            jeanTextBoxGender.Text =
+            jeanTextBoxPhone.Text =
+            jeanTextBoxNumberCard.Text =
+            jeanTextBoxEmail.Text =
+            jeanTextBoxBirthday.Text =
+            jeanTextBoxDiscount.Text =
+            jeanTextBoxPurchase.Text = "";
+        }
+
+        private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (dataGridViewClients.SelectedRows.Count == 0) return;
+
+            var selectedRow = dataGridViewClients.SelectedRows[0];
+
+            jeanTextBoxClient.Text = $"{selectedRow.Cells[0].Value} {selectedRow.Cells[1].Value} {selectedRow.Cells[6].Value}";
+            jeanTextBoxGender.Text = selectedRow.Cells[2].Value.ToString();
+            jeanTextBoxPhone.Text = selectedRow.Cells[3].Value.ToString();
+            jeanTextBoxNumberCard.Text = selectedRow.Cells[4].Value.ToString();
+            jeanTextBoxPurchase.Text = selectedRow.Cells[5].Value.ToString();
+            jeanTextBoxEmail.Text = selectedRow.Cells[7].Value.ToString();
+            jeanTextBoxBirthday.Text = selectedRow.Cells[8].Value.ToString();
+            jeanTextBoxDiscount.Text = selectedRow.Cells[9].Value.ToString();
         }
     }
 

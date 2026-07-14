@@ -1,9 +1,10 @@
-﻿using GymApplicationV2._0.Connections;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
@@ -22,8 +23,7 @@ namespace GymApplicationV2._0
         private string _phone = "";
         private string _clientId = "";
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
 
         public SingleTicket()
         {
@@ -31,42 +31,19 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void SingleTicket_Load(object sender, EventArgs e)
         {
             Width = (int)(Screen.PrimaryScreen.Bounds.Width * FormWidthRatio);
             Height = (int)(Screen.PrimaryScreen.Bounds.Height * FormHeightRatio);
-
-            SetFonts();
+ 
             InitializeData();
-        }
 
-        private void SetFonts()
-        {
-            jeanModernButtonSell.Font = new Font("Продать", DataConfig.sizeFontButtons);
-            dataGridViewClients.DefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
-            dataGridViewClients.ColumnHeadersDefaultCellStyle.Font = new Font("Contacts", DataConfig.sizeFontTables);
-            checkBoxVisited.Font = new Font("Отметить посещение сразу", DataConfig.sizeFontCaptions - 2);
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void InitializeData()

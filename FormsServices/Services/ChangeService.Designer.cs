@@ -1,4 +1,6 @@
-﻿namespace GymApplicationV2._0
+﻿using System.Drawing;
+
+namespace GymApplicationV2._0
 {
     partial class ChangeService
     {
@@ -31,25 +33,25 @@
             this.hintLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.titleLabel = new System.Windows.Forms.Label();
-            this.jeanSoftTextBoxQuantity = new GymApplicationV2._0.Controls.jeanSoftTextBox();
-            this.jeanSoftTextBoxTerm = new GymApplicationV2._0.Controls.jeanSoftTextBox();
-            this.jeanSoftTextBoxPrice = new GymApplicationV2._0.Controls.jeanSoftTextBox();
-            this.jeanSoftTextBoxName = new GymApplicationV2._0.Controls.jeanSoftTextBox();
-            this.jeanModernButton1 = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanModernButtonSave = new GymApplicationV2._0.Controls.JeanModernButton();
+            this.jeanTextBoxVisited = new GymApplicationV2._0.JeanTextBox();
+            this.jeanTextBoxTerm = new GymApplicationV2._0.JeanTextBox();
+            this.jeanTextBoxPrice = new GymApplicationV2._0.JeanTextBox();
+            this.jeanTextBoxName = new GymApplicationV2._0.JeanTextBox();
             this.SuspendLayout();
             // 
             // hintLabel
             // 
             this.hintLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.hintLabel.AutoSize = true;
-            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.hintLabel.Location = new System.Drawing.Point(71, 329);
+            this.hintLabel.BackColor = System.Drawing.Color.Transparent;
+            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
+            this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
+            this.hintLabel.Location = new System.Drawing.Point(0, 0);
             this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.hintLabel.Name = "hintLabel";
-            this.hintLabel.Size = new System.Drawing.Size(271, 13);
+            this.hintLabel.Size = new System.Drawing.Size(155, 25);
             this.hintLabel.TabIndex = 67;
-            this.hintLabel.Text = "Измените параметры услуги и нажмите \'Сохранить\'";
+            this.hintLabel.Text = "Измените параметры услуги";
             // 
             // label1
             // 
@@ -66,116 +68,15 @@
             // titleLabel
             // 
             this.titleLabel.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            this.titleLabel.AutoSize = true;
-            this.titleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.titleLabel.Location = new System.Drawing.Point(62, 12);
+            this.titleLabel.BackColor = System.Drawing.Color.Transparent;
+            this.titleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.titleLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(255)))));
+            this.titleLabel.Location = new System.Drawing.Point(0, 0);
             this.titleLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(289, 24);
+            this.titleLabel.Size = new System.Drawing.Size(270, 25);
             this.titleLabel.TabIndex = 65;
             this.titleLabel.Text = "РЕДАКТИРОВАНИЕ УСЛУГИ";
-            // 
-            // jeanSoftTextBoxQuantity
-            // 
-            this.jeanSoftTextBoxQuantity.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.jeanSoftTextBoxQuantity.BorderColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanSoftTextBoxQuantity.BorderFocusColor = System.Drawing.Color.HotPink;
-            this.jeanSoftTextBoxQuantity.BorderRadius = 0;
-            this.jeanSoftTextBoxQuantity.BorderSize = 2;
-            this.jeanSoftTextBoxQuantity.Location = new System.Drawing.Point(74, 223);
-            this.jeanSoftTextBoxQuantity.Margin = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxQuantity.Multiline = false;
-            this.jeanSoftTextBoxQuantity.Name = "jeanSoftTextBoxQuantity";
-            this.jeanSoftTextBoxQuantity.Padding = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxQuantity.PasswordChar = false;
-            this.jeanSoftTextBoxQuantity.PlaceholderColor = System.Drawing.Color.DarkGray;
-            this.jeanSoftTextBoxQuantity.PlaceholderText = "";
-            this.jeanSoftTextBoxQuantity.Size = new System.Drawing.Size(256, 24);
-            this.jeanSoftTextBoxQuantity.TabIndex = 64;
-            this.jeanSoftTextBoxQuantity.Texts = "";
-            this.jeanSoftTextBoxQuantity.UnderlinedStyle = false;
-            // 
-            // jeanSoftTextBoxTerm
-            // 
-            this.jeanSoftTextBoxTerm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.jeanSoftTextBoxTerm.BorderColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanSoftTextBoxTerm.BorderFocusColor = System.Drawing.Color.HotPink;
-            this.jeanSoftTextBoxTerm.BorderRadius = 0;
-            this.jeanSoftTextBoxTerm.BorderSize = 2;
-            this.jeanSoftTextBoxTerm.Location = new System.Drawing.Point(74, 185);
-            this.jeanSoftTextBoxTerm.Margin = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxTerm.Multiline = false;
-            this.jeanSoftTextBoxTerm.Name = "jeanSoftTextBoxTerm";
-            this.jeanSoftTextBoxTerm.Padding = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxTerm.PasswordChar = false;
-            this.jeanSoftTextBoxTerm.PlaceholderColor = System.Drawing.Color.DarkGray;
-            this.jeanSoftTextBoxTerm.PlaceholderText = "";
-            this.jeanSoftTextBoxTerm.Size = new System.Drawing.Size(256, 24);
-            this.jeanSoftTextBoxTerm.TabIndex = 63;
-            this.jeanSoftTextBoxTerm.Texts = "";
-            this.jeanSoftTextBoxTerm.UnderlinedStyle = false;
-            // 
-            // jeanSoftTextBoxPrice
-            // 
-            this.jeanSoftTextBoxPrice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.jeanSoftTextBoxPrice.BorderColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanSoftTextBoxPrice.BorderFocusColor = System.Drawing.Color.HotPink;
-            this.jeanSoftTextBoxPrice.BorderRadius = 0;
-            this.jeanSoftTextBoxPrice.BorderSize = 2;
-            this.jeanSoftTextBoxPrice.Location = new System.Drawing.Point(74, 148);
-            this.jeanSoftTextBoxPrice.Margin = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxPrice.Multiline = false;
-            this.jeanSoftTextBoxPrice.Name = "jeanSoftTextBoxPrice";
-            this.jeanSoftTextBoxPrice.Padding = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxPrice.PasswordChar = false;
-            this.jeanSoftTextBoxPrice.PlaceholderColor = System.Drawing.Color.DarkGray;
-            this.jeanSoftTextBoxPrice.PlaceholderText = "";
-            this.jeanSoftTextBoxPrice.Size = new System.Drawing.Size(256, 24);
-            this.jeanSoftTextBoxPrice.TabIndex = 62;
-            this.jeanSoftTextBoxPrice.Texts = "";
-            this.jeanSoftTextBoxPrice.UnderlinedStyle = false;
-            // 
-            // jeanSoftTextBoxName
-            // 
-            this.jeanSoftTextBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.jeanSoftTextBoxName.BorderColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanSoftTextBoxName.BorderFocusColor = System.Drawing.Color.HotPink;
-            this.jeanSoftTextBoxName.BorderRadius = 0;
-            this.jeanSoftTextBoxName.BorderSize = 2;
-            this.jeanSoftTextBoxName.Location = new System.Drawing.Point(74, 111);
-            this.jeanSoftTextBoxName.Margin = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxName.Multiline = false;
-            this.jeanSoftTextBoxName.Name = "jeanSoftTextBoxName";
-            this.jeanSoftTextBoxName.Padding = new System.Windows.Forms.Padding(4);
-            this.jeanSoftTextBoxName.PasswordChar = false;
-            this.jeanSoftTextBoxName.PlaceholderColor = System.Drawing.Color.DarkGray;
-            this.jeanSoftTextBoxName.PlaceholderText = "";
-            this.jeanSoftTextBoxName.Size = new System.Drawing.Size(256, 24);
-            this.jeanSoftTextBoxName.TabIndex = 61;
-            this.jeanSoftTextBoxName.Texts = "";
-            this.jeanSoftTextBoxName.UnderlinedStyle = false;
-            // 
-            // jeanModernButton1
-            // 
-            this.jeanModernButton1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.jeanModernButton1.BackColor = System.Drawing.Color.White;
-            this.jeanModernButton1.BackgroundColor = System.Drawing.Color.White;
-            this.jeanModernButton1.BorderColor = System.Drawing.Color.DarkOrange;
-            this.jeanModernButton1.BorderRadius = 20;
-            this.jeanModernButton1.BorderSize = 2;
-            this.jeanModernButton1.FlatAppearance.BorderSize = 0;
-            this.jeanModernButton1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.jeanModernButton1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanModernButton1.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButton1.Location = new System.Drawing.Point(358, 5);
-            this.jeanModernButton1.Margin = new System.Windows.Forms.Padding(2);
-            this.jeanModernButton1.Name = "jeanModernButton1";
-            this.jeanModernButton1.Size = new System.Drawing.Size(30, 28);
-            this.jeanModernButton1.TabIndex = 60;
-            this.jeanModernButton1.Text = " X";
-            this.jeanModernButton1.TextColor = System.Drawing.Color.Black;
-            this.jeanModernButton1.UseVisualStyleBackColor = false;
-            this.jeanModernButton1.Click += new System.EventHandler(this.jeanModernButton1_Click);
             // 
             // jeanModernButtonSave
             // 
@@ -199,29 +100,105 @@
             this.jeanModernButtonSave.UseVisualStyleBackColor = false;
             this.jeanModernButtonSave.Click += new System.EventHandler(this.jeanModernButtonSave_Click);
             // 
+            // jeanTextBoxVisited
+            // 
+            this.jeanTextBoxVisited.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.jeanTextBoxVisited.BackColor = System.Drawing.Color.White;
+            this.jeanTextBoxVisited.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.jeanTextBoxVisited.BorderColorNotActive = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(140)))), ((int)(((byte)(141)))));
+            this.jeanTextBoxVisited.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.jeanTextBoxVisited.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.jeanTextBoxVisited.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            this.jeanTextBoxVisited.ForeColor = System.Drawing.Color.Black;
+            this.jeanTextBoxVisited.Location = new System.Drawing.Point(77, 228);
+            this.jeanTextBoxVisited.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxVisited.Name = "jeanTextBoxVisited";
+            this.jeanTextBoxVisited.SelectionStart = 0;
+            this.jeanTextBoxVisited.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxVisited.TabIndex = 71;
+            this.jeanTextBoxVisited.TextInput = "";
+            this.jeanTextBoxVisited.TextPreview = "Количество посещений";
+            this.jeanTextBoxVisited.UseSystemPasswordChar = false;
+            // 
+            // jeanTextBoxTerm
+            // 
+            this.jeanTextBoxTerm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.jeanTextBoxTerm.BackColor = System.Drawing.Color.White;
+            this.jeanTextBoxTerm.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.jeanTextBoxTerm.BorderColorNotActive = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(140)))), ((int)(((byte)(141)))));
+            this.jeanTextBoxTerm.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.jeanTextBoxTerm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.jeanTextBoxTerm.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            this.jeanTextBoxTerm.ForeColor = System.Drawing.Color.Black;
+            this.jeanTextBoxTerm.Location = new System.Drawing.Point(77, 192);
+            this.jeanTextBoxTerm.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxTerm.Name = "jeanTextBoxTerm";
+            this.jeanTextBoxTerm.SelectionStart = 0;
+            this.jeanTextBoxTerm.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxTerm.TabIndex = 70;
+            this.jeanTextBoxTerm.TextInput = "";
+            this.jeanTextBoxTerm.TextPreview = "Срок Действия (Мес)";
+            this.jeanTextBoxTerm.UseSystemPasswordChar = false;
+            // 
+            // jeanTextBoxPrice
+            // 
+            this.jeanTextBoxPrice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.jeanTextBoxPrice.BackColor = System.Drawing.Color.White;
+            this.jeanTextBoxPrice.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.jeanTextBoxPrice.BorderColorNotActive = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(140)))), ((int)(((byte)(141)))));
+            this.jeanTextBoxPrice.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.jeanTextBoxPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.jeanTextBoxPrice.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            this.jeanTextBoxPrice.ForeColor = System.Drawing.Color.Black;
+            this.jeanTextBoxPrice.Location = new System.Drawing.Point(77, 156);
+            this.jeanTextBoxPrice.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxPrice.Name = "jeanTextBoxPrice";
+            this.jeanTextBoxPrice.SelectionStart = 0;
+            this.jeanTextBoxPrice.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxPrice.TabIndex = 69;
+            this.jeanTextBoxPrice.TextInput = "";
+            this.jeanTextBoxPrice.TextPreview = "Цена";
+            this.jeanTextBoxPrice.UseSystemPasswordChar = false;
+            // 
+            // jeanTextBoxName
+            // 
+            this.jeanTextBoxName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.jeanTextBoxName.BackColor = System.Drawing.Color.White;
+            this.jeanTextBoxName.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.jeanTextBoxName.BorderColorNotActive = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(140)))), ((int)(((byte)(141)))));
+            this.jeanTextBoxName.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.jeanTextBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.jeanTextBoxName.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            this.jeanTextBoxName.ForeColor = System.Drawing.Color.Black;
+            this.jeanTextBoxName.Location = new System.Drawing.Point(77, 119);
+            this.jeanTextBoxName.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxName.Name = "jeanTextBoxName";
+            this.jeanTextBoxName.SelectionStart = 0;
+            this.jeanTextBoxName.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxName.TabIndex = 68;
+            this.jeanTextBoxName.TextInput = "";
+            this.jeanTextBoxName.TextPreview = "Наименование";
+            this.jeanTextBoxName.UseSystemPasswordChar = false;
+            // 
             // ChangeService
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(398, 362);
+            this.Controls.Add(this.jeanTextBoxVisited);
+            this.Controls.Add(this.jeanTextBoxTerm);
+            this.Controls.Add(this.jeanTextBoxPrice);
+            this.Controls.Add(this.jeanTextBoxName);
             this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.titleLabel);
-            this.Controls.Add(this.jeanSoftTextBoxQuantity);
-            this.Controls.Add(this.jeanSoftTextBoxTerm);
-            this.Controls.Add(this.jeanSoftTextBoxPrice);
-            this.Controls.Add(this.jeanSoftTextBoxName);
-            this.Controls.Add(this.jeanModernButton1);
             this.Controls.Add(this.jeanModernButtonSave);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ChangeService";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ChangeService";
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ChangeService_MouseDown);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ChangeService_MouseMove);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ChangeService_MouseUp);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -229,13 +206,12 @@
 
         #endregion
         protected internal Controls.JeanModernButton jeanModernButtonSave;
-        private Controls.JeanModernButton jeanModernButton1;
-        protected internal Controls.jeanSoftTextBox jeanSoftTextBoxName;
-        protected internal Controls.jeanSoftTextBox jeanSoftTextBoxPrice;
-        protected internal Controls.jeanSoftTextBox jeanSoftTextBoxTerm;
-        protected internal Controls.jeanSoftTextBox jeanSoftTextBoxQuantity;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label hintLabel;
+        public JeanTextBox jeanTextBoxVisited;
+        public JeanTextBox jeanTextBoxTerm;
+        public JeanTextBox jeanTextBoxPrice;
+        public JeanTextBox jeanTextBoxName;
     }
 }

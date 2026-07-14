@@ -164,6 +164,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimationTools\BackgroundAnimation.cs" />
+    <Compile Include="AnimationTools\FadeAnimation.cs" />
+    <Compile Include="AnimationTools\ScreenAnimation.cs" />
+    <Compile Include="AppColors\AppColor.cs" />
     <Compile Include="Components\Drawer.cs" />
     <Compile Include="Components\JeanFormStyle.cs">
       <SubType>Component</SubType>
@@ -252,12 +256,6 @@
     <Compile Include="Connections\HistoryPaymentContext.cs" />
     <Compile Include="Controls\Animation.cs" />
     <Compile Include="Controls\Animator.cs" />
-    <Compile Include="FormsClients\ChangeData.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="FormsClients\ChangeData.Designer.cs">
-      <DependentUpon>ChangeData.cs</DependentUpon>
-    </Compile>
     <Compile Include="FormsClients\ChooseClient.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -332,6 +330,8 @@
     <Compile Include="FormsSplashScreens\LoadingScreen.Designer.cs">
       <DependentUpon>LoadingScreen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FontHelper.cs" />
+    <Compile Include="Helpers\FormDragHelper.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="FormsClients\NewClient.cs">
       <SubType>Form</SubType>
@@ -380,9 +380,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormsServices\ArchiveServices\ArchiveServices.resx">
       <DependentUpon>ArchiveServices.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FormsClients\ChangeData.resx">
-      <DependentUpon>ChangeData.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormsServices\ArchiveServices\BackToLife.resx">
       <DependentUpon>BackToLife.cs</DependentUpon>
@@ -476,6 +473,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Loading.gif" />
     <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

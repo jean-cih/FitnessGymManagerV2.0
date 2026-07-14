@@ -1,12 +1,11 @@
-﻿using GymApplicationV2._0.Components;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
-using System.Text;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -18,17 +17,23 @@ namespace GymApplicationV2._0.FormsSettings
         private Panel previewPanel;
         private JeanModernButton documentationButton;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-
         Panel titlePanel;
 
         private Action refreshAction;
 
         // Словарь для хранения ссылок на элементы управления
-        private Dictionary<string, System.Windows.Forms.ComboBox> fontComboBoxes = new Dictionary<string, System.Windows.Forms.ComboBox>();
-        private System.Windows.Forms.ComboBox formStyleComboBox;
-        private System.Windows.Forms.ComboBox backgroundStyleComboBox;
+        private Dictionary<string, ComboBox> fontComboBoxes = new Dictionary<string, ComboBox>();
+        private ComboBox formStyleComboBox;
+        private ComboBox backgroundStyleComboBox;
+
+        private FadeAnimation _fadeAnimation;
+
+        string[] notChangeableTexts = new string[]
+            {
+                "✅ Настройки сохранены",
+                "Пример",
+                "🎨 Настройки дизайна"
+            };
 
         public Design()
         {
@@ -36,12 +41,16 @@ namespace GymApplicationV2._0.FormsSettings
             LoadSettings();
 
             InitializeComponents();
-            titlePanel.MouseDown += TitlePanel_MouseDown;
-            titlePanel.MouseMove += TitlePanel_MouseMove;
-            titlePanel.MouseUp += TitlePanel_MouseUp;
+
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
+
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
+
+            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+
+            titlePanel.EnableDrag(this);
         }
 
         public void SetRefreshAction(Action action)
@@ -56,6 +65,7 @@ namespace GymApplicationV2._0.FormsSettings
                 DataConfig.sizeFontCaptions = ConfigManager.GetSetting<int>("headlineSize");
                 DataConfig.sizeFontButtons = ConfigManager.GetSetting<int>("sizeKeyName");
                 DataConfig.sizeFontTables = ConfigManager.GetSetting<int>("sizeTableTitle");
+                DataConfig.sizeFontText = ConfigManager.GetSetting<int>("textSize");
                 DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
                 DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
             }
@@ -88,11 +98,11 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            titlePanel = new System.Windows.Forms.Panel
+            titlePanel = new Panel
             {
                 Size = new Size(933, 50),
                 BackColor = Color.MediumSlateBlue,
-                Location = new System.Drawing.Point(0, 0),
+                Location = new Point(0, 0),
             };
 
             var titleLabel = new Label
@@ -107,7 +117,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             var settingsContainer = new Panel
             {
-                BackColor = Color.White,
+                BackColor = Color.FromArgb(240, 240, 250),
                 Padding = new Padding(10),
                 Location = new Point(20, 50),
                 Size = new Size(893, 500),
@@ -128,21 +138,23 @@ namespace GymApplicationV2._0.FormsSettings
                 BackColor = Color.FromArgb(37, 99, 235),
                 Location = new Point(620, 430),
                 ForeColor = Color.White,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 BorderRadius = 8,
             };
             documentationButton.Click += DocumentationButton_Click;
             settingsContainer.Controls.Add(documentationButton);
 
             // Элементы для выбора шрифтов
-            AddFontSetting("🔤 Размер шрифта кнопок:", "comboBoxFontButtons", DataConfig.sizeFontButtons,
-                "Размер текста на всех кнопках интерфейса");
+            AddFontSetting("🔤 Шрифт кнопок", "comboBoxFontButtons", DataConfig.sizeFontButtons,
+                "Размер текста на всех кнопках интерфейса", 14);
 
-            AddFontSetting("📊 Размер шрифта таблиц:", "comboBoxFontTables", DataConfig.sizeFontTables,
-                "Размер текста в таблицах и списках");
+            AddFontSetting("📊 Шрифт таблиц", "comboBoxFontTables", DataConfig.sizeFontTables,
+                "Размер текста в таблицах", 14);
 
-            AddFontSetting("📝 Размер шрифта надписей:", "comboBoxFontCaptions", DataConfig.sizeFontCaptions,
-                "Размер текста заголовков и меток");
+            AddFontSetting("📌 Шрифт заголовков", "comboBoxFontCaptions", DataConfig.sizeFontCaptions,
+                "Размер текста заголовков", 18);
+
+            AddFontSetting("📝 Шрифт текста", "comboBoxFontText", DataConfig.sizeFontText,
+                "Размер обычного текста", 14);
 
             AddFormStyleSetting();
             AddBackgroundStyleSetting();
@@ -150,7 +162,7 @@ namespace GymApplicationV2._0.FormsSettings
             titlePanel.Controls.Add(titleLabel);
 
             var btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(893, 10), new Size(30, 28));
-            btnClose.Click += (s, e) => CloseWithAnimation();
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
@@ -159,39 +171,23 @@ namespace GymApplicationV2._0.FormsSettings
             this.Controls.Add(settingsContainer);
         }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
-        }
-
         private void DocumentationButton_Click(object sender, EventArgs e)
         {
             Documentation documentation = new Documentation();
             documentation.Show();
         }
 
-        private void AddFontSetting(string labelText, string comboBoxName, int defaultValue, string tooltipText)
+        private void AddFontSetting(string labelText, string comboBoxName, int defaultValue, string tooltipText, int range)
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
                 Padding = new Padding(20),
-                Cursor = Cursors.Default
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -206,45 +202,42 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 Text = labelText,
                 Location = new Point(15, 15),
-                Width = 250,
-                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
+                Size = new Size(350, 70),
                 ForeColor = Color.FromArgb(255, 140, 0)
             };
 
             var comboBox = new ModernComboBox
             {
                 Name = comboBoxName,
-                Location = new Point(390, 50),
-                Width = 80,
-                Height = 35,
+                Location = new Point(420, 55),
+                Size = new Size(60, 35),
                 BackColor = Color.White,
                 ForeColor = Color.Black,
                 BorderColor = Color.FromArgb(255, 140, 0),
-                ArrowColor = Color.White
+                ArrowColor = Color.White,
+                IntegralHeight = false
             };
 
-            for (int i = 8; i <= 20; i++)
+            for (int i = 8; i <= range; i++)
             {
                 comboBox.Items.Add(i);
             }
 
             comboBox.SelectedItem = defaultValue;
 
-            // Сохраняем ссылку на ComboBox
             fontComboBoxes[comboBoxName] = comboBox;
 
             comboBox.SelectedIndexChanged += ComboBox_SelectedIndexChanged;
 
-            var tooltip = new System.Windows.Forms.ToolTip();
+            var tooltip = new ToolTip();
             tooltip.SetToolTip(comboBox, tooltipText);
             tooltip.SetToolTip(label, tooltipText);
 
             var previewLabel = new Label
             {
-                Text = "Пример текста",
-                Location = new Point(360, 15),
-                Width = 120,
-                Font = new Font("Segoe UI", defaultValue, FontStyle.Regular),
+                Text = "Пример",
+                Location = new Point(360, 10),
+                Size = new Size(120, 50),
                 ForeColor = Color.FromArgb(255, 140, 0),
                 TextAlign = ContentAlignment.MiddleRight
             };
@@ -265,12 +258,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void AddFormStyleSetting()
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
-                Padding = new Padding(20)
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -283,19 +279,17 @@ namespace GymApplicationV2._0.FormsSettings
 
             var label = new Label
             {
-                Text = "🎭 Стиль интерфейса:",
+                Text = "🎭 Интерфейс",
                 Location = new Point(15, 15),
-                Width = 250,
-                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
+                Size = new Size(300, 70),
                 ForeColor = Color.FromArgb(255, 140, 0),
             };
 
             formStyleComboBox = new ModernComboBox
             {
                 Name = "comboBoxForm",
-                Location = new Point(270, 50),
-                Width = 150,
-                Height = 35,
+                Location = new Point(320, 55),
+                Size = new Size(100, 35),
                 BackColor = Color.White,
                 ForeColor = Color.Black,
                 BorderColor = Color.FromArgb(255, 140, 0),
@@ -308,7 +302,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             previewPanel = new Panel
             {
-                Location = new Point(430, 46),
+                Location = new Point(440, 47),
                 Size = new Size(40, 35),
                 BackColor = GetStylePreviewColor(DataConfig.styleForm),
                 BorderStyle = BorderStyle.FixedSingle
@@ -319,7 +313,7 @@ namespace GymApplicationV2._0.FormsSettings
                 previewPanel.BackColor = GetStylePreviewColor(formStyleComboBox.Text);
             };
 
-            var tooltip = new System.Windows.Forms.ToolTip();
+            var tooltip = new ToolTip();
             tooltip.SetToolTip(formStyleComboBox, "Выберите визуальный стиль интерфейса приложения");
             tooltip.SetToolTip(previewPanel, "Предпросмотр цвета стиля");
 
@@ -331,12 +325,15 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void AddBackgroundStyleSetting()
         {
-            var settingCard = new Panel
+            var settingCard = new JeanPanel
             {
                 Size = new Size(500, 100),
                 Margin = new Padding(0, 0, 0, 20),
                 BackColor = Color.FromArgb(55, 55, 58),
-                Padding = new Padding(20)
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
             };
 
             settingCard.Paint += (s, e) =>
@@ -349,19 +346,17 @@ namespace GymApplicationV2._0.FormsSettings
 
             var label = new Label
             {
-                Text = "🌊 Стиль заднего фона:",
+                Text = "🌊 Задний фон",
                 Location = new Point(15, 15),
-                Width = 250,
-                Font = new Font("Segoe UI", DataConfig.sizeFontCaptions, FontStyle.Bold),
+                Size = new Size(350, 70),
                 ForeColor = Color.FromArgb(255, 140, 0),
             };
 
             backgroundStyleComboBox = new ModernComboBox
             {
                 Name = "comboBoxBackground",
-                Location = new Point(320, 50),
-                Width = 150,
-                Height = 35,
+                Location = new Point(360, 55),
+                Size = new Size(120, 35),
                 BackColor = Color.White,
                 ForeColor = Color.Black,
                 BorderColor = Color.FromArgb(255, 140, 0),
@@ -372,31 +367,12 @@ namespace GymApplicationV2._0.FormsSettings
             backgroundStyleComboBox.SelectedItem = DataConfig.styleBackground;
             backgroundStyleComboBox.SelectedIndexChanged += ComboBoxBackground_SelectedIndexChanged;
 
-            var tooltip = new System.Windows.Forms.ToolTip();
+            var tooltip = new ToolTip();
             tooltip.SetToolTip(backgroundStyleComboBox, "Выберите визуальный стиль заднего фона");
 
             settingCard.Controls.Add(label);
             settingCard.Controls.Add(backgroundStyleComboBox);
             flowLayout.Controls.Add(settingCard);
-        }
-
-        private void CloseWithAnimation()
-        {
-            var closeTimer = new Timer();
-            closeTimer.Interval = 10;
-            float closeOpacity = 1;
-            closeTimer.Tick += (s, args) =>
-            {
-                closeOpacity -= 0.05f;
-                this.Opacity = closeOpacity;
-
-                if (closeOpacity <= 0)
-                {
-                    closeTimer.Stop();
-                    this.Close();
-                }
-            };
-            closeTimer.Start();
         }
 
         private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location, Size size)
@@ -406,25 +382,20 @@ namespace GymApplicationV2._0.FormsSettings
                 Text = text,
                 Location = location,
                 Size = size,
-                Font = new Font("Segoe UI", DataConfig.sizeFontButtons, FontStyle.Bold),
                 BackColor = baseColor,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
+                Cursor = Cursors.Hand,
+                BorderColor = radiusColor,
+                BackgroundColor = baseColor,
+                TextColor = Color.White,
+                BorderRadius = radius,
+                BorderSize = radiusSize
             };
 
             button.FlatAppearance.BorderSize = 0;
             button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
             button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.Text = text;
-            button.Font = new Font("Montserrat", DataConfig.sizeFontButtons, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
 
             button.MouseEnter += (s, e) =>
             {
@@ -464,7 +435,7 @@ namespace GymApplicationV2._0.FormsSettings
             switch (style)
             {
                 case "UserStyle":
-                    return Color.FromArgb(120, 73, 18);
+                    return Color.FromArgb(188, 122, 121);
                 case "SimpleDark":
                     return Color.FromArgb(146, 110, 53);
                 case "TelegramStyle":
@@ -476,7 +447,7 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void ComboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var comboBox = (System.Windows.Forms.ComboBox)sender;
+            var comboBox = (ComboBox)sender;
             if (int.TryParse(comboBox.Text, out int size))
             {
                 switch (comboBox.Name)
@@ -493,20 +464,24 @@ namespace GymApplicationV2._0.FormsSettings
                         DataConfig.sizeFontCaptions = size;
                         UpdateSettingInFile("headlineSize", size);
                         break;
+                    case "comboBoxFontText":
+                        DataConfig.sizeFontCaptions = size;
+                        UpdateSettingInFile("textSize", size);
+                        break;
                 }
             }
         }
 
         private void ComboBoxForm_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var comboBox = (System.Windows.Forms.ComboBox)sender;
+            var comboBox = (ComboBox)sender;
             DataConfig.styleForm = comboBox.Text;
             UpdateSettingInFile("designForm", comboBox.Text);
         }
 
         private void ComboBoxBackground_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var comboBox = (System.Windows.Forms.ComboBox)sender;
+            var comboBox = (ComboBox)sender;
             DataConfig.styleBackground = comboBox.Text;
             UpdateSettingInFile("designBackground", comboBox.Text);
         }
@@ -522,7 +497,7 @@ namespace GymApplicationV2._0.FormsSettings
                 // Вызываем обновление главной формы
                 refreshAction?.Invoke();
 
-                ApplySettingsToAllControls();
+                FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
                 // Показываем индикатор сохранения
                 ShowSaveIndicator();
@@ -534,45 +509,6 @@ namespace GymApplicationV2._0.FormsSettings
             }
         }
 
-        private void ApplySettingsToAllControls()
-        {
-            // Обходим все элементы управления на форме
-            foreach (Control control in GetAllControls(this))
-            {
-                // Обновляем кнопки
-                if (control is JeanModernButton button)
-                {
-                    button.Font = new Font(button.Font.FontFamily, DataConfig.sizeFontButtons, button.Font.Style);
-                }
-                // Обновляем метки
-                else if (control is Label label)
-                {
-                    // Проверяем, не является ли label индикатором сохранения
-                    if (label.Text != "✅ Настройки сохранены" && label.Text != "🎨 Настройки дизайна" && label.Text != "Пример текста")
-                    {
-                        label.Font = new Font(label.Font.FontFamily, DataConfig.sizeFontCaptions, label.Font.Style);
-                    }
-                }
-            }
-        }
-
-        private IEnumerable<Control> GetAllControls(Control parent)
-        {
-            foreach (Control control in parent.Controls)
-            {
-                yield return control;
-
-                // Рекурсивно обходим вложенные элементы
-                if (control.HasChildren)
-                {
-                    foreach (Control child in GetAllControls(control))
-                    {
-                        yield return child;
-                    }
-                }
-            }
-        }
-
         private void ShowSaveIndicator()
         {
             var indicator = new Label
@@ -581,7 +517,7 @@ namespace GymApplicationV2._0.FormsSettings
                 ForeColor = Color.FromArgb(255, 140, 0),
                 BackColor = Color.MediumSlateBlue,
                 AutoSize = true,
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Font = new Font("Segoe UI", DataConfig.sizeFontText > 11 ? 11 : DataConfig.sizeFontText, FontStyle.Bold),
                 Location = new Point(this.Width - 270, 10),
                 Padding = new Padding(10, 5, 10, 5)
             };
@@ -599,39 +535,15 @@ namespace GymApplicationV2._0.FormsSettings
             timer.Start();
         }
 
-        private bool isDragging = false;
-        private Point lastCursor;
-        private Point lastForm;
-
-        private void TitlePanel_MouseDown(object sender, MouseEventArgs e)
+        protected override void OnFormClosed(FormClosedEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = true;
-                lastCursor = Cursor.Position;
-                lastForm = this.Location;
-            }
-        }
-
-        private void TitlePanel_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (isDragging)
-            {
-                Point diff = Point.Subtract(Cursor.Position, new Size(lastCursor));
-                this.Location = Point.Add(lastForm, new Size(diff));
-            }
-        }
-
-        private void TitlePanel_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = false;
-            }
+            base.OnFormClosed(e);
+            _fadeAnimation?.Dispose();
+            _fadeAnimation = null;
         }
     }
 
-    public class ModernComboBox : System.Windows.Forms.ComboBox
+    public class ModernComboBox : ComboBox
     {
         public Color BorderColor { get; set; } = Color.Gray;
         public Color ArrowColor { get; set; } = Color.Black;

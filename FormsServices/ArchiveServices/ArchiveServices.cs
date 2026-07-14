@@ -1,13 +1,11 @@
-﻿using GymApplicationV2._0;
+﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsServices;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -15,11 +13,10 @@ namespace GymApplicationV2._0
 {
     public partial class ArchiveServices : Form
     {
-        private Timer _fadeTimer;
-        private float _opacity = 0;
-
         private ToolStripDropDownMenu _menu;
         private string client = "", membership = "", term = "", cost = "", numberCard = "", visits = "";
+
+        private FadeAnimation _fadeAnimation;
 
         public ArchiveServices()
         {
@@ -31,31 +28,15 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void InitializeMenu()
         {
             _menu = new ToolStripDropDownMenu();
-            _menu.Font = new System.Drawing.Font("Arial", 12, FontStyle.Regular);
+            _menu.Font = new Font("Arial", 12, FontStyle.Regular);
             ToolStripMenuItem item1 = new ToolStripMenuItem("Вернуть из архива", Properties.Resources.backToLife);
             ToolStripMenuItem item2 = new ToolStripMenuItem("Изменить параметры", Properties.Resources.change);
             _menu.Items.Add(item1);
@@ -69,6 +50,8 @@ namespace GymApplicationV2._0
         {
             ConfigureFormSize();
             LoadArchiveData();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void ConfigureFormSize()
@@ -83,19 +66,97 @@ namespace GymApplicationV2._0
             jeanModernButtonChangeData.Location = new Point(Width - 150, 30);
 
             dataGridViewArchive.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+            this.Location = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - this.Width / 2,
+                Screen.PrimaryScreen.Bounds.Height / 2 - this.Height / 2);
         }
+
+        private DataTable _currentDataTable;
 
         private void LoadArchiveData()
         {
-            dataGridViewArchive.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
+            string query = "SELECT " +
             "Клиент, " +
             "№Карты, " +
             "Дата_окончания AS 'Дата окончания', " +
             "Абонемент, " +
             "Оплата, " +
             "Посещений_осталось AS 'Посещений осталось' " +
-            "FROM Archive",
-                ArchiveServicesContext.ConnectionStringArchive());
+            "FROM Archive";
+
+            _currentDataTable = GeneralContext.GetDataFromDatabase(query,
+            ArchiveServicesContext.ConnectionStringArchive());
+
+            dataGridViewArchive.DataSource = _currentDataTable;
+
+            dataGridViewArchive.ColumnHeaderMouseClick += DataGridViewArchive_ColumnHeaderMouseClick;
+        }
+
+        private void DataGridViewArchive_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (_currentDataTable == null) return;
+
+            string columnName = dataGridViewArchive.Columns[e.ColumnIndex].Name;
+            bool ascending = dataGridViewArchive.Tag == null || !((bool)dataGridViewArchive.Tag);
+
+            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
+            dataGridViewArchive.DataSource = sortedTable;
+
+            dataGridViewArchive.Tag = ascending;
+        }
+
+        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
+        {
+            DataTable sortedTable = table.Clone();
+
+            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("окончания");
+
+            IEnumerable<DataRow> sortedRows;
+
+            if (isDateColumn)
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+            }
+            else if (columnName == "Оплата")
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+            }
+            else
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
+                }
+            }
+
+            foreach (DataRow row in sortedRows)
+            {
+                sortedTable.ImportRow(row);
+            }
+
+            return sortedTable;
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
@@ -208,9 +269,9 @@ namespace GymApplicationV2._0
                 var f = (BackToLife)form;
                 f.labelNameClient.Text = client;
                 f.labelNubmerCard.Text = numberCard;
-                f.jeanSoftTextBoxMembership.Texts = membership;
-                f.jeanSoftTextBoxTerm.Texts = term;
-                f.jeanSoftTextBoxVisits.Texts = visits;
+                f.jeanTextBoxMembership.Text = membership;
+                f.jeanTextBoxTerm.Text = term;
+                f.jeanTextBoxVisits.Text = visits;
             });
         }
 
@@ -218,12 +279,12 @@ namespace GymApplicationV2._0
         {
             ShowFormWithData(new ChangeArhiveService(), form => {
                 var f = (ChangeArhiveService)form;
-                f.jeanSoftTextBoxClient.Texts = client;
-                f.jeanSoftTextBoxCard.Texts = numberCard;
-                f.jeanSoftTextBoxMembership.Texts = membership;
-                f.jeanSoftTextBoxTerm.Texts = term;
-                f.jeanSoftTextBoxCost.Texts = cost;
-                f.jeanSoftTextBoxVisits.Texts = visits;
+                f.jeanTextBoxClient.Text = client;
+                f.jeanTextBoxCard.Text = numberCard;
+                f.jeanTextBoxMembership.Text = membership;
+                f.jeanTextBoxTerm.Text = term;
+                f.jeanTextBoxCost.Text = cost;
+                f.jeanTextBoxVisits.Text = visits;
             });
         }
     }

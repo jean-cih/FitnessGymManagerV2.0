@@ -1,9 +1,10 @@
-﻿using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Controls;
+﻿using GymApplicationV2._0.AnimationTools;
+using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Runtime.InteropServices.ComTypes;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
@@ -24,8 +25,9 @@ namespace GymApplicationV2._0
         public bool allClient;
         public bool forPeriod;
 
-        private Timer _fadeTimer;
-        private float _opacity = 0;
+        private FadeAnimation _fadeAnimation;
+
+        private DataTable _currentDataTable;
 
         public InformationReport()
         {
@@ -33,38 +35,17 @@ namespace GymApplicationV2._0
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
-            SetupAnimation();
-        }
 
-        private void SetupAnimation()
-        {
-            _fadeTimer = new Timer();
-            _fadeTimer.Interval = 10;
-            _fadeTimer.Tick += (s, e) =>
-            {
-                _opacity += 0.05f;
-                this.Opacity = _opacity;
-
-                if (_opacity >= 1)
-                {
-                    _fadeTimer.Stop();
-                    _fadeTimer.Dispose();
-                }
-            };
-            _fadeTimer.Start();
+            _fadeAnimation = new FadeAnimation(this);
+            _fadeAnimation.FadeIn();
         }
 
         private void Attendance_Load(object sender, EventArgs e)
         {
-            SetupDataGridView();
-            LoadReportData();
-        }
-
-        private void SetupDataGridView()
-        {
             dataGridViewShowReport.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewShowReport.DefaultCellStyle.Font = new Font("ShowTables", DataConfig.sizeFontTables);
-            dataGridViewShowReport.ColumnHeadersDefaultCellStyle.Font = new Font("ShowTables", DataConfig.sizeFontTables);
+            LoadReportData();
+
+            FontHelper.ApplyFontSettings(this, null);
         }
 
         private void LoadReportData()
@@ -85,11 +66,85 @@ namespace GymApplicationV2._0
 
         private void LoadAllClientsReport()
         {
-            dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase("SELECT * FROM Contacts",
+            _currentDataTable = GeneralContext.GetDataFromDatabase("SELECT * FROM Contacts",
                 ClientsContext.ConnectionStringClients());
+
             labelQuantity.Text = GeneralContext.GetElementFromDatabase("SELECT COUNT(*) FROM Contacts",
                 ClientsContext.ConnectionStringClients()).ToString();
             labelShowPeriod.Text = "Клиенты за все время";
+
+
+            dataGridViewShowReport.DataSource = _currentDataTable;
+
+            dataGridViewShowReport.ColumnHeaderMouseClick += DataGridViewClients_ColumnHeaderMouseClick;
+        }
+
+        private void DataGridViewClients_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (_currentDataTable == null) return;
+
+            string columnName = dataGridViewShowReport.Columns[e.ColumnIndex].Name;
+            bool ascending = dataGridViewShowReport.Tag == null || !((bool)dataGridViewShowReport.Tag);
+
+            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
+            dataGridViewShowReport.DataSource = sortedTable;
+
+            dataGridViewShowReport.Tag = ascending;
+        }
+
+        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
+        {
+            DataTable sortedTable = table.Clone();
+
+            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("рождения") ||
+                                columnName.Contains("Сохранено");
+
+            IEnumerable<DataRow> sortedRows;
+
+            if (isDateColumn)
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
+                }
+            }
+            else if (columnName == "Покупки")
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable()
+                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
+                }
+            }
+            else
+            {
+                if (ascending)
+                {
+                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
+                }
+                else
+                {
+                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
+                }
+            }
+
+            foreach (DataRow row in sortedRows)
+            {
+                sortedTable.ImportRow(row);
+            }
+
+            return sortedTable;
         }
 
         private void LoadPeriodClientsReport()
