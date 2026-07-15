@@ -46,7 +46,7 @@ namespace GymApplicationV2._0
                 Font = new Font("Arial", 12)
             };
 
-            var freezeItem = new ToolStripMenuItem("Заморозить", Properties.Resources.Freeze)
+            var freezeItem = new ToolStripMenuItem("Заморозить", Properties.Resources.freeze)
             {
                 Tag = "freeze"
             };

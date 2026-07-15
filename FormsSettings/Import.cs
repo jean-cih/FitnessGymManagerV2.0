@@ -297,7 +297,7 @@ namespace GymApplicationV2._0.FormsSettings
         private void DocumentationButton_Click(object sender, EventArgs e)
         {
             Documentation documentation = new Documentation();
-            documentation.Show();
+            documentation.ShowDialog();
         }
 
         private void ChooseFile_Click(object sender, EventArgs e)

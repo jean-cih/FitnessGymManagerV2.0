@@ -51,7 +51,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Assets\bearFront.ico</ApplicationIcon>
+    <ApplicationIcon>bearFront.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -506,13 +506,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\Loading.gif" />
-    <Content Include="Assets\Buttons\AdjustingFont.png" />
-    <Content Include="Assets\Buttons\cross.png" />
-    <Content Include="Assets\Buttons\ImportingData.png" />
-    <Content Include="Assets\Buttons\manual-book.png" />
-    <Content Include="Assets\Buttons\SystemSounds.png" />
-    <Content Include="Assets\Buttons\user.jpg" />
+    <None Include="Resources\search.png" />
+    <None Include="Resources\redError.png" />
+    <None Include="Resources\greenSuccess.png" />
+    <None Include="Resources\documentation.png" />
+    <None Include="Resources\loadData.png" />
+    <Content Include="bearFront.ico" />
+    <Content Include="Resources\AdjustingFont.png" />
+    <Content Include="Resources\cross.png" />
     <Content Include="packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.119.0\build\net46\**\*.dll">
       <Link>%(RecursiveDir)%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -528,28 +529,16 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\bearFront.ico" />
-    <None Include="Resources\pow.png" />
-    <None Include="Resources\Person.jpg" />
     <None Include="Resources\Freeze.png" />
-    <None Include="Resources\error.wav" />
-    <None Include="Resources\LoadInstruction.png" />
-    <None Include="Resources\Arrow.png" />
-    <None Include="Resources\NightMode.png" />
-    <None Include="Resources\LightMode.png" />
     <Resource Include="Resources\change.png" />
     <Resource Include="Resources\backToLife.png" />
     <Resource Include="Resources\issuedMembership.png" />
     <Resource Include="Resources\payments.png" />
     <Resource Include="Resources\archive.png" />
-    <Resource Include="Resources\exit.png" />
     <Resource Include="Resources\membership.png" />
     <Resource Include="Resources\calendarDark.png" />
     <Resource Include="Resources\calendarWhite.png" />
-    <Resource Include="Resources\calendarTwo.png" />
-    <Resource Include="Resources\calendarOne.png" />
-    <Content Include="Assets\search.png" />
     <Content Include="Assets\Sounds\SoundError.wav" />
-    <Content Include="Assets\bearFront.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.8">

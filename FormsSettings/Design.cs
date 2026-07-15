@@ -3,7 +3,6 @@ using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
-using NAudio.MediaFoundation;
 using Shadow;
 using System;
 using System.Collections.Generic;
@@ -23,6 +22,8 @@ namespace GymApplicationV2._0.FormsSettings
         private JeanModernButton documentationButton;
 
         Panel titlePanel;
+
+        Label label_sound;
 
         private Action refreshAction;
 
@@ -183,7 +184,7 @@ namespace GymApplicationV2._0.FormsSettings
         private void DocumentationButton_Click(object sender, EventArgs e)
         {
             Documentation documentation = new Documentation();
-            documentation.Show();
+            documentation.ShowDialog();
         }
 
         private void AddFontSetting(string labelText, string comboBoxName, int defaultValue, string tooltipText, int range)
@@ -353,9 +354,9 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            var label = new Label
+            label_sound = new Label
             {
-                Text = "🔊 Звук ошибки",
+                Text = "🔊 Звук ошибки - " + Path.GetFileName(Properties.Settings.Default.ErrorSoundPath),
                 Location = new Point(15, 15),
                 Size = new Size(300, 70),
                 ForeColor = Color.FromArgb(255, 140, 0),
@@ -367,7 +368,7 @@ namespace GymApplicationV2._0.FormsSettings
             var tooltip = new ToolTip();
             tooltip.SetToolTip(choose, "Выберите файл для звука ошибки");
 
-            settingCard.Controls.Add(label);
+            settingCard.Controls.Add(label_sound);
             settingCard.Controls.Add(choose);
             flowLayout.Controls.Add(settingCard);
         }
@@ -390,6 +391,8 @@ namespace GymApplicationV2._0.FormsSettings
                     audioFile = new MediaFoundationReader(soundPath);
                     outputDevice.Init(audioFile);
                     outputDevice.Play();
+
+                    label_sound.Text = "🔊 Звук ошибки - " + Path.GetFileName(soundPath);
                 }
                 catch (Exception ex)
                 {
