@@ -667,6 +667,40 @@ namespace GymApplicationV2._0.FormsSettings
                             if (dataTable.Columns.Contains(targetColumn.Key))
                             {
                                 object value = dataTable.Rows[i][targetColumn.Key];
+
+                                if ((targetColumn.Key == "Сохранено" || targetColumn.Key == "Дата оформления" || targetColumn.Key == "Дата окончания" || targetColumn.Key == "Посетил") && value != DBNull.Value && value != null)
+                                {
+                                    try
+                                    {
+                                        // Пытаемся преобразовать в DateTime
+                                        DateTime dateValue;
+                                        if (value is DateTime dt)
+                                        {
+                                            dateValue = dt;
+                                        }
+                                        else if (value is string str)
+                                        {
+                                            // Пробуем распарсить строку
+                                            if (!DateTime.TryParse(str, out dateValue))
+                                            {
+                                                dateValue = DateTime.MinValue;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            dateValue = Convert.ToDateTime(value);
+                                        }
+
+                                        // Форматируем в нужный формат
+                                        value = dateValue.ToString("dd.MM.yyyy HH:mm:ss");
+                                    }
+                                    catch
+                                    {
+                                        // Если не удалось преобразовать, оставляем как есть
+                                        value = value ?? DBNull.Value;
+                                    }
+                                }
+
                                 command.Parameters.AddWithValue($"@{targetColumn.Key}", value ?? DBNull.Value);
                             }
                             else

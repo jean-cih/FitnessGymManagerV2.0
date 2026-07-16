@@ -112,80 +112,12 @@ namespace GymApplicationV2._0
             _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
 
+            GeneralContext.FormatDateColumns(_currentDataTable);
+
             dataGridViewIssued.DataSource = _currentDataTable;
 
-            dataGridViewIssued.ColumnHeaderMouseClick += DataGridViewIssued_ColumnHeaderMouseClick;
+            GeneralContext.FormatData(dataGridViewIssued);
         }
-
-        private void DataGridViewIssued_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (_currentDataTable == null) return;
-
-            string columnName = dataGridViewIssued.Columns[e.ColumnIndex].Name;
-            bool ascending = dataGridViewIssued.Tag == null || !((bool)dataGridViewIssued.Tag);
-
-            DataTable sortedTable = SortDataTable(_currentDataTable, columnName, ascending);
-            dataGridViewIssued.DataSource = sortedTable;
-
-            dataGridViewIssued.Tag = ascending;
-        }
-
-        private DataTable SortDataTable(DataTable table, string columnName, bool ascending)
-        {
-            DataTable sortedTable = table.Clone();
-
-            bool isDateColumn = columnName.Contains("Дата") || columnName.Contains("окончания") ||
-                                columnName.Contains("оформления") || columnName == "Посетил" ||
-                                columnName == "Окончание заморозки";
-
-            IEnumerable<DataRow> sortedRows;
-
-            if (isDateColumn)
-            {
-                if (ascending)
-                {
-                    sortedRows = table.AsEnumerable()
-                        .OrderBy(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
-                }
-                else
-                {
-                    sortedRows = table.AsEnumerable()
-                        .OrderByDescending(row => DateTime.TryParse(row[columnName].ToString(), out DateTime d) ? d : DateTime.MinValue);
-                }
-            }
-            else if (columnName == "Оплата")
-            {
-                if (ascending)
-                {
-                    sortedRows = table.AsEnumerable()
-                        .OrderBy(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
-                }
-                else
-                {
-                    sortedRows = table.AsEnumerable()
-                        .OrderByDescending(row => int.TryParse(row[columnName].ToString(), out int n) ? n : 0);
-                }
-            }
-            else
-            {
-                if (ascending)
-                {
-                    sortedRows = table.AsEnumerable().OrderBy(row => row[columnName].ToString());
-                }
-                else
-                {
-                    sortedRows = table.AsEnumerable().OrderByDescending(row => row[columnName].ToString());
-                }
-            }
-
-            foreach (DataRow row in sortedRows)
-            {
-                sortedTable.ImportRow(row);
-            }
-
-            return sortedTable;
-        }
-
         private void jeanModernButtonRefresh_Click(object sender, EventArgs e) =>
             RefreshDataGrid();
 
