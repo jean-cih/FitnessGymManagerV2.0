@@ -10,6 +10,7 @@ using Shadow;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
@@ -46,6 +47,8 @@ namespace GymApplicationV2._0
                 "🏋️ СИБИРЯК"
             };
 
+        PictureBox picture_status;
+
         Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public Form1()
@@ -71,7 +74,6 @@ namespace GymApplicationV2._0
 
             ApplySettingsToAllControls();
 
-            this.Load += Main_Form_Load;
             SetBackgroundColor();
 
             this.EnableDrag(this);
@@ -108,9 +110,9 @@ namespace GymApplicationV2._0
             _menu_settings = new ToolStripDropDownMenu();
             _menu_settings.Font = new Font("Segoe UI", DataConfig.sizeFontText, FontStyle.Regular);
 
-            ToolStripMenuItem item5 = new ToolStripMenuItem("Дизайн", Properties.Resources.membership);
-            ToolStripMenuItem item6 = new ToolStripMenuItem("Загрузка данных", Properties.Resources.issuedMembership);
-            ToolStripMenuItem item7 = new ToolStripMenuItem("Документация", Properties.Resources.archive);
+            ToolStripMenuItem item5 = new ToolStripMenuItem("Дизайн", Properties.Resources.adjustingFont);
+            ToolStripMenuItem item6 = new ToolStripMenuItem("Загрузка данных", Properties.Resources.loadData);
+            ToolStripMenuItem item7 = new ToolStripMenuItem("Документация", Properties.Resources.documentation);
 
             _menu_settings.Items.Add(item5);
             _menu_settings.Items.Add(item6);
@@ -119,11 +121,6 @@ namespace GymApplicationV2._0
             _menu_settings.Items[0].Click += jeanModernButtonDesign_Click;
             _menu_settings.Items[1].Click += jeanModernButtonImport_Click;
             _menu_settings.Items[2].Click += jeanModernButtonDocumentation_Click;
-        }
-
-        private void Main_Form_Load(object sender, EventArgs e)
-        {
-            this.Hide();
         }
 
         private void UpdateButtonLayout()
@@ -412,6 +409,14 @@ namespace GymApplicationV2._0
                 AutoSize = true
             };
 
+            picture_status = new PictureBox
+            {
+                Visible = true,
+                Size = new Size(40, 35),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Location = new Point(clientPanel.Width - 40 - 10, 10)
+            };
+
             // Стилизуем DataGridView с новой цветовой схемой
             dataGridViewClient.Location = new Point(20, 60);
             dataGridViewClient.Size = new Size(750, 2 * jeanModernButtonSettings.Width);
@@ -435,6 +440,7 @@ namespace GymApplicationV2._0
             // Чередующиеся строки
             dataGridViewClient.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 248, 252);
 
+            clientPanel.Controls.Add(picture_status);
             clientPanel.Controls.Add(titleLabel);
             clientPanel.Controls.Add(dataGridViewClient);
 
@@ -667,8 +673,22 @@ namespace GymApplicationV2._0
             {
                 PlayErrorSound();
                 ShowMessage("Этот номер не существует");
-                userStatus.Add(cardNumber, "Абонемент закончился ");
+
+                if (!userStatus.ContainsKey(cardNumber))
+                {
+                    userStatus.Add(cardNumber, "Абонемент закончился");
+                }
+                else
+                {
+                    userStatus[cardNumber] = "Абонемент закончился (Повторно)";
+                }
+
                 ClearCardNumber();
+
+                dataGridViewClient.DataSource = null;
+                dataGridViewClient.Rows.Clear();
+                dataGridViewClient.Refresh();
+                picture_status.Image = Properties.Resources.redError;
                 return false;
             }
 
@@ -694,8 +714,20 @@ namespace GymApplicationV2._0
             if (DateTime.Compare(Convert.ToDateTime(endDate), DateTime.Now) < 0)
             {
                 ShowMessage("Заморозка закончилась");
-                userStatus.Add(cardNumber, "Заморозка закончилась");
+                if (!userStatus.ContainsKey(cardNumber))
+                {
+                    userStatus.Add(cardNumber, "Заморозка закончилась");
+                }
+                else
+                {
+                    userStatus[cardNumber] = "Заморозка закончилась (Повторно)";
+                }
                 ClearCardNumber();
+
+                dataGridViewClient.DataSource = null;
+                dataGridViewClient.Rows.Clear();
+                dataGridViewClient.Refresh();
+                picture_status.Image = Properties.Resources.redError;
                 return true;
                 //return false;
             }
@@ -707,7 +739,15 @@ namespace GymApplicationV2._0
 
             UnfreezeMembership(cardNumber, endDate, visitsLeft);
             ShowMessage("Заморозка снята");
-            userStatus.Add(cardNumber, "Заморозка снята");
+
+            if (!userStatus.ContainsKey(cardNumber))
+            {
+                userStatus.Add(cardNumber, "Заморозка снята");
+            }
+            else
+            {
+                userStatus[cardNumber] = "Заморозка снята (Повторно)";
+            }
 
             return true;
             //return false;
@@ -763,9 +803,22 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился по времени");
-            userStatus.Add(cardNumber, "Абонемент закончился по времени");
+
+            if (!userStatus.ContainsKey(cardNumber))
+            {
+                userStatus.Add(cardNumber, "Абонемент закончился по времени");
+            }
+            else
+            {
+                userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
+            }
 
             ResetClientMembership(cardNumber);
+
+            dataGridViewClient.DataSource = null;
+            dataGridViewClient.Rows.Clear();
+            dataGridViewClient.Refresh();
+            picture_status.Image = Properties.Resources.redError;
         }
 
         // Сброс данных абонемента клиента
@@ -842,9 +895,19 @@ namespace GymApplicationV2._0
                 IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@cardNumber", cardNumber));
 
-            userStatus.Add(cardNumber, "Активен");
+            if (!userStatus.ContainsKey(cardNumber))
+            {
+                userStatus.Add(cardNumber, "Активен");
+            }
+            else
+            {
+                userStatus[cardNumber] = "Активен (Повторно)";
+            }
+
             DisplayClientData(cardNumber);
             ClearCardNumber();
+
+            picture_status.Image = Properties.Resources.greenSuccess;
         }
 
         // Обработка отсутствия посещений
@@ -858,8 +921,21 @@ namespace GymApplicationV2._0
 
             PlayErrorSound();
             ShowMessage("Абонемент закончился. Посещений осталось 0");
-            userStatus.Add(cardNumber, "Абонемент закончился. Посещений осталось 0");
+
+            if (!userStatus.ContainsKey(cardNumber))
+            {
+                userStatus.Add(cardNumber, "Абонемент закончился. Посещений осталось 0");
+            }
+            else
+            {
+                userStatus[cardNumber] = "Абонемент закончился. Посещений осталось 0 (Повторно)";
+            }
             ClearCardNumber();
+
+            dataGridViewClient.DataSource = null;
+            dataGridViewClient.Rows.Clear();
+            dataGridViewClient.Refresh();
+            picture_status.Image = Properties.Resources.redError;
         }
 
         // Обработка ограниченного посещения
@@ -873,10 +949,20 @@ namespace GymApplicationV2._0
                 new SQLiteParameter("@cardNumber", cardNumber));
 
             DisplayClientData(cardNumber);
-            userStatus.Add(cardNumber, "Активен");
+            if (!userStatus.ContainsKey(cardNumber))
+            {
+                userStatus.Add(cardNumber, "Активен");
+            }
+            else
+            {
+                userStatus[cardNumber] = "Активен (Повторно)";
+            }
+
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
             ClearCardNumber();
+
+            picture_status.Image = Properties.Resources.greenSuccess;
         }
 
         private void DisplayClientData(string cardNumber)

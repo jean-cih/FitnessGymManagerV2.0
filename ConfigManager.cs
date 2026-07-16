@@ -7,12 +7,11 @@ using NAudio.Wave;
 
 public static class ConfigManager
 {
-    private static string filePath;
+    private static string _configPath;
     private static Dictionary<string, object> settings;
 
-    public static void Initialize(string path)
+    public static void Initialize()
     {
-        filePath = path;
         LoadSettings();
     }
 
@@ -20,13 +19,17 @@ public static class ConfigManager
     {
         try
         {
-            if (!File.Exists(filePath))
+            string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string configFolder = Path.Combine(appDirectory, "AppFiles");
+            _configPath = Path.Combine(configFolder, "Font.json");
+
+            if (!File.Exists(_configPath))
             {
                 CreateDefaultSettings();
                 return;
             }
 
-            string jsonString = File.ReadAllText(filePath, Encoding.UTF8);
+            string jsonString = File.ReadAllText(_configPath, Encoding.UTF8);
 
             using (JsonDocument document = JsonDocument.Parse(jsonString))
             {
@@ -165,7 +168,7 @@ public static class ConfigManager
             {
                 WriteIndented = true
             });
-            File.WriteAllText(filePath, jsonString, Encoding.UTF8);
+            File.WriteAllText(_configPath, jsonString, Encoding.UTF8);
         }
         catch (Exception ex)
         {

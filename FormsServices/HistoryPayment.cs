@@ -42,8 +42,11 @@ namespace GymApplicationV2._0
             Width = (int)(Screen.PrimaryScreen.Bounds.Width * FormWidthRatio);
             Height = (int)(Screen.PrimaryScreen.Bounds.Height * FormHeightRatio);
 
-            dataGridViewHistory.DataSource = GeneralContext.GetDataFromDatabase(BaseQuery,
-                HistoryPaymentContext.ConnectionStringPayment());
+            var _currentDataTable = GeneralContext.GetDataFromDatabase(BaseQuery,
+    HistoryPaymentContext.ConnectionStringPayment());
+            GeneralContext.FormatDateColumns(_currentDataTable);
+            dataGridViewHistory.DataSource = _currentDataTable;
+            GeneralContext.FormatData(dataGridViewHistory);
 
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - this.Width / 2,
                 Screen.PrimaryScreen.Bounds.Height / 2 - this.Height / 2);
@@ -61,9 +64,15 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonRefresh_Click(object sender, EventArgs e)
         {
-            dataGridViewHistory.DataSource = GeneralContext.GetDataFromDatabase(BaseQuery,
+            var _currentDataTable = GeneralContext.GetDataFromDatabase(BaseQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
             radioOtherPeriod.Checked = true;
+
+            GeneralContext.FormatDateColumns(_currentDataTable);
+
+            dataGridViewHistory.DataSource = _currentDataTable;
+
+            GeneralContext.FormatData(dataGridViewHistory);
         }
 
         private void LoadHistoryData()
@@ -99,8 +108,12 @@ namespace GymApplicationV2._0
             var dataQuery = string.IsNullOrEmpty(filter) ? BaseQuery : $"{BaseQuery} {filter}";
             var countQuery = string.IsNullOrEmpty(countFilter) ? CountQuery : $"{CountQuery} {countFilter}";
 
-            dataGridViewHistory.DataSource = GeneralContext.GetDataFromDatabase(dataQuery,
+            var _currentDataTable = GeneralContext.GetDataFromDatabase(dataQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
+            GeneralContext.FormatDateColumns(_currentDataTable);
+            dataGridViewHistory.DataSource = _currentDataTable;
+            GeneralContext.FormatData(dataGridViewHistory);
+
             labelPayments.Text = $"Платежей{(string.IsNullOrEmpty(countFilter) ? " за все время" : " за период")}: " + GeneralContext.GetElementFromDatabase(countQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
         }
@@ -110,15 +123,21 @@ namespace GymApplicationV2._0
             if (string.IsNullOrEmpty(jeanSoftTextBoxSearch.Texts))
             {
                 jeanModernButtonErase.Visible = false;
-                dataGridViewHistory.DataSource = GeneralContext.GetDataFromDatabase(BaseQuery,
+                var _currentDataTableBase = GeneralContext.GetDataFromDatabase(BaseQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
+                GeneralContext.FormatDateColumns(_currentDataTableBase);
+                dataGridViewHistory.DataSource = _currentDataTableBase;
+                GeneralContext.FormatData(dataGridViewHistory);
                 return;
             }
 
             jeanModernButtonErase.Visible = true;
             var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
-            dataGridViewHistory.DataSource = GeneralContext.GetDataFromDatabase(searchQuery,
+            var _currentDataTable = GeneralContext.GetDataFromDatabase(searchQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
+            GeneralContext.FormatDateColumns(_currentDataTable);
+            dataGridViewHistory.DataSource = _currentDataTable;
+            GeneralContext.FormatData(dataGridViewHistory);
         }
 
         private string BuildSearchQuery(string searchText)

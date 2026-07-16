@@ -60,7 +60,7 @@ namespace GymApplicationV2._0
 
         private void LoadClientData()
         {
-            dataGridViewClients.DataSource = GeneralContext.GetDataFromDatabase("SELECT " +
+            var _currentDataTable = GeneralContext.GetDataFromDatabase("SELECT " +
                 "Фамилия," +
                 "Имя," +
                 "Телефон," +
@@ -72,6 +72,10 @@ namespace GymApplicationV2._0
                 "Сохранено" +
                 " FROM Contacts",
                 ClientsContext.ConnectionStringClients());
+
+            GeneralContext.FormatDateColumns(_currentDataTable);
+            dataGridViewClients.DataSource = _currentDataTable;
+            GeneralContext.FormatData(dataGridViewClients);
         }
 
         private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)
