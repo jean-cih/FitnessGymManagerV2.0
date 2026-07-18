@@ -158,9 +158,11 @@ namespace GymApplicationV2._0
                 $"SELECT Проданных_за_месяц FROM Descriptions WHERE Абонемент = '{labelMembership.Text}'",
                 ServicesContext.ConnectionStringServices());
 
+            int numbers = (quantity != DBNull.Value && quantity != null) ? Convert.ToInt32(quantity) : 0;
+
             GeneralContext.CommandDataFromDatabase($@"
                 UPDATE Descriptions SET 
-                Проданных_за_месяц = '{Convert.ToInt32(quantity) + 1}' 
+                Проданных_за_месяц = '{numbers + 1}' 
                 WHERE Абонемент = '{labelMembership.Text}'",
                 ServicesContext.ConnectionStringServices());
         }

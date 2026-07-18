@@ -16,6 +16,7 @@ namespace GymApplicationV2._0
 {
     internal static class Program
     {
+        /*
         // ---- Импорт функций Windows API для гарантированного управления окнами ----
         [DllImport("user32.dll")]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -52,7 +53,9 @@ namespace GymApplicationV2._0
         // Уникальный идентификатор приложения (Mutex)
         private static readonly string MutexName = "Local\\GymApplicationV2.0_Unique_Mutex_ID";
         private static Mutex _appMutex;
+        */
 
+        private static bool isNewInstance = true;
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
@@ -60,12 +63,12 @@ namespace GymApplicationV2._0
         static void Main()
         {
             // Проверяем, запущено ли уже приложение
-            _appMutex = new Mutex(true, MutexName, out bool isNewInstance);
+            //_appMutex = new Mutex(true, MutexName, out bool isNewInstance);
 
             if (!isNewInstance)
             {
                 // Если приложение УЖЕ запущено, находим его окно и разворачиваем его
-                ActivateExistingInstance();
+                //ActivateExistingInstance();
                 // Завершаем работу текущего (нового) процесса
             }
             else
@@ -89,16 +92,16 @@ namespace GymApplicationV2._0
                 {
                     MessageBox.Show(ex.ToString(), "Ошибка при запуске");
                 }
-                finally
-                {
-                    if (_appMutex != null)
-                    {
-                        _appMutex.Close();
-                    }
-                }
+                //finally
+                //{
+                //    if (_appMutex != null)
+                //    {
+                //        _appMutex.Close();
+                //   }
+                //}
             }
         }
-
+        /*
         /// <summary>
         /// Находит уже запущенный процесс программы, восстанавливает его окно и выводит на передний план.
         /// </summary>
@@ -184,6 +187,8 @@ namespace GymApplicationV2._0
                 SetForegroundWindow(hWnd);
             }
         }
+        */
+
         private static void InitializeApplication(LoadingScreen splash)
         {
             splash.UpdateProgress("Создание структуры папок...", "Инициализация", 5);
@@ -191,6 +196,7 @@ namespace GymApplicationV2._0
 
             splash.UpdateProgress("Создание ресурсов", "Ресурсы", 10);
             EnsureRequiredDirectoriesExist();
+
             CopyPhotosToOutput();
 
             CheckIfConfigExists(splash);
@@ -202,8 +208,28 @@ namespace GymApplicationV2._0
             CheckIfDataExistsIssued(splash);
             CheckIfDataExistsProducts(splash);
 
+            LoadSettings();
+
             splash.UpdateProgress("Готово!", "Запуск приложения", 100);
             Thread.Sleep(300);
+        }
+
+        private static void LoadSettings()
+        {
+            try
+            {
+                DataConfig.sizeFontCaptions = ConfigManager.GetSetting<int>("headlineSize");
+                DataConfig.sizeFontButtons = ConfigManager.GetSetting<int>("sizeKeyName");
+                DataConfig.sizeFontTables = ConfigManager.GetSetting<int>("sizeTableTitle");
+                DataConfig.sizeFontText = ConfigManager.GetSetting<int>("textSize");
+                DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
+                DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки настроек: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static void CopyPhotosToOutput()

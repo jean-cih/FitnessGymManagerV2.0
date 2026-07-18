@@ -149,9 +149,11 @@ namespace GymApplicationV2._0
 
             checkBoxClientsForPeriod = CreateStyledCheckBox("Посещаемость", new System.Drawing.Point((card.Width - 130) / 2, 95));
             checkBoxClientsForPeriod.Checked = true;
+            checkBoxClientsForPeriod.CheckedChanged += checkBoxClientsForPeriod_CheckedChanged;
 
 
             checkBoxSellServices = CreateStyledCheckBox("Количество проданных\nабонементов", new System.Drawing.Point((card.Width - 130) / 2, 175));
+            checkBoxSellServices.CheckedChanged += checkBoxSellServices_CheckedChanged;
 
             card.Controls.AddRange(new Control[] { title, checkBoxClientsForPeriod, checkBoxSellServices });
 
@@ -436,14 +438,8 @@ namespace GymApplicationV2._0
         private void checkBoxClientsForPeriod_CheckedChanged(object sender, EventArgs e) =>
             HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
 
-        private void checkBoxAllClients_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
-
         private void checkBoxSellServices_CheckedChanged(object sender, EventArgs e) =>
             HandleCheckBoxChanged(checkBoxSellServices, checkBoxClientsForPeriod);
-
-        private void checkBoxHistoryPayment_CheckedChanged(object sender, EventArgs e) =>
-            HandleCheckBoxChanged(checkBoxClientsForPeriod, checkBoxSellServices);
 
         private void checkBoxXLS_CheckedChanged(object sender, EventArgs e) =>
             HandleCheckBoxChanged(checkBoxXLS, checkBoxTXT, checkBoxJSON, checkBoxCSV, checkBoxTSV);

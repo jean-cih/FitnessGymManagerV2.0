@@ -129,6 +129,10 @@ namespace GymApplicationV2._0.Connections
 
         public static void FormatDateColumns(DataTable dataTable)
         {
+            if (dataTable == null || dataTable.Rows.Count <= 0)
+            {
+                return;
+            }
             // Список колонок, которые нужно отформатировать
             string[] dateColumns = { "Сохранено", "Дата окончания", "Дата рождения", "Дата начала", "Дата платежа", "Окончание заморозки", "Дата оформления", "Посетил", "Время продажи" };
 

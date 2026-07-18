@@ -199,11 +199,11 @@ namespace GymApplicationV2._0
             var row = dataGridViewIssued.SelectedRows[0];
             _client = row.Cells[0].Value.ToString();
             _numberCard = row.Cells[1].Value.ToString();
-            _dateOver = row.Cells[2].Value.ToString();
-            _membership = row.Cells[4].Value.ToString();
-            _cost = row.Cells[5].Value.ToString();
-            _status = row.Cells[6].Value.ToString();
-            _visits = row.Cells[7].Value.ToString();
+            _dateOver = row.Cells[6].Value.ToString();
+            _membership = row.Cells[2].Value.ToString();
+            _cost = row.Cells[3].Value.ToString();
+            _status = row.Cells[4].Value.ToString();
+            _visits = row.Cells[5].Value.ToString();
 
             card.Text = _numberCard;
             nameClient.Text = _client;
