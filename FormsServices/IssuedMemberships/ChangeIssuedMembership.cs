@@ -36,7 +36,7 @@ namespace GymApplicationV2._0.FormsServices
 
             FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
-            this.EnableDrag(this);
+            titlePanel.EnableDrag(this);
         }
 
         private void InitializeCustomDesign()

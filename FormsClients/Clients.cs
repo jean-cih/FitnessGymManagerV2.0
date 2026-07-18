@@ -163,13 +163,13 @@ namespace GymApplicationV2._0
             var clientData = new ClientData
             {
                 FullName = $"{row.Cells[0].Value} {row.Cells[1].Value}",
+                Gender = row.Cells[2].Value?.ToString() ?? "",
                 Phone = row.Cells[3].Value?.ToString() ?? "",
                 CardNumber = row.Cells[4].Value?.ToString() ?? "",
-                Birthday = row.Cells[8].Value?.ToString() ?? "",
-                Saved = row.Cells[10].Value?.ToString() ?? "",
-                Discount = row.Cells[9].Value?.ToString() ?? "",
+                Saved = row.Cells[9].Value?.ToString() ?? "",
+                Discount = row.Cells[8].Value?.ToString() ?? "",
                 Email = row.Cells[7].Value?.ToString() ?? "",
-                Gender = row.Cells[2].Value?.ToString() ?? "",
+                Birthday = row.Cells[10].Value?.ToString() ?? "",
             };
 
             string query = @"
@@ -483,8 +483,8 @@ namespace GymApplicationV2._0
             jeanTextBoxNumberCard.Text = selectedRow.Cells[4].Value.ToString();
             jeanTextBoxPurchase.Text = selectedRow.Cells[5].Value.ToString();
             jeanTextBoxEmail.Text = selectedRow.Cells[7].Value.ToString();
-            jeanTextBoxBirthday.Text = selectedRow.Cells[8].Value.ToString();
-            jeanTextBoxDiscount.Text = selectedRow.Cells[9].Value.ToString();
+            jeanTextBoxBirthday.Text = selectedRow.Cells[10].Value.ToString();
+            jeanTextBoxDiscount.Text = selectedRow.Cells[8].Value.ToString();
         }
     }
 

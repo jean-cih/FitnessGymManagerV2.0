@@ -43,7 +43,7 @@ namespace GymApplicationV2._0.FormsServices
 
             FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
-            this.EnableDrag(this);
+            titlePanel.EnableDrag(this);
         }
 
         private void InitializeCustomDesign()
@@ -172,7 +172,7 @@ namespace GymApplicationV2._0.FormsServices
                 Size = new Size(60, 30),
                 Font = new Font("Segoe UI", 9),
                 Minimum = 1,
-                Maximum = 30,
+                Maximum = 90,
                 Value = 30,
                 BorderStyle = BorderStyle.FixedSingle,
                 BackColor = Color.White,
@@ -331,6 +331,7 @@ namespace GymApplicationV2._0.FormsServices
                                   MessageBoxButtons.OK,
                                   MessageBoxIcon.Information);
 
+                    
                     this.DialogResult = DialogResult.OK;
                     this.Close();
                 }

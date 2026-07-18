@@ -55,8 +55,6 @@ namespace GymApplicationV2._0
         {
             InitializeComponent();
 
-            LoadSettings();
-
             InitializeCustomDesign();
             UpdateButtonLayout();
 
@@ -627,6 +625,14 @@ namespace GymApplicationV2._0
             }
         }
 
+        private void UpdateDataGrid()
+        {
+            dataGridViewClient.DataSource = null;
+            dataGridViewClient.Rows.Clear();
+            dataGridViewClient.Refresh();
+            picture_status.Image = Properties.Resources.redError;
+        }
+
         private void textNumberClient_TextChanged(object sender, EventArgs e)
         {
             if (isProgrammaticChange)
@@ -648,14 +654,16 @@ namespace GymApplicationV2._0
                 return;
 
             string cardNumber = jeanTextBoxNumberCard.Text.Trim();
+            ClearCardNumber();
 
             if (!ValidateIssuedExists(cardNumber))
                 return;
 
-            if (TryHandleFrozenMembership(cardNumber))
+            DisplayClientData(cardNumber);
+            if (!ValidateMembershipStatus(cardNumber))
                 return;
 
-            if (!ValidateMembershipStatus(cardNumber))
+            if (TryHandleFrozenMembership(cardNumber))
                 return;
 
             ProcessClientVisit(cardNumber);
@@ -672,23 +680,17 @@ namespace GymApplicationV2._0
             if (existClient == null)
             {
                 PlayErrorSound();
-                ShowMessage("Этот номер не существует");
-
                 if (!userStatus.ContainsKey(cardNumber))
                 {
-                    userStatus.Add(cardNumber, "Абонемент закончился");
+                    userStatus.Add(cardNumber, "Этого номера нет в действительных абонементах");
                 }
                 else
                 {
-                    userStatus[cardNumber] = "Абонемент закончился (Повторно)";
+                    userStatus[cardNumber] = "Этого номера нет в действительных абонементах (Повторно)";
                 }
 
-                ClearCardNumber();
-
-                dataGridViewClient.DataSource = null;
-                dataGridViewClient.Rows.Clear();
-                dataGridViewClient.Refresh();
-                picture_status.Image = Properties.Resources.redError;
+                UpdateDataGrid();
+                ShowMessage("Этого номера нет в действительных абонементах");
                 return false;
             }
 
@@ -698,47 +700,14 @@ namespace GymApplicationV2._0
         // Обработка замороженного абонемента
         private bool TryHandleFrozenMembership(string cardNumber)
         {
-            string statusQuery = "SELECT Статус FROM Issued WHERE №Карты = @cardNumber";
-            object status = GeneralContext.GetElementFromDatabase(statusQuery,
+            object status = GeneralContext.GetElementFromDatabase("SELECT Статус FROM Issued WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
             if (status?.ToString() != "заморожен")
                 return false;
 
-            string dateQuery = "SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber";
-            object endDate = GeneralContext.GetElementFromDatabase(dateQuery,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
-
-            if (DateTime.Compare(Convert.ToDateTime(endDate), DateTime.Now) < 0)
-            {
-                ShowMessage("Заморозка закончилась");
-                if (!userStatus.ContainsKey(cardNumber))
-                {
-                    userStatus.Add(cardNumber, "Заморозка закончилась");
-                }
-                else
-                {
-                    userStatus[cardNumber] = "Заморозка закончилась (Повторно)";
-                }
-                ClearCardNumber();
-
-                dataGridViewClient.DataSource = null;
-                dataGridViewClient.Rows.Clear();
-                dataGridViewClient.Refresh();
-                picture_status.Image = Properties.Resources.redError;
-                return true;
-                //return false;
-            }
-
-            string visitsQuery = "SELECT Посещений_осталось FROM Issued WHERE №Карты = @cardNumber";
-            object visitsLeft = GeneralContext.GetElementFromDatabase(visitsQuery,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
-
-            UnfreezeMembership(cardNumber, endDate, visitsLeft);
-            ShowMessage("Заморозка снята");
+            UnfreezeMembership(cardNumber);
 
             if (!userStatus.ContainsKey(cardNumber))
             {
@@ -749,40 +718,33 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Заморозка снята (Повторно)";
             }
 
-            return true;
-            //return false;
+            return false;
         }
 
         // Разморозка абонемента
-        private void UnfreezeMembership(string cardNumber, object endDate, object visitsLeft)
+        private void UnfreezeMembership(string cardNumber)
         {
             string updateIssuedQuery = @"
                 UPDATE Issued SET 
                     Статус = @status,
-                    Посетил = @visitDate,
-                    Дата_окончания = @endDate,
-                    Посещений_осталось = @visitsLeft 
                 WHERE №Карты = @cardNumber";
 
             GeneralContext.CommandDataFromDatabase(updateIssuedQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@status", "активирован"),
-                new SQLiteParameter("@visitDate", DateTime.Now),
-                new SQLiteParameter("@endDate", endDate),
-                new SQLiteParameter("@visitsLeft", visitsLeft),
                 new SQLiteParameter("@cardNumber", cardNumber));
+
+            ShowMessage("Заморозка снята");
         }
 
         // Валидация статуса абонемента
         private bool ValidateMembershipStatus(string cardNumber)
         {
-            string timeLeftQuery = "SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber";
-            object timeLeft = GeneralContext.GetElementFromDatabase(timeLeftQuery,
+            object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            DateTime expiryDate = Convert.ToDateTime(timeLeft);
-            if (expiryDate.Subtract(DateTime.Now).Days < 0)
+            if (DateTime.Compare(Convert.ToDateTime(timeLeft), DateTime.Now) < 0)
             {
                 HandleExpiredMembership(cardNumber);
                 return false;
@@ -796,14 +758,12 @@ namespace GymApplicationV2._0
         {
             IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
             UpdateSellButton(issuedInfo);
-            DisplayClientData(cardNumber);
 
             ArchiveExpiredMembership(cardNumber, issuedInfo);
-            ClearCardNumber();
+
+            ResetClientMembership(cardNumber);
 
             PlayErrorSound();
-            ShowMessage("Абонемент закончился по времени");
-
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Абонемент закончился по времени");
@@ -812,13 +772,8 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
             }
-
-            ResetClientMembership(cardNumber);
-
-            dataGridViewClient.DataSource = null;
-            dataGridViewClient.Rows.Clear();
-            dataGridViewClient.Refresh();
-            picture_status.Image = Properties.Resources.redError;
+            UpdateDataGrid();
+            ShowMessage("Абонемент закончился по времени");
         }
 
         // Сброс данных абонемента клиента
@@ -904,9 +859,6 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
 
-            DisplayClientData(cardNumber);
-            ClearCardNumber();
-
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
@@ -915,27 +867,21 @@ namespace GymApplicationV2._0
         {
             IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
             UpdateSellButton(issuedInfo);
-            DisplayClientData(cardNumber);
 
             ArchiveExpiredMembership(cardNumber, issuedInfo);
 
             PlayErrorSound();
-            ShowMessage("Абонемент закончился. Посещений осталось 0");
-
             if (!userStatus.ContainsKey(cardNumber))
             {
-                userStatus.Add(cardNumber, "Абонемент закончился. Посещений осталось 0");
+                userStatus.Add(cardNumber, "Абонемент закончился. Посещений 0");
             }
             else
             {
-                userStatus[cardNumber] = "Абонемент закончился. Посещений осталось 0 (Повторно)";
+                userStatus[cardNumber] = "Абонемент закончился. Посещений 0 (Повторно)";
             }
-            ClearCardNumber();
 
-            dataGridViewClient.DataSource = null;
-            dataGridViewClient.Rows.Clear();
-            dataGridViewClient.Refresh();
-            picture_status.Image = Properties.Resources.redError;
+            UpdateDataGrid();
+            ShowMessage("Абонемент закончился. Посещений 0");
         }
 
         // Обработка ограниченного посещения
@@ -948,7 +894,6 @@ namespace GymApplicationV2._0
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            DisplayClientData(cardNumber);
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Активен");
@@ -960,7 +905,6 @@ namespace GymApplicationV2._0
 
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
-            ClearCardNumber();
 
             picture_status.Image = Properties.Resources.greenSuccess;
         }
@@ -1034,24 +978,6 @@ namespace GymApplicationV2._0
             services.labelNumberCard.Text = numberCard;
             services.labelNumberCard.Visible = true;
             services.checkBoxVisited.Visible = true;
-        }
-
-        private void LoadSettings()
-        {
-            try
-            {
-                DataConfig.sizeFontCaptions = ConfigManager.GetSetting<int>("headlineSize");
-                DataConfig.sizeFontButtons = ConfigManager.GetSetting<int>("sizeKeyName");
-                DataConfig.sizeFontTables = ConfigManager.GetSetting<int>("sizeTableTitle");
-                DataConfig.sizeFontText = ConfigManager.GetSetting<int>("textSize");
-                DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
-                DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Ошибка загрузки настроек: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void ApplySettingsToAllControls()

@@ -16,11 +16,11 @@ namespace GymApplicationV2._0
         public bool periodForDay;
         public bool otherPeriond;
 
-        public bool sellServices;
 
         public DateTime dateBegin;
         public DateTime dateEnd;
 
+        public bool sellServices;
         public bool forPeriod;
 
         private FadeAnimation _fadeAnimation;
@@ -97,6 +97,11 @@ namespace GymApplicationV2._0
             DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
 
+            if (dataTable == null || dataTable.Rows.Count <= 0)
+            {
+                return;
+            }
+
             dataTable.Columns.Add("Статус", typeof(string));
 
             foreach (DataRow row in dataTable.Rows)
@@ -147,13 +152,15 @@ namespace GymApplicationV2._0
         private void LoadServicesReport()
         {
             DateTime startDate = DateTime.Now;
-            string query = string.Empty;
+            string query = "SELECT * FROM Descriptions";
 
             labelShowPeriod.Text = $"Абонементы";
             labelAllClients.Text = "Всего продано:";
+
             labelQuantity.Text = GeneralContext.GetElementFromDatabase($"SELECT SUM(Проданных_за_месяц) FROM Descriptions",
             ServicesContext.ConnectionStringServices()).ToString();
-            dataGridViewShowReport.DataSource = GeneralContext.GetElementFromDatabase("SELECT * FROM Descriptions",
+
+            dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase("SELECT Абонемент, Цена, Проданных_за_месяц AS 'Проданных за месяц'  FROM Descriptions WHERE Проданных_за_месяц != 0",
             ServicesContext.ConnectionStringServices());
         }
     }
