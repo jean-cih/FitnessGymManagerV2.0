@@ -690,7 +690,7 @@ namespace GymApplicationV2._0
                 }
 
                 UpdateDataGrid();
-                ShowMessage("Этого номера нет в действительных абонементах");
+                //ShowMessage("Этого номера нет в действительных абонементах");
                 return false;
             }
 
@@ -734,7 +734,27 @@ namespace GymApplicationV2._0
                 new SQLiteParameter("@status", "активирован"),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            ShowMessage("Заморозка снята");
+            //ShowMessage("Заморозка снята");
+
+            object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Окончание_заморозки FROM Issued WHERE №Карты = @cardNumber",
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@cardNumber", cardNumber));
+
+            DateTime endDate = Convert.ToDateTime(timeLeft);
+            int daysLeft = (int)(endDate - DateTime.Now).TotalDays;
+
+            if (daysLeft > 0)
+            {
+                string updateIssuedQueryDate = @"
+                UPDATE Issued SET 
+                    Дата_окончания = @endDate,
+                WHERE №Карты = @cardNumber";
+
+                GeneralContext.CommandDataFromDatabase(updateIssuedQueryDate,
+                    IssuedMembershipContext.ConnectionStringIssued(),
+                    new SQLiteParameter("@endDate", Convert.ToDateTime(timeLeft).AddDays(-daysLeft).ToShortDateString()),
+                    new SQLiteParameter("@cardNumber", cardNumber));
+            }
         }
 
         // Валидация статуса абонемента
@@ -773,7 +793,7 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
             }
             UpdateDataGrid();
-            ShowMessage("Абонемент закончился по времени");
+            //ShowMessage("Абонемент закончился по времени");
         }
 
         // Сброс данных абонемента клиента
@@ -881,7 +901,7 @@ namespace GymApplicationV2._0
             }
 
             UpdateDataGrid();
-            ShowMessage("Абонемент закончился. Посещений 0");
+            //ShowMessage("Абонемент закончился. Посещений 0");
         }
 
         // Обработка ограниченного посещения
