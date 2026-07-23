@@ -519,7 +519,8 @@ namespace GymApplicationV2._0
 
                     if (existClient == null)
                     {
-                        Message.MessageWindowOk("Клиент без карты");
+                        PlayErrorSound();
+                        UpdateDataGrid();
                         return;
                     }
 
@@ -724,18 +725,6 @@ namespace GymApplicationV2._0
         // Разморозка абонемента
         private void UnfreezeMembership(string cardNumber)
         {
-            string updateIssuedQuery = @"
-                UPDATE Issued SET 
-                    Статус = @status,
-                WHERE №Карты = @cardNumber";
-
-            GeneralContext.CommandDataFromDatabase(updateIssuedQuery,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@status", "активирован"),
-                new SQLiteParameter("@cardNumber", cardNumber));
-
-            //ShowMessage("Заморозка снята");
-
             object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Окончание_заморозки FROM Issued WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
@@ -748,11 +737,15 @@ namespace GymApplicationV2._0
                 string updateIssuedQueryDate = @"
                 UPDATE Issued SET 
                     Дата_окончания = @endDate,
+                    Статус = @status,
+                    Окончание_заморозки = @stopFreeze
                 WHERE №Карты = @cardNumber";
 
                 GeneralContext.CommandDataFromDatabase(updateIssuedQueryDate,
                     IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@endDate", Convert.ToDateTime(timeLeft).AddDays(-daysLeft).ToShortDateString()),
+                    new SQLiteParameter("@status", "активирован"),
+                    new SQLiteParameter("@stopFreeze", DBNull.Value),
                     new SQLiteParameter("@cardNumber", cardNumber));
             }
         }
