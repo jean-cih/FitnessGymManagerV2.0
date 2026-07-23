@@ -35,10 +35,8 @@ namespace GymApplicationV2._0
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.labelName = new System.Windows.Forms.Label();
-            this.labelNumberCard = new System.Windows.Forms.Label();
             this.checkBoxVisited = new System.Windows.Forms.CheckBox();
             this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
-            this.labelMembership = new System.Windows.Forms.Label();
             this.dataGridViewServices = new System.Windows.Forms.DataGridView();
             this.jeanPanel = new GymApplicationV2._0.Controls.JeanPanel();
             this.jeanModernButtonErase = new GymApplicationV2._0.Controls.JeanModernButton();
@@ -56,33 +54,21 @@ namespace GymApplicationV2._0
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelName.Location = new System.Drawing.Point(28, 36);
-            this.labelName.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.labelName.Location = new System.Drawing.Point(37, 82);
             this.labelName.Name = "labelName";
-            this.labelName.Size = new System.Drawing.Size(0, 17);
+            this.labelName.Size = new System.Drawing.Size(0, 20);
             this.labelName.TabIndex = 20;
             this.labelName.Visible = false;
-            // 
-            // labelNumberCard
-            // 
-            this.labelNumberCard.AutoSize = true;
-            this.labelNumberCard.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelNumberCard.Location = new System.Drawing.Point(172, 66);
-            this.labelNumberCard.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.labelNumberCard.Name = "labelNumberCard";
-            this.labelNumberCard.Size = new System.Drawing.Size(0, 17);
-            this.labelNumberCard.TabIndex = 22;
-            this.labelNumberCard.Visible = false;
             // 
             // checkBoxVisited
             // 
             this.checkBoxVisited.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.checkBoxVisited.AutoSize = true;
             this.checkBoxVisited.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkBoxVisited.Location = new System.Drawing.Point(11, 418);
-            this.checkBoxVisited.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxVisited.Location = new System.Drawing.Point(15, 515);
+            this.checkBoxVisited.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBoxVisited.Name = "checkBoxVisited";
-            this.checkBoxVisited.Size = new System.Drawing.Size(167, 17);
+            this.checkBoxVisited.Size = new System.Drawing.Size(209, 20);
             this.checkBoxVisited.TabIndex = 37;
             this.checkBoxVisited.Text = "Отметить посещение сразу";
             this.checkBoxVisited.UseVisualStyleBackColor = true;
@@ -92,21 +78,13 @@ namespace GymApplicationV2._0
             // 
             this.pictureBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.pictureBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSearch.Image")));
-            this.pictureBoxSearch.Location = new System.Drawing.Point(352, 46);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2);
+            this.pictureBoxSearch.Location = new System.Drawing.Point(469, 57);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(26, 24);
+            this.pictureBoxSearch.Size = new System.Drawing.Size(35, 30);
             this.pictureBoxSearch.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxSearch.TabIndex = 57;
             this.pictureBoxSearch.TabStop = false;
-            // 
-            // labelMembership
-            // 
-            this.labelMembership.AutoSize = true;
-            this.labelMembership.Location = new System.Drawing.Point(19, 71);
-            this.labelMembership.Name = "labelMembership";
-            this.labelMembership.Size = new System.Drawing.Size(0, 13);
-            this.labelMembership.TabIndex = 58;
             // 
             // dataGridViewServices
             // 
@@ -141,8 +119,8 @@ namespace GymApplicationV2._0
             this.dataGridViewServices.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewServices.EnableHeadersVisualStyles = false;
             this.dataGridViewServices.GridColor = System.Drawing.Color.Black;
-            this.dataGridViewServices.Location = new System.Drawing.Point(13, 11);
-            this.dataGridViewServices.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridViewServices.Location = new System.Drawing.Point(17, 14);
+            this.dataGridViewServices.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridViewServices.Name = "dataGridViewServices";
             this.dataGridViewServices.ReadOnly = true;
             this.dataGridViewServices.RowHeadersVisible = false;
@@ -151,7 +129,7 @@ namespace GymApplicationV2._0
             this.dataGridViewServices.RowsDefaultCellStyle = dataGridViewCellStyle3;
             this.dataGridViewServices.RowTemplate.Height = 24;
             this.dataGridViewServices.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewServices.Size = new System.Drawing.Size(842, 306);
+            this.dataGridViewServices.Size = new System.Drawing.Size(1123, 377);
             this.dataGridViewServices.TabIndex = 58;
             this.dataGridViewServices.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewServices_CellContentClick_1);
             // 
@@ -168,10 +146,10 @@ namespace GymApplicationV2._0
             this.jeanPanel.GradientAngle = 90F;
             this.jeanPanel.GradientBottomColor = System.Drawing.Color.DodgerBlue;
             this.jeanPanel.GradientTapColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            this.jeanPanel.Location = new System.Drawing.Point(11, 89);
-            this.jeanPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanPanel.Location = new System.Drawing.Point(15, 110);
+            this.jeanPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanPanel.Name = "jeanPanel";
-            this.jeanPanel.Size = new System.Drawing.Size(868, 325);
+            this.jeanPanel.Size = new System.Drawing.Size(1157, 400);
             this.jeanPanel.TabIndex = 54;
             // 
             // jeanModernButtonErase
@@ -187,10 +165,10 @@ namespace GymApplicationV2._0
             this.jeanModernButtonErase.FlatAppearance.BorderSize = 0;
             this.jeanModernButtonErase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonErase.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonErase.Location = new System.Drawing.Point(536, 46);
-            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonErase.Location = new System.Drawing.Point(715, 57);
+            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonErase.Name = "jeanModernButtonErase";
-            this.jeanModernButtonErase.Size = new System.Drawing.Size(26, 24);
+            this.jeanModernButtonErase.Size = new System.Drawing.Size(35, 30);
             this.jeanModernButtonErase.TabIndex = 59;
             this.jeanModernButtonErase.TextColor = System.Drawing.Color.White;
             this.jeanModernButtonErase.UseVisualStyleBackColor = false;
@@ -205,15 +183,15 @@ namespace GymApplicationV2._0
             this.jeanSoftTextBoxPurchase.BorderRadius = 15;
             this.jeanSoftTextBoxPurchase.BorderSize = 2;
             this.jeanSoftTextBoxPurchase.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanSoftTextBoxPurchase.Location = new System.Drawing.Point(343, 41);
-            this.jeanSoftTextBoxPurchase.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.jeanSoftTextBoxPurchase.Location = new System.Drawing.Point(457, 50);
+            this.jeanSoftTextBoxPurchase.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.jeanSoftTextBoxPurchase.Multiline = false;
             this.jeanSoftTextBoxPurchase.Name = "jeanSoftTextBoxPurchase";
-            this.jeanSoftTextBoxPurchase.Padding = new System.Windows.Forms.Padding(38, 8, 38, 8);
+            this.jeanSoftTextBoxPurchase.Padding = new System.Windows.Forms.Padding(51, 10, 51, 10);
             this.jeanSoftTextBoxPurchase.PasswordChar = false;
             this.jeanSoftTextBoxPurchase.PlaceholderColor = System.Drawing.Color.DarkGray;
             this.jeanSoftTextBoxPurchase.PlaceholderText = "  Услуга";
-            this.jeanSoftTextBoxPurchase.Size = new System.Drawing.Size(226, 34);
+            this.jeanSoftTextBoxPurchase.Size = new System.Drawing.Size(301, 41);
             this.jeanSoftTextBoxPurchase.TabIndex = 55;
             this.jeanSoftTextBoxPurchase.Texts = "";
             this.jeanSoftTextBoxPurchase.UnderlinedStyle = false;
@@ -231,10 +209,10 @@ namespace GymApplicationV2._0
             this.jeanModernButtonChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonChange.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChange.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonChange.Location = new System.Drawing.Point(752, 29);
-            this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonChange.Location = new System.Drawing.Point(1003, 36);
+            this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonChange.Name = "jeanModernButtonChange";
-            this.jeanModernButtonChange.Size = new System.Drawing.Size(112, 45);
+            this.jeanModernButtonChange.Size = new System.Drawing.Size(149, 55);
             this.jeanModernButtonChange.TabIndex = 53;
             this.jeanModernButtonChange.Text = "Изменить";
             this.jeanModernButtonChange.TextColor = System.Drawing.Color.White;
@@ -253,10 +231,10 @@ namespace GymApplicationV2._0
             this.jeanModernButtonSell.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonSell.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonSell.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonSell.Location = new System.Drawing.Point(403, 430);
-            this.jeanModernButtonSell.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonSell.Location = new System.Drawing.Point(537, 529);
+            this.jeanModernButtonSell.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonSell.Name = "jeanModernButtonSell";
-            this.jeanModernButtonSell.Size = new System.Drawing.Size(112, 45);
+            this.jeanModernButtonSell.Size = new System.Drawing.Size(149, 55);
             this.jeanModernButtonSell.TabIndex = 51;
             this.jeanModernButtonSell.Text = "Продать";
             this.jeanModernButtonSell.TextColor = System.Drawing.Color.White;
@@ -276,10 +254,10 @@ namespace GymApplicationV2._0
             this.jeanModernButtonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonAdd.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonAdd.Location = new System.Drawing.Point(344, 430);
-            this.jeanModernButtonAdd.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonAdd.Location = new System.Drawing.Point(459, 529);
+            this.jeanModernButtonAdd.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonAdd.Name = "jeanModernButtonAdd";
-            this.jeanModernButtonAdd.Size = new System.Drawing.Size(112, 45);
+            this.jeanModernButtonAdd.Size = new System.Drawing.Size(149, 55);
             this.jeanModernButtonAdd.TabIndex = 50;
             this.jeanModernButtonAdd.Text = "Добавить";
             this.jeanModernButtonAdd.TextColor = System.Drawing.Color.White;
@@ -298,10 +276,10 @@ namespace GymApplicationV2._0
             this.jeanModernButtonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonDelete.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonDelete.Location = new System.Drawing.Point(460, 430);
-            this.jeanModernButtonDelete.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonDelete.Location = new System.Drawing.Point(613, 529);
+            this.jeanModernButtonDelete.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonDelete.Name = "jeanModernButtonDelete";
-            this.jeanModernButtonDelete.Size = new System.Drawing.Size(112, 45);
+            this.jeanModernButtonDelete.Size = new System.Drawing.Size(149, 55);
             this.jeanModernButtonDelete.TabIndex = 52;
             this.jeanModernButtonDelete.Text = "Удалить";
             this.jeanModernButtonDelete.TextColor = System.Drawing.Color.White;
@@ -310,26 +288,24 @@ namespace GymApplicationV2._0
             // 
             // Services
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(886, 497);
+            this.ClientSize = new System.Drawing.Size(1181, 612);
             this.Controls.Add(this.jeanPanel);
             this.Controls.Add(this.jeanModernButtonErase);
-            this.Controls.Add(this.labelMembership);
             this.Controls.Add(this.pictureBoxSearch);
             this.Controls.Add(this.jeanSoftTextBoxPurchase);
             this.Controls.Add(this.jeanModernButtonChange);
             this.Controls.Add(this.jeanModernButtonSell);
             this.Controls.Add(this.jeanModernButtonAdd);
             this.Controls.Add(this.checkBoxVisited);
-            this.Controls.Add(this.labelNumberCard);
             this.Controls.Add(this.labelName);
             this.Controls.Add(this.jeanModernButtonDelete);
             this.ForeColor = System.Drawing.Color.Black;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Services";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Абонементы";
@@ -344,7 +320,6 @@ namespace GymApplicationV2._0
 
         #endregion
         protected internal System.Windows.Forms.Label labelName;
-        protected internal System.Windows.Forms.Label labelNumberCard;
         protected internal System.Windows.Forms.CheckBox checkBoxVisited;
         protected internal Controls.JeanModernButton jeanModernButtonAdd;
         protected internal Controls.JeanModernButton jeanModernButtonSell;
@@ -354,7 +329,6 @@ namespace GymApplicationV2._0
         private System.Windows.Forms.PictureBox pictureBoxSearch;
         protected internal Controls.jeanSoftTextBox jeanSoftTextBoxPurchase;
         protected internal System.Windows.Forms.DataGridView dataGridViewServices;
-        private System.Windows.Forms.Label labelMembership;
         private Controls.JeanModernButton jeanModernButtonErase;
     }
 }

@@ -14,6 +14,8 @@ namespace GymApplicationV2._0
         private string _termMembership = string.Empty;
         private string _servicesQuantity = string.Empty;
         private string _servicesCost = string.Empty;
+        private string _labelMembership = string.Empty;
+        public string NumberCard = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -52,7 +54,7 @@ namespace GymApplicationV2._0
             if (dataGridViewServices.SelectedRows.Count == 0) return;
 
             var selectedRow = dataGridViewServices.SelectedRows[0];
-            labelMembership.Text = selectedRow.Cells[0].Value?.ToString();
+            _labelMembership = selectedRow.Cells[0].Value?.ToString();
             _termMembership = selectedRow.Cells[2].Value?.ToString();
             _servicesCost = selectedRow.Cells[1].Value.ToString();
             _servicesQuantity = selectedRow.Cells[3].Value.ToString();
@@ -69,13 +71,13 @@ namespace GymApplicationV2._0
 
         private void buttonDelete_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(labelMembership.Text)) return;
+            if (string.IsNullOrWhiteSpace(_labelMembership)) return;
 
             if (Message.MessageWindowYesNo("Вы действительно хотите удалить услугу?") != DialogResult.Yes)
                 return;
 
             GeneralContext.CommandDataFromDatabase(
-                $"DELETE FROM Descriptions WHERE Абонемент = '{labelMembership.Text}'",
+                $"DELETE FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
             Message.MessageWindowOk("Услуга удалена");
@@ -84,15 +86,36 @@ namespace GymApplicationV2._0
 
         private void buttonSell_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(labelMembership.Text))
+            if (string.IsNullOrWhiteSpace(_labelMembership))
             {
                 Message.MessageWindowOk("Нужно сначала выбрать услугу");
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(labelNumberCard.Text))
+            if (string.IsNullOrWhiteSpace(NumberCard))
             {
                 Message.MessageWindowOk("Клиент не выбран");
+                return;
+            }
+
+            var _existInIssued = GeneralContext.GetDataFromDatabase($@"SELECT
+                    Клиент,
+                    №Карты,
+                    Дата_окончания AS 'Дата окончания',
+                    Дата_оформления AS 'Дата оформления',
+                    Абонемент,
+                    Посетил,
+                    Оплата,
+                    Статус,
+                    Посещений_осталось AS 'Посещений осталось',
+                    Окончание_заморозки AS 'Окончание заморозки'
+                    FROM Issued 
+                    WHERE №Карты LIKE '%{NumberCard}%'",
+                IssuedMembershipContext.ConnectionStringIssued());
+
+            if (_existInIssued != null)
+            {
+                Message.MessageWindowOk("У клиента уже есть абонемент");
                 return;
             }
 
@@ -122,7 +145,7 @@ namespace GymApplicationV2._0
         private int? GetServiceQuantityLeft()
         {
             var left = GeneralContext.GetElementFromDatabase(
-                $"SELECT Посещений FROM Descriptions WHERE Абонемент = '{labelMembership.Text}'",
+                $"SELECT Посещений FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
             if (string.IsNullOrEmpty(left?.ToString())) return null;
@@ -134,7 +157,7 @@ namespace GymApplicationV2._0
         private int GetClientPurchases()
         {
             var purchase = GeneralContext.GetElementFromDatabase(
-                $"SELECT Покупки FROM Contacts WHERE №Карты = '{labelNumberCard.Text}'",
+                $"SELECT Покупки FROM Contacts WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients());
 
             return purchase == null ? Convert.ToInt32(purchase) : 0;
@@ -148,14 +171,14 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase($@"
                 UPDATE Contacts SET 
                 Покупки = '{clientPurchases + _servicesCost}'
-                WHERE №Карты = '{labelNumberCard.Text}'",
+                WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients());
         }
 
         private void UpdateServiceStatistics()
         {
             var quantity = GeneralContext.GetElementFromDatabase(
-                $"SELECT Проданных_за_месяц FROM Descriptions WHERE Абонемент = '{labelMembership.Text}'",
+                $"SELECT Проданных_за_месяц FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
             int numbers = (quantity != DBNull.Value && quantity != null) ? Convert.ToInt32(quantity) : 0;
@@ -163,14 +186,14 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase($@"
                 UPDATE Descriptions SET 
                 Проданных_за_месяц = '{numbers + 1}' 
-                WHERE Абонемент = '{labelMembership.Text}'",
+                WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
         }
 
         private void AddPaymentHistory()
         {
             var fatherName = GeneralContext.GetElementFromDatabase(
-                $"SELECT Отчество FROM Contacts WHERE №Карты = '{labelNumberCard.Text}'",
+                $"SELECT Отчество FROM Contacts WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients())?.ToString() ?? string.Empty;
 
             var now = DateTime.Now;
@@ -186,7 +209,7 @@ namespace GymApplicationV2._0
                 )", conn))
             {
                 cmd.Parameters.AddWithValue("@Клиент", clientName);
-                cmd.Parameters.AddWithValue("@Абонемент", labelMembership.Text);
+                cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
                 cmd.Parameters.AddWithValue("@Дата_начала", now.ToShortDateString());
                 cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToShortDateString());
                 cmd.Parameters.AddWithValue("@Цена", _servicesCost);
@@ -200,7 +223,7 @@ namespace GymApplicationV2._0
         private void AddIssuedMembership()
         {
             var fatherName = GeneralContext.GetElementFromDatabase(
-                $"SELECT Отчество FROM Contacts WHERE №Карты = '{labelNumberCard.Text}'",
+                $"SELECT Отчество FROM Contacts WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients())?.ToString() ?? string.Empty;
 
             var now = DateTime.Now;
@@ -219,10 +242,10 @@ namespace GymApplicationV2._0
                 )", conn))
             {
                 cmd.Parameters.AddWithValue("@Клиент", clientName);
-                cmd.Parameters.AddWithValue("@№Карты", labelNumberCard.Text);
+                cmd.Parameters.AddWithValue("@№Карты", NumberCard);
                 cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToShortDateString());
                 cmd.Parameters.AddWithValue("@Дата_оформления", now.ToShortDateString());
-                cmd.Parameters.AddWithValue("@Абонемент", labelMembership.Text);
+                cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
                 cmd.Parameters.AddWithValue("@Оплата", _servicesCost);
                 cmd.Parameters.AddWithValue("@Статус", "активирован");
                 cmd.Parameters.AddWithValue("@Посещений_осталось", quantityLeft?.ToString() ?? string.Empty);
@@ -244,7 +267,7 @@ namespace GymApplicationV2._0
                 f.jeanTextBoxPrice.Text = _servicesCost;
                 f.jeanTextBoxTerm.Text = _termMembership;
                 f.jeanTextBoxVisited.Text = _servicesQuantity;
-                f.jeanTextBoxName.Text = labelMembership.Text;
+                f.jeanTextBoxName.Text = _labelMembership;
             });
 
             RefreshServicesData();
@@ -252,7 +275,7 @@ namespace GymApplicationV2._0
 
         private void ShowFormWithData(Form form, Action<Form> setData)
         {
-            if (string.IsNullOrWhiteSpace(labelMembership.Text))
+            if (string.IsNullOrWhiteSpace(_labelMembership))
             {
                 Message.MessageWindowOk("Выберите услугу из таблицы");
                 return;

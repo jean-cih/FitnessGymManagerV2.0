@@ -190,7 +190,7 @@ namespace GymApplicationV2._0
                 jeanModernButtonChange = { Visible = false },
                 labelName = { Text = $"{_name} {_surname}", Visible = true },
                 jeanSoftTextBoxPurchase = { Visible = true },
-                labelNumberCard = { Text = _numberCard, Visible = true },
+                NumberCard = _numberCard,
                 checkBoxVisited = { Visible = true }
             };
 

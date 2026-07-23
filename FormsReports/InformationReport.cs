@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
@@ -115,6 +116,24 @@ namespace GymApplicationV2._0
                 else
                 {
                     row["Статус"] = "Неизвестно";
+                }
+            }
+
+            foreach (var kvp in userStatus)
+            {
+                string cardNumber = kvp.Key;
+                string status = kvp.Value;
+
+                bool cardExists = dataTable.AsEnumerable().Any(row => row["№Карты"].ToString() == cardNumber);
+
+                if (!cardExists)
+                {
+                    DataRow newRow = dataTable.NewRow();
+                    newRow["№Карты"] = cardNumber;
+                    newRow["Статус"] = status;
+                    newRow["Клиент"] = "***";
+                                                   
+                    dataTable.Rows.Add(newRow);
                 }
             }
 
