@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Clients));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.checkBoxPerson = new System.Windows.Forms.CheckBox();
             this.jeanModernButtonDelete = new GymApplicationV2._0.Controls.JeanModernButton();
@@ -58,24 +58,25 @@
             // 
             this.pictureBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.pictureBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSearch.Image")));
-            this.pictureBoxSearch.Location = new System.Drawing.Point(334, 37);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2);
+            this.pictureBoxSearch.Location = new System.Drawing.Point(445, 46);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(26, 24);
+            this.pictureBoxSearch.Size = new System.Drawing.Size(35, 30);
             this.pictureBoxSearch.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxSearch.TabIndex = 47;
             this.pictureBoxSearch.TabStop = false;
             // 
             // checkBoxPerson
             // 
+            this.checkBoxPerson.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.checkBoxPerson.AutoSize = true;
-            this.checkBoxPerson.Location = new System.Drawing.Point(626, 610);
-            this.checkBoxPerson.Margin = new System.Windows.Forms.Padding(2);
+            this.checkBoxPerson.Location = new System.Drawing.Point(835, 761);
+            this.checkBoxPerson.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.checkBoxPerson.Name = "checkBoxPerson";
-            this.checkBoxPerson.Size = new System.Drawing.Size(95, 17);
+            this.checkBoxPerson.Size = new System.Drawing.Size(116, 20);
             this.checkBoxPerson.TabIndex = 49;
             this.checkBoxPerson.Text = "В новом окне";
-            this.checkBoxPerson.UseVisualStyleBackColor = true;
+            this.checkBoxPerson.UseVisualStyleBackColor = false;
             // 
             // jeanModernButtonDelete
             // 
@@ -89,10 +90,10 @@
             this.jeanModernButtonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonDelete.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonDelete.Location = new System.Drawing.Point(481, 610);
-            this.jeanModernButtonDelete.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonDelete.Location = new System.Drawing.Point(641, 751);
+            this.jeanModernButtonDelete.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonDelete.Name = "jeanModernButtonDelete";
-            this.jeanModernButtonDelete.Size = new System.Drawing.Size(124, 45);
+            this.jeanModernButtonDelete.Size = new System.Drawing.Size(165, 55);
             this.jeanModernButtonDelete.TabIndex = 117;
             this.jeanModernButtonDelete.Text = "Удалить";
             this.jeanModernButtonDelete.TextColor = System.Drawing.Color.White;
@@ -111,10 +112,10 @@
             this.jeanModernButtonChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonChange.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChange.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonChange.Location = new System.Drawing.Point(352, 610);
-            this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonChange.Location = new System.Drawing.Point(469, 751);
+            this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonChange.Name = "jeanModernButtonChange";
-            this.jeanModernButtonChange.Size = new System.Drawing.Size(124, 45);
+            this.jeanModernButtonChange.Size = new System.Drawing.Size(165, 55);
             this.jeanModernButtonChange.TabIndex = 116;
             this.jeanModernButtonChange.Text = "Изменить";
             this.jeanModernButtonChange.TextColor = System.Drawing.Color.White;
@@ -130,11 +131,11 @@
             this.jeanTextBoxDiscount.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxDiscount.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxDiscount.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxDiscount.Location = new System.Drawing.Point(11, 339);
-            this.jeanTextBoxDiscount.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxDiscount.Location = new System.Drawing.Point(15, 417);
+            this.jeanTextBoxDiscount.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxDiscount.Name = "jeanTextBoxDiscount";
             this.jeanTextBoxDiscount.SelectionStart = 0;
-            this.jeanTextBoxDiscount.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxDiscount.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxDiscount.TabIndex = 115;
             this.jeanTextBoxDiscount.TextInput = "";
             this.jeanTextBoxDiscount.TextPreview = "Скидка";
@@ -149,11 +150,11 @@
             this.jeanTextBoxBirthday.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxBirthday.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxBirthday.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxBirthday.Location = new System.Drawing.Point(11, 300);
-            this.jeanTextBoxBirthday.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxBirthday.Location = new System.Drawing.Point(15, 369);
+            this.jeanTextBoxBirthday.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxBirthday.Name = "jeanTextBoxBirthday";
             this.jeanTextBoxBirthday.SelectionStart = 0;
-            this.jeanTextBoxBirthday.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxBirthday.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxBirthday.TabIndex = 114;
             this.jeanTextBoxBirthday.TextInput = "";
             this.jeanTextBoxBirthday.TextPreview = "Дата рождения";
@@ -168,11 +169,11 @@
             this.jeanTextBoxEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxEmail.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxEmail.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxEmail.Location = new System.Drawing.Point(11, 261);
-            this.jeanTextBoxEmail.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxEmail.Location = new System.Drawing.Point(15, 321);
+            this.jeanTextBoxEmail.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxEmail.Name = "jeanTextBoxEmail";
             this.jeanTextBoxEmail.SelectionStart = 0;
-            this.jeanTextBoxEmail.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxEmail.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxEmail.TabIndex = 113;
             this.jeanTextBoxEmail.TextInput = "";
             this.jeanTextBoxEmail.TextPreview = "Email";
@@ -187,11 +188,11 @@
             this.jeanTextBoxPurchase.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxPurchase.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxPurchase.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxPurchase.Location = new System.Drawing.Point(11, 216);
-            this.jeanTextBoxPurchase.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxPurchase.Location = new System.Drawing.Point(15, 266);
+            this.jeanTextBoxPurchase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxPurchase.Name = "jeanTextBoxPurchase";
             this.jeanTextBoxPurchase.SelectionStart = 0;
-            this.jeanTextBoxPurchase.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxPurchase.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxPurchase.TabIndex = 112;
             this.jeanTextBoxPurchase.TextInput = "";
             this.jeanTextBoxPurchase.TextPreview = "Покупки";
@@ -206,11 +207,11 @@
             this.jeanTextBoxNumberCard.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxNumberCard.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxNumberCard.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxNumberCard.Location = new System.Drawing.Point(11, 177);
-            this.jeanTextBoxNumberCard.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxNumberCard.Location = new System.Drawing.Point(15, 218);
+            this.jeanTextBoxNumberCard.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxNumberCard.Name = "jeanTextBoxNumberCard";
             this.jeanTextBoxNumberCard.SelectionStart = 0;
-            this.jeanTextBoxNumberCard.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxNumberCard.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxNumberCard.TabIndex = 111;
             this.jeanTextBoxNumberCard.TextInput = "";
             this.jeanTextBoxNumberCard.TextPreview = "Номер карты";
@@ -225,11 +226,11 @@
             this.jeanTextBoxPhone.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxPhone.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxPhone.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxPhone.Location = new System.Drawing.Point(11, 138);
-            this.jeanTextBoxPhone.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxPhone.Location = new System.Drawing.Point(15, 170);
+            this.jeanTextBoxPhone.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxPhone.Name = "jeanTextBoxPhone";
             this.jeanTextBoxPhone.SelectionStart = 0;
-            this.jeanTextBoxPhone.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxPhone.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxPhone.TabIndex = 110;
             this.jeanTextBoxPhone.TextInput = "";
             this.jeanTextBoxPhone.TextPreview = "Телефон";
@@ -244,11 +245,11 @@
             this.jeanTextBoxGender.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxGender.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxGender.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxGender.Location = new System.Drawing.Point(11, 99);
-            this.jeanTextBoxGender.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxGender.Location = new System.Drawing.Point(15, 122);
+            this.jeanTextBoxGender.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxGender.Name = "jeanTextBoxGender";
             this.jeanTextBoxGender.SelectionStart = 0;
-            this.jeanTextBoxGender.Size = new System.Drawing.Size(167, 32);
+            this.jeanTextBoxGender.Size = new System.Drawing.Size(223, 39);
             this.jeanTextBoxGender.TabIndex = 109;
             this.jeanTextBoxGender.TextInput = "";
             this.jeanTextBoxGender.TextPreview = "Пол";
@@ -263,11 +264,11 @@
             this.jeanTextBoxClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxClient.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxClient.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxClient.Location = new System.Drawing.Point(11, 60);
-            this.jeanTextBoxClient.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxClient.Location = new System.Drawing.Point(15, 74);
+            this.jeanTextBoxClient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxClient.Name = "jeanTextBoxClient";
             this.jeanTextBoxClient.SelectionStart = 0;
-            this.jeanTextBoxClient.Size = new System.Drawing.Size(232, 32);
+            this.jeanTextBoxClient.Size = new System.Drawing.Size(309, 39);
             this.jeanTextBoxClient.TabIndex = 108;
             this.jeanTextBoxClient.TextInput = "";
             this.jeanTextBoxClient.TextPreview = "Клиент";
@@ -286,10 +287,10 @@
             this.jeanModernButtonErase.FlatAppearance.BorderSize = 0;
             this.jeanModernButtonErase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonErase.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonErase.Location = new System.Drawing.Point(590, 37);
-            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonErase.Location = new System.Drawing.Point(787, 46);
+            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonErase.Name = "jeanModernButtonErase";
-            this.jeanModernButtonErase.Size = new System.Drawing.Size(26, 24);
+            this.jeanModernButtonErase.Size = new System.Drawing.Size(35, 30);
             this.jeanModernButtonErase.TabIndex = 46;
             this.jeanModernButtonErase.TextColor = System.Drawing.Color.White;
             this.jeanModernButtonErase.UseVisualStyleBackColor = false;
@@ -304,15 +305,15 @@
             this.jeanSoftTextBoxSearch.BorderRadius = 15;
             this.jeanSoftTextBoxSearch.BorderSize = 2;
             this.jeanSoftTextBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanSoftTextBoxSearch.Location = new System.Drawing.Point(325, 32);
-            this.jeanSoftTextBoxSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.jeanSoftTextBoxSearch.Location = new System.Drawing.Point(433, 39);
+            this.jeanSoftTextBoxSearch.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.jeanSoftTextBoxSearch.Multiline = false;
             this.jeanSoftTextBoxSearch.Name = "jeanSoftTextBoxSearch";
-            this.jeanSoftTextBoxSearch.Padding = new System.Windows.Forms.Padding(38, 8, 38, 8);
+            this.jeanSoftTextBoxSearch.Padding = new System.Windows.Forms.Padding(51, 10, 51, 10);
             this.jeanSoftTextBoxSearch.PasswordChar = false;
             this.jeanSoftTextBoxSearch.PlaceholderColor = System.Drawing.Color.DarkGray;
             this.jeanSoftTextBoxSearch.PlaceholderText = "  Фамилия, Имя или №Карты";
-            this.jeanSoftTextBoxSearch.Size = new System.Drawing.Size(295, 34);
+            this.jeanSoftTextBoxSearch.Size = new System.Drawing.Size(393, 41);
             this.jeanSoftTextBoxSearch.TabIndex = 45;
             this.jeanSoftTextBoxSearch.Texts = "";
             this.jeanSoftTextBoxSearch.UnderlinedStyle = false;
@@ -332,20 +333,22 @@
             this.jeanPanel.GradientAngle = 90F;
             this.jeanPanel.GradientBottomColor = System.Drawing.Color.DodgerBlue;
             this.jeanPanel.GradientTapColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            this.jeanPanel.Location = new System.Drawing.Point(191, 99);
-            this.jeanPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanPanel.Location = new System.Drawing.Point(255, 122);
+            this.jeanPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanPanel.Name = "jeanPanel";
-            this.jeanPanel.Size = new System.Drawing.Size(736, 489);
+            this.jeanPanel.Size = new System.Drawing.Size(981, 602);
             this.jeanPanel.TabIndex = 48;
             // 
             // panelPerson
             // 
+            this.panelPerson.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.panelPerson.AutoScroll = true;
             this.panelPerson.AutoSize = true;
-            this.panelPerson.Location = new System.Drawing.Point(736, 0);
-            this.panelPerson.Margin = new System.Windows.Forms.Padding(2);
+            this.panelPerson.Location = new System.Drawing.Point(528, 2);
+            this.panelPerson.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panelPerson.Name = "panelPerson";
-            this.panelPerson.Size = new System.Drawing.Size(0, 489);
+            this.panelPerson.Size = new System.Drawing.Size(450, 650);
             this.panelPerson.TabIndex = 50;
             this.panelPerson.Visible = false;
             // 
@@ -362,45 +365,45 @@
             this.dataGridViewClients.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dataGridViewClients.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.dataGridViewClients.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewClients.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewClients.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridViewClients.ColumnHeadersHeight = 35;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewClients.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewClients.DefaultCellStyle = dataGridViewCellStyle5;
             this.dataGridViewClients.EnableHeadersVisualStyles = false;
             this.dataGridViewClients.GridColor = System.Drawing.Color.Black;
-            this.dataGridViewClients.Location = new System.Drawing.Point(14, 9);
-            this.dataGridViewClients.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridViewClients.Location = new System.Drawing.Point(19, 11);
+            this.dataGridViewClients.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridViewClients.Name = "dataGridViewClients";
             this.dataGridViewClients.ReadOnly = true;
             this.dataGridViewClients.RowHeadersVisible = false;
             this.dataGridViewClients.RowHeadersWidth = 40;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            this.dataGridViewClients.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            this.dataGridViewClients.RowsDefaultCellStyle = dataGridViewCellStyle6;
             this.dataGridViewClients.RowTemplate.Height = 24;
             this.dataGridViewClients.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewClients.Size = new System.Drawing.Size(712, 468);
+            this.dataGridViewClients.Size = new System.Drawing.Size(949, 576);
             this.dataGridViewClients.TabIndex = 0;
             this.dataGridViewClients.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewClients_CellContentClick);
             // 
             // Clients
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(963, 696);
+            this.ClientSize = new System.Drawing.Size(1284, 857);
             this.Controls.Add(this.jeanModernButtonDelete);
             this.Controls.Add(this.jeanModernButtonChange);
             this.Controls.Add(this.jeanTextBoxDiscount);
@@ -417,7 +420,7 @@
             this.Controls.Add(this.jeanSoftTextBoxSearch);
             this.Controls.Add(this.jeanPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Clients";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Клиенты";

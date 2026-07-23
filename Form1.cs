@@ -487,7 +487,6 @@ namespace GymApplicationV2._0
 
             if (e.KeyChar == (char)Keys.Enter)
             {
-
                 if (Regex.IsMatch(jeanTextBoxNumberCard.Text, @"^-?\d+(\d+)?$") || jeanTextBoxNumberCard.Text.Length == 0)
                 {
                     string cardNumber_trim = jeanTextBoxNumberCard.Text.Trim();
@@ -495,11 +494,11 @@ namespace GymApplicationV2._0
                     if (!ValidateIssuedExists(cardNumber_trim))
                         return;
 
-                    if (TryHandleFrozenMembership(cardNumber_trim))
-                        return;
-
                     if (!ValidateMembershipStatus(cardNumber_trim))
                         return;
+
+                    TryHandleFrozenMembership(cardNumber_trim);
+                    DisplayClientData(cardNumber_trim);
 
                     ProcessClientVisit(cardNumber_trim);
                 }
@@ -528,12 +527,11 @@ namespace GymApplicationV2._0
                     if (!ValidateIssuedExists(numberCard))
                         return;
 
-                    if (TryHandleFrozenMembership(numberCard))
-                        return;
-
                     if (!ValidateMembershipStatus(numberCard))
                         return;
 
+                    TryHandleFrozenMembership(numberCard);
+                    DisplayClientData(numberCard);
 
                     ProcessClientVisit(numberCard);
                 }
@@ -606,6 +604,11 @@ namespace GymApplicationV2._0
             audioFile = null;
         }
 
+        private void PlaySuccessSound()
+        {
+            SystemSounds.Exclamation.Play();
+        }
+
         private void ShowMessage(string message)
         {
             Message.MessageWindowOk(message);
@@ -659,12 +662,11 @@ namespace GymApplicationV2._0
             if (!ValidateIssuedExists(cardNumber))
                 return;
 
-            DisplayClientData(cardNumber);
             if (!ValidateMembershipStatus(cardNumber))
                 return;
 
-            if (TryHandleFrozenMembership(cardNumber))
-                return;
+            TryHandleFrozenMembership(cardNumber);
+            DisplayClientData(cardNumber);
 
             ProcessClientVisit(cardNumber);
         }
@@ -698,14 +700,14 @@ namespace GymApplicationV2._0
         }
 
         // Обработка замороженного абонемента
-        private bool TryHandleFrozenMembership(string cardNumber)
+        private void TryHandleFrozenMembership(string cardNumber)
         {
             object status = GeneralContext.GetElementFromDatabase("SELECT Статус FROM Issued WHERE №Карты = @cardNumber",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
             if (status?.ToString() != "заморожен")
-                return false;
+                return;
 
             UnfreezeMembership(cardNumber);
 
@@ -717,8 +719,6 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Заморозка снята (Повторно)";
             }
-
-            return false;
         }
 
         // Разморозка абонемента
@@ -776,6 +776,9 @@ namespace GymApplicationV2._0
         // Обработка просроченного абонемента
         private void HandleExpiredMembership(string cardNumber)
         {
+            DisplayClientData(cardNumber);
+            picture_status.Image = Properties.Resources.redError;
+
             IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
             UpdateSellButton(issuedInfo);
 
@@ -792,7 +795,6 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
             }
-            UpdateDataGrid();
             //ShowMessage("Абонемент закончился по времени");
         }
 
@@ -879,12 +881,16 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
 
+            PlaySuccessSound();
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
         // Обработка отсутствия посещений
         private void HandleNoVisitsLeft(string cardNumber)
         {
+            DisplayClientData(cardNumber);
+            picture_status.Image = Properties.Resources.redError;
+
             IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
             UpdateSellButton(issuedInfo);
 
@@ -900,7 +906,6 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Абонемент закончился. Посещений 0 (Повторно)";
             }
 
-            UpdateDataGrid();
             //ShowMessage("Абонемент закончился. Посещений 0");
         }
 
@@ -926,6 +931,7 @@ namespace GymApplicationV2._0
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
 
+            PlaySuccessSound();
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
@@ -995,8 +1001,7 @@ namespace GymApplicationV2._0
             services.labelName.Visible = true;
             services.jeanSoftTextBoxPurchase.Visible = true;
             services.labelName.Text = nameClient;
-            services.labelNumberCard.Text = numberCard;
-            services.labelNumberCard.Visible = true;
+            services.NumberCard = numberCard;
             services.checkBoxVisited.Visible = true;
         }
 

@@ -69,8 +69,8 @@
             this.dataGridViewIssued.ColumnHeadersHeight = 35;
             this.dataGridViewIssued.EnableHeadersVisualStyles = false;
             this.dataGridViewIssued.GridColor = System.Drawing.Color.Black;
-            this.dataGridViewIssued.Location = new System.Drawing.Point(14, 10);
-            this.dataGridViewIssued.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridViewIssued.Location = new System.Drawing.Point(19, 12);
+            this.dataGridViewIssued.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridViewIssued.Name = "dataGridViewIssued";
             this.dataGridViewIssued.ReadOnly = true;
             this.dataGridViewIssued.RowHeadersVisible = false;
@@ -79,7 +79,7 @@
             this.dataGridViewIssued.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewIssued.RowTemplate.Height = 24;
             this.dataGridViewIssued.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewIssued.Size = new System.Drawing.Size(885, 451);
+            this.dataGridViewIssued.Size = new System.Drawing.Size(1180, 555);
             this.dataGridViewIssued.TabIndex = 51;
             this.dataGridViewIssued.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewIssued_CellContentClick);
             // 
@@ -96,20 +96,20 @@
             this.jeanPanel.GradientAngle = 90F;
             this.jeanPanel.GradientBottomColor = System.Drawing.Color.DodgerBlue;
             this.jeanPanel.GradientTapColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            this.jeanPanel.Location = new System.Drawing.Point(10, 102);
-            this.jeanPanel.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanPanel.Location = new System.Drawing.Point(13, 126);
+            this.jeanPanel.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanPanel.Name = "jeanPanel";
-            this.jeanPanel.Size = new System.Drawing.Size(913, 473);
+            this.jeanPanel.Size = new System.Drawing.Size(1217, 582);
             this.jeanPanel.TabIndex = 52;
             // 
             // pictureBoxSearch
             // 
             this.pictureBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.pictureBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSearch.Image")));
-            this.pictureBoxSearch.Location = new System.Drawing.Point(323, 62);
-            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2);
+            this.pictureBoxSearch.Location = new System.Drawing.Point(431, 76);
+            this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.pictureBoxSearch.Name = "pictureBoxSearch";
-            this.pictureBoxSearch.Size = new System.Drawing.Size(26, 24);
+            this.pictureBoxSearch.Size = new System.Drawing.Size(35, 30);
             this.pictureBoxSearch.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBoxSearch.TabIndex = 56;
             this.pictureBoxSearch.TabStop = false;
@@ -127,10 +127,10 @@
             this.jeanModernButtonErase.FlatAppearance.BorderSize = 0;
             this.jeanModernButtonErase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonErase.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonErase.Location = new System.Drawing.Point(580, 62);
-            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonErase.Location = new System.Drawing.Point(773, 76);
+            this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonErase.Name = "jeanModernButtonErase";
-            this.jeanModernButtonErase.Size = new System.Drawing.Size(26, 24);
+            this.jeanModernButtonErase.Size = new System.Drawing.Size(35, 30);
             this.jeanModernButtonErase.TabIndex = 55;
             this.jeanModernButtonErase.TextColor = System.Drawing.Color.White;
             this.jeanModernButtonErase.UseVisualStyleBackColor = false;
@@ -145,15 +145,15 @@
             this.jeanSoftTextBoxSearch.BorderRadius = 15;
             this.jeanSoftTextBoxSearch.BorderSize = 2;
             this.jeanSoftTextBoxSearch.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanSoftTextBoxSearch.Location = new System.Drawing.Point(315, 57);
-            this.jeanSoftTextBoxSearch.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.jeanSoftTextBoxSearch.Location = new System.Drawing.Point(420, 70);
+            this.jeanSoftTextBoxSearch.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.jeanSoftTextBoxSearch.Multiline = false;
             this.jeanSoftTextBoxSearch.Name = "jeanSoftTextBoxSearch";
-            this.jeanSoftTextBoxSearch.Padding = new System.Windows.Forms.Padding(38, 8, 38, 8);
+            this.jeanSoftTextBoxSearch.Padding = new System.Windows.Forms.Padding(51, 10, 51, 10);
             this.jeanSoftTextBoxSearch.PasswordChar = false;
             this.jeanSoftTextBoxSearch.PlaceholderColor = System.Drawing.Color.DarkGray;
             this.jeanSoftTextBoxSearch.PlaceholderText = "  Фамилия, Имя или №Карты";
-            this.jeanSoftTextBoxSearch.Size = new System.Drawing.Size(295, 34);
+            this.jeanSoftTextBoxSearch.Size = new System.Drawing.Size(393, 41);
             this.jeanSoftTextBoxSearch.TabIndex = 54;
             this.jeanSoftTextBoxSearch.Texts = "";
             this.jeanSoftTextBoxSearch.UnderlinedStyle = false;
@@ -171,10 +171,10 @@
             this.jeanModernButtonChangeData.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonChangeData.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChangeData.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButtonChangeData.Location = new System.Drawing.Point(809, 54);
-            this.jeanModernButtonChangeData.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonChangeData.Location = new System.Drawing.Point(1079, 66);
+            this.jeanModernButtonChangeData.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonChangeData.Name = "jeanModernButtonChangeData";
-            this.jeanModernButtonChangeData.Size = new System.Drawing.Size(106, 37);
+            this.jeanModernButtonChangeData.Size = new System.Drawing.Size(141, 46);
             this.jeanModernButtonChangeData.TabIndex = 57;
             this.jeanModernButtonChangeData.Text = "Изменить";
             this.jeanModernButtonChangeData.TextColor = System.Drawing.Color.Black;
@@ -184,9 +184,10 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(21, 79);
+            this.label2.Location = new System.Drawing.Point(28, 97);
+            this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(111, 16);
+            this.label2.Size = new System.Drawing.Size(143, 20);
             this.label2.TabIndex = 61;
             this.label2.Text = "Номер карты: ";
             // 
@@ -194,36 +195,39 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(21, 54);
+            this.label1.Location = new System.Drawing.Point(28, 66);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(68, 16);
+            this.label1.Size = new System.Drawing.Size(88, 20);
             this.label1.TabIndex = 60;
             this.label1.Text = "Клиент: ";
             // 
             // card
             // 
             this.card.AutoSize = true;
-            this.card.Location = new System.Drawing.Point(131, 81);
+            this.card.Location = new System.Drawing.Point(180, 100);
+            this.card.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.card.Name = "card";
-            this.card.Size = new System.Drawing.Size(10, 13);
+            this.card.Size = new System.Drawing.Size(11, 16);
             this.card.TabIndex = 59;
             this.card.Text = "-";
             // 
             // nameClient
             // 
             this.nameClient.AutoSize = true;
-            this.nameClient.Location = new System.Drawing.Point(90, 56);
+            this.nameClient.Location = new System.Drawing.Point(120, 69);
+            this.nameClient.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.nameClient.Name = "nameClient";
-            this.nameClient.Size = new System.Drawing.Size(10, 13);
+            this.nameClient.Size = new System.Drawing.Size(11, 16);
             this.nameClient.TabIndex = 58;
             this.nameClient.Text = "-";
             // 
             // IssuedMembership
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(932, 606);
+            this.ClientSize = new System.Drawing.Size(1243, 746);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.card);
@@ -234,7 +238,7 @@
             this.Controls.Add(this.jeanSoftTextBoxSearch);
             this.Controls.Add(this.jeanPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "IssuedMembership";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Выданные абонементы";

@@ -58,13 +58,13 @@ namespace GymApplicationV2._0
             jeanModernButtonDelete.Location = new Point(this.Width / 2 + jeanModernButtonDelete.Width / 2 + 20, this.Height - 3 * jeanModernButtonDelete.Height);
             jeanModernButtonChange.Location = new Point(this.Width / 2 - jeanModernButtonChange.Width / 2 - 20, this.Height - 3 * jeanModernButtonChange.Height);
 
-            checkBoxPerson.Location = new Point(this.Width / 2 + 2 * jeanModernButtonDelete.Width, this.Height - 3 * jeanModernButtonChange.Height);
+            checkBoxPerson.Location = new Point(this.Width / 2 + 2 * jeanModernButtonDelete.Width, this.Height - 3 * jeanModernButtonChange.Height + 10);
 
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - this.Width / 2,
                 Screen.PrimaryScreen.Bounds.Height / 2 - this.Height / 2);
             
-            panelPerson.Location = new Point(dataGridViewClients.Location.X + dataGridViewClients.Width - 430, panelPerson.Location.Y);
-            panelPerson.Width = 450;
+            panelPerson.Location = new Point(dataGridViewClients.Location.X + dataGridViewClients.Width - 440, panelPerson.Location.Y);
+            panelPerson.Width = 460;
             panelPerson.Height = jeanPanel.Height;
         }
 
