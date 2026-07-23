@@ -734,6 +734,10 @@ namespace GymApplicationV2._0
 
             if (daysLeft > 0)
             {
+                object timeLeftMem = GeneralContext.GetElementFromDatabase("SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber",
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@cardNumber", cardNumber));
+
                 string updateIssuedQueryDate = @"
                 UPDATE Issued SET 
                     Дата_окончания = @endDate,
@@ -743,7 +747,7 @@ namespace GymApplicationV2._0
 
                 GeneralContext.CommandDataFromDatabase(updateIssuedQueryDate,
                     IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@endDate", Convert.ToDateTime(timeLeft).AddDays(-daysLeft).ToShortDateString()),
+                    new SQLiteParameter("@endDate", Convert.ToDateTime(timeLeftMem).AddDays(-daysLeft-1).ToShortDateString()),
                     new SQLiteParameter("@status", "активирован"),
                     new SQLiteParameter("@stopFreeze", DBNull.Value),
                     new SQLiteParameter("@cardNumber", cardNumber));
