@@ -98,6 +98,7 @@ namespace GymApplicationV2._0.Connections
             public string EndDate { get; set; }
             public string VisitsLeft { get; set; }
             public string Price { get; set; }
+            public string NumberCard { get; set; }
         }
     }
 }

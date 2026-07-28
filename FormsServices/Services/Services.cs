@@ -98,17 +98,7 @@ namespace GymApplicationV2._0
                 return;
             }
 
-            var _existInIssued = GeneralContext.GetDataFromDatabase($@"SELECT
-                    Клиент,
-                    №Карты,
-                    Дата_окончания AS 'Дата окончания',
-                    Дата_оформления AS 'Дата оформления',
-                    Абонемент,
-                    Посетил,
-                    Оплата,
-                    Статус,
-                    Посещений_осталось AS 'Посещений осталось',
-                    Окончание_заморозки AS 'Окончание заморозки'
+            object _existInIssued = GeneralContext.GetElementFromDatabase($@"SELECT Клиент
                     FROM Issued 
                     WHERE №Карты LIKE '%{NumberCard}%'",
                 IssuedMembershipContext.ConnectionStringIssued());
