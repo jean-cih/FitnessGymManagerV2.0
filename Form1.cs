@@ -518,23 +518,40 @@ namespace GymApplicationV2._0
                 IssuedMembershipContext.ConnectionStringIssued());
 
                     if (existClient == null)
-                    {
+                    { 
+                        string query = $@"SELECT №Карты
+                            FROM Archive 
+                            WHERE Клиент LIKE '%{names[0]}%' 
+                            AND Клиент LIKE '%{names[1]}%'";
+
+                        object archiveClientNumber = GeneralContext.GetDataFromDatabase(query,
+                        ArchiveServicesContext.ConnectionStringArchive());
+
+                        if (archiveClientNumber != null)
+                        {
+                            nameClient = names[0] + " " + names[1];
+                            numberCard = archiveClientNumber.ToString();
+                            jeanModernButtonSell.Text = $"💰 Продать\n{names[0]} {names[1]}";
+                        }
+
                         PlayErrorSound();
                         UpdateDataGrid();
+
                         return;
                     }
 
-                    string numberCard = existClient.ToString();
-                    if (!ValidateIssuedExists(numberCard))
+                    string numberCardExist = existClient.ToString();
+                    if (!ValidateIssuedExists(numberCardExist))
                         return;
 
-                    if (!ValidateMembershipStatus(numberCard))
+                    if (!ValidateMembershipStatus(numberCardExist))
                         return;
 
-                    TryHandleFrozenMembership(numberCard);
-                    DisplayClientData(numberCard);
+                    TryHandleFrozenMembership(numberCardExist);
+                    
+                    ProcessClientVisit(numberCardExist);
 
-                    ProcessClientVisit(numberCard);
+                    DisplayClientData(numberCardExist);
                 }
             }
         }
@@ -625,6 +642,7 @@ namespace GymApplicationV2._0
             if (issuedInfo != null)
             {
                 nameClient = issuedInfo.FullName;
+                numberCard = issuedInfo.NumberCard;
                 jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
             }
         }
@@ -667,9 +685,10 @@ namespace GymApplicationV2._0
                 return;
 
             TryHandleFrozenMembership(cardNumber);
-            DisplayClientData(cardNumber);
 
             ProcessClientVisit(cardNumber);
+
+            DisplayClientData(cardNumber);
         }
 
         // Валидация существования клиента
@@ -969,7 +988,8 @@ namespace GymApplicationV2._0
                 Membership = result.Membership,
                 EndDate = result.EndDate,
                 VisitsLeft = result.VisitsLeft,
-                Price = price?.ToString() ?? "0"
+                Price = price?.ToString() ?? "0",
+                NumberCard = cardNumber
             };
         }
 

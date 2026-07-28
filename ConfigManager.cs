@@ -77,11 +77,11 @@ public static class ConfigManager
     {
         settings = new Dictionary<string, object>
         {
-            ["headlineSize"] = 10,
+            ["headlineSize"] = 9,
             ["sizeKeyName"] = 10,
             ["sizeTableTitle"] = 10,
             ["textSize"] = 10,
-            ["designForm"] = "None",
+            ["designForm"] = "UserStyle",
             ["designBackground"] = "Casual"
         };
         SaveSettings();
