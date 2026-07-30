@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0
@@ -165,6 +166,11 @@ namespace GymApplicationV2._0
             _numberCard = selectedRow.Cells[4].Value.ToString();
 
             labelName.Text = $"{_surname} {_name} : {_numberCard}";
+
+            if(_numberCard == "")
+            {
+                jeanTextBoxNumberCard.Visible = true;
+            }
         }
 
         private void buttonChoose_Click(object sender, EventArgs e)
@@ -195,6 +201,23 @@ namespace GymApplicationV2._0
             };
 
             services.Show();
+        }
+
+        private void jeanTextBoxNumberCard_TextChanged(object sender, EventArgs e)
+        {
+            if (Regex.IsMatch(jeanTextBoxNumberCard.Text, @"^-?\d+(\d+)?$") || jeanTextBoxNumberCard.Text.Length == 0)
+            {
+                jeanTextBoxNumberCard.BackColor = Color.White;
+            }
+            else
+            {
+                jeanTextBoxNumberCard.BackColor = Color.FromArgb(255, 150, 150);
+            }
+
+            if (jeanTextBoxNumberCard.Text.Length != 13)
+                return;
+
+            _numberCard = jeanTextBoxNumberCard.Text.Trim();
         }
     }
 }

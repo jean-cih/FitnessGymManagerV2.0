@@ -109,7 +109,26 @@ namespace GymApplicationV2._0
                 return;
             }
 
+            UpdateClientDataCard(NumberCard);
             ProcessServiceSale();
+        }
+
+        private void UpdateClientDataCard(string numberCard)
+        {
+            string[] names = labelName.Text.Split(' ');
+
+            var updateQuery = $@"UPDATE Contacts SET 
+              №Карты = @CardNumber,
+              WHERE Имя LIKE '%{names[0]}%' 
+                AND Фамилия LIKE '%{names[1]}%'";
+
+            var parameters = new SQLiteParameter[]
+            {
+              new SQLiteParameter("@CardNumber", numberCard),
+            };
+
+            GeneralContext.CommandDataFromDatabase(updateQuery,
+                ClientsContext.ConnectionStringClients(), parameters);
         }
 
         private void ProcessServiceSale()

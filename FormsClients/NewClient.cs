@@ -246,12 +246,15 @@ namespace GymApplicationV2._0
                 return false;
             }
 
-            var cardExist = GeneralContext.GetElementFromDatabase($"SELECT Id FROM Contacts WHERE №Карты = '{jeanTextBoxNumberCard.Text}'",
-                ClientsContext.ConnectionStringClients());
-            if (cardExist != null)
+            if (jeanTextBoxNumberCard.Text != "")
             {
-                Message.MessageWindowOk("Клиент с такой картой уже существует");
-                return false;
+                var cardExist = GeneralContext.GetElementFromDatabase($"SELECT Id FROM Contacts WHERE №Карты = '{jeanTextBoxNumberCard.Text}'",
+                    ClientsContext.ConnectionStringClients());
+                if (cardExist != null)
+                {
+                    Message.MessageWindowOk("Клиент с такой картой уже существует");
+                    return false;
+                }
             }
 
             var phoneExist = GeneralContext.GetElementFromDatabase($"SELECT Телефон FROM Contacts WHERE Телефон = '{jeanTextBoxNumber.Text}'",

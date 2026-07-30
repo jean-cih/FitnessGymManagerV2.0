@@ -59,11 +59,11 @@
             this.jeanTextBoxNumberCard.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxNumberCard.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxNumberCard.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxNumberCard.Location = new System.Drawing.Point(514, 155);
-            this.jeanTextBoxNumberCard.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxNumberCard.Location = new System.Drawing.Point(685, 191);
+            this.jeanTextBoxNumberCard.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanTextBoxNumberCard.Name = "jeanTextBoxNumberCard";
             this.jeanTextBoxNumberCard.SelectionStart = 0;
-            this.jeanTextBoxNumberCard.Size = new System.Drawing.Size(253, 37);
+            this.jeanTextBoxNumberCard.Size = new System.Drawing.Size(337, 46);
             this.jeanTextBoxNumberCard.TabIndex = 39;
             this.jeanTextBoxNumberCard.TextInput = "";
             this.jeanTextBoxNumberCard.TextPreview = "Номер Клиента / ФИО";
@@ -102,8 +102,8 @@
             this.dataGridViewClient.DefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewClient.EnableHeadersVisualStyles = false;
             this.dataGridViewClient.GridColor = System.Drawing.Color.Black;
-            this.dataGridViewClient.Location = new System.Drawing.Point(310, 322);
-            this.dataGridViewClient.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridViewClient.Location = new System.Drawing.Point(413, 396);
+            this.dataGridViewClient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridViewClient.MultiSelect = false;
             this.dataGridViewClient.Name = "dataGridViewClient";
             this.dataGridViewClient.ReadOnly = true;
@@ -111,7 +111,7 @@
             this.dataGridViewClient.RowHeadersWidth = 40;
             this.dataGridViewClient.RowTemplate.Height = 24;
             this.dataGridViewClient.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewClient.Size = new System.Drawing.Size(615, 48);
+            this.dataGridViewClient.Size = new System.Drawing.Size(820, 59);
             this.dataGridViewClient.TabIndex = 10;
             // 
             // jeanFormStyle
@@ -144,10 +144,10 @@
             this.jeanModernButtonSell.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonSell.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonSell.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButtonSell.Location = new System.Drawing.Point(38, 292);
-            this.jeanModernButtonSell.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonSell.Location = new System.Drawing.Point(51, 359);
+            this.jeanModernButtonSell.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonSell.Name = "jeanModernButtonSell";
-            this.jeanModernButtonSell.Size = new System.Drawing.Size(218, 48);
+            this.jeanModernButtonSell.Size = new System.Drawing.Size(291, 59);
             this.jeanModernButtonSell.TabIndex = 21;
             this.jeanModernButtonSell.Text = "Продать";
             this.jeanModernButtonSell.TextColor = System.Drawing.Color.Black;
@@ -165,10 +165,10 @@
             this.jeanModernButtonChooseClient.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonChooseClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChooseClient.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButtonChooseClient.Location = new System.Drawing.Point(38, 253);
-            this.jeanModernButtonChooseClient.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonChooseClient.Location = new System.Drawing.Point(51, 311);
+            this.jeanModernButtonChooseClient.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonChooseClient.Name = "jeanModernButtonChooseClient";
-            this.jeanModernButtonChooseClient.Size = new System.Drawing.Size(218, 37);
+            this.jeanModernButtonChooseClient.Size = new System.Drawing.Size(291, 46);
             this.jeanModernButtonChooseClient.TabIndex = 20;
             this.jeanModernButtonChooseClient.Text = "Выбрать клиента";
             this.jeanModernButtonChooseClient.TextColor = System.Drawing.Color.Black;
@@ -187,10 +187,10 @@
             this.jeanModernButtonReturn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonReturn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonReturn.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonReturn.Location = new System.Drawing.Point(602, 209);
-            this.jeanModernButtonReturn.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonReturn.Location = new System.Drawing.Point(803, 257);
+            this.jeanModernButtonReturn.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonReturn.Name = "jeanModernButtonReturn";
-            this.jeanModernButtonReturn.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonReturn.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonReturn.TabIndex = 24;
             this.jeanModernButtonReturn.Text = "Возврат";
             this.jeanModernButtonReturn.TextColor = System.Drawing.Color.White;
@@ -209,10 +209,10 @@
             this.jeanModernButtonSingleTicket.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonSingleTicket.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonSingleTicket.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButtonSingleTicket.Location = new System.Drawing.Point(150, 183);
-            this.jeanModernButtonSingleTicket.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonSingleTicket.Location = new System.Drawing.Point(200, 225);
+            this.jeanModernButtonSingleTicket.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonSingleTicket.Name = "jeanModernButtonSingleTicket";
-            this.jeanModernButtonSingleTicket.Size = new System.Drawing.Size(106, 37);
+            this.jeanModernButtonSingleTicket.Size = new System.Drawing.Size(141, 46);
             this.jeanModernButtonSingleTicket.TabIndex = 19;
             this.jeanModernButtonSingleTicket.Text = "Разовый";
             this.jeanModernButtonSingleTicket.TextColor = System.Drawing.Color.Black;
@@ -231,10 +231,10 @@
             this.jeanModernButtonNewMember.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonNewMember.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonNewMember.ForeColor = System.Drawing.Color.Black;
-            this.jeanModernButtonNewMember.Location = new System.Drawing.Point(38, 183);
-            this.jeanModernButtonNewMember.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonNewMember.Location = new System.Drawing.Point(51, 225);
+            this.jeanModernButtonNewMember.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonNewMember.Name = "jeanModernButtonNewMember";
-            this.jeanModernButtonNewMember.Size = new System.Drawing.Size(106, 37);
+            this.jeanModernButtonNewMember.Size = new System.Drawing.Size(141, 46);
             this.jeanModernButtonNewMember.TabIndex = 18;
             this.jeanModernButtonNewMember.Text = "Новый";
             this.jeanModernButtonNewMember.TextColor = System.Drawing.Color.Black;
@@ -253,10 +253,10 @@
             this.jeanModernButtonReport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonReport.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonReport.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonReport.Location = new System.Drawing.Point(688, 10);
-            this.jeanModernButtonReport.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonReport.Location = new System.Drawing.Point(917, 12);
+            this.jeanModernButtonReport.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonReport.Name = "jeanModernButtonReport";
-            this.jeanModernButtonReport.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonReport.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonReport.TabIndex = 22;
             this.jeanModernButtonReport.Text = "Отчет";
             this.jeanModernButtonReport.TextColor = System.Drawing.Color.White;
@@ -275,10 +275,10 @@
             this.jeanModernButtonClients.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonClients.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonClients.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonClients.Location = new System.Drawing.Point(571, 10);
-            this.jeanModernButtonClients.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonClients.Location = new System.Drawing.Point(761, 12);
+            this.jeanModernButtonClients.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonClients.Name = "jeanModernButtonClients";
-            this.jeanModernButtonClients.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonClients.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonClients.TabIndex = 21;
             this.jeanModernButtonClients.Text = "Клиенты";
             this.jeanModernButtonClients.TextColor = System.Drawing.Color.White;
@@ -297,10 +297,10 @@
             this.jeanModernButtonPurchase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonPurchase.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonPurchase.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonPurchase.Location = new System.Drawing.Point(454, 10);
-            this.jeanModernButtonPurchase.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonPurchase.Location = new System.Drawing.Point(605, 12);
+            this.jeanModernButtonPurchase.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonPurchase.Name = "jeanModernButtonPurchase";
-            this.jeanModernButtonPurchase.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonPurchase.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonPurchase.TabIndex = 20;
             this.jeanModernButtonPurchase.Text = "Товары";
             this.jeanModernButtonPurchase.TextColor = System.Drawing.Color.White;
@@ -319,10 +319,10 @@
             this.jeanModernButtonServices.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonServices.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonServices.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonServices.Location = new System.Drawing.Point(337, 10);
-            this.jeanModernButtonServices.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonServices.Location = new System.Drawing.Point(449, 12);
+            this.jeanModernButtonServices.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonServices.Name = "jeanModernButtonServices";
-            this.jeanModernButtonServices.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonServices.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonServices.TabIndex = 19;
             this.jeanModernButtonServices.Text = "Услуги";
             this.jeanModernButtonServices.TextColor = System.Drawing.Color.White;
@@ -340,10 +340,10 @@
             this.jeanModernButtonSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonSettings.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonSettings.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonSettings.Location = new System.Drawing.Point(220, 10);
-            this.jeanModernButtonSettings.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanModernButtonSettings.Location = new System.Drawing.Point(293, 12);
+            this.jeanModernButtonSettings.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.jeanModernButtonSettings.Name = "jeanModernButtonSettings";
-            this.jeanModernButtonSettings.Size = new System.Drawing.Size(112, 37);
+            this.jeanModernButtonSettings.Size = new System.Drawing.Size(149, 46);
             this.jeanModernButtonSettings.TabIndex = 18;
             this.jeanModernButtonSettings.Text = "Настройки";
             this.jeanModernButtonSettings.TextColor = System.Drawing.Color.White;
@@ -351,11 +351,11 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoValidate = System.Windows.Forms.AutoValidate.EnablePreventFocusChange;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(960, 531);
+            this.ClientSize = new System.Drawing.Size(1280, 654);
             this.Controls.Add(this.jeanTextBoxNumberCard);
             this.Controls.Add(this.jeanModernButtonSell);
             this.Controls.Add(this.dataGridViewClient);
@@ -369,7 +369,7 @@
             this.Controls.Add(this.jeanModernButtonServices);
             this.Controls.Add(this.jeanModernButtonSettings);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewClient)).EndInit();

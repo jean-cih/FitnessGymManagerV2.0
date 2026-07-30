@@ -77,8 +77,8 @@ public static class ConfigManager
     {
         settings = new Dictionary<string, object>
         {
-            ["headlineSize"] = 9,
-            ["sizeKeyName"] = 10,
+            ["headlineSize"] = 10,
+            ["sizeKeyName"] = 9,
             ["sizeTableTitle"] = 10,
             ["textSize"] = 10,
             ["designForm"] = "UserStyle",

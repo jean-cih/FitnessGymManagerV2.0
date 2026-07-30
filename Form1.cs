@@ -42,6 +42,9 @@ namespace GymApplicationV2._0
         private int baseStartX;
         private int baseButtonHeight = 40;
 
+        private WaveOutEvent outputDevice;
+        private MediaFoundationReader audioFile;
+
         string[] notChangeableTexts = new string[]
             {
                 "🏋️ СИБИРЯК"
@@ -524,7 +527,7 @@ namespace GymApplicationV2._0
                             WHERE Клиент LIKE '%{names[0]}%' 
                             AND Клиент LIKE '%{names[1]}%'";
 
-                        object archiveClientNumber = GeneralContext.GetDataFromDatabase(query,
+                        object archiveClientNumber = GeneralContext.GetElementFromDatabase(query,
                         ArchiveServicesContext.ConnectionStringArchive());
 
                         if (archiveClientNumber != null)
@@ -579,8 +582,6 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        private WaveOutEvent outputDevice;
-        private MediaFoundationReader audioFile;
         private void PlayErrorSound()
         {
             string soundPath = Properties.Settings.Default.ErrorSoundPath;
@@ -911,6 +912,8 @@ namespace GymApplicationV2._0
             UpdateSellButton(issuedInfo);
 
             ArchiveExpiredMembership(cardNumber, issuedInfo);
+
+            ResetClientMembership(cardNumber);
 
             PlayErrorSound();
             if (!userStatus.ContainsKey(cardNumber))
