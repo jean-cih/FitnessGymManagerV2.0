@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace GymApplicationV2._0
+namespace GymApplicationV2._0.Helpers
 {
     public class MessageHelper
     {

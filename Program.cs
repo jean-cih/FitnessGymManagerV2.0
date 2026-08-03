@@ -1,6 +1,7 @@
 ﻿using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.FormsSplashScreens;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.IO;
 using System.Threading;
