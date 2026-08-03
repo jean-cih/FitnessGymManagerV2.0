@@ -1,193 +1,42 @@
 ﻿using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.FormsServices;
-using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.FormsSplashScreens;
+using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Runtime.InteropServices; // Нужен для работы с Win32 API
-using System.Diagnostics;             // Нужен для работы с процессами
 
 namespace GymApplicationV2._0
 {
     internal static class Program
     {
-        /*
-        // ---- Импорт функций Windows API для гарантированного управления окнами ----
-        [DllImport("user32.dll")]
-        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        [DllImport("user32.dll")]
-        private static extern bool SetForegroundWindow(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool IsIconic(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        private static extern IntPtr GetForegroundWindow();
-
-        [DllImport("user32.dll")]
-        private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
-
-        [DllImport("user32.dll")]
-        private static extern bool AttachThreadInput(uint idAttach, uint idAttachTo, bool fAttach);
-
-        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        private static extern int GetWindowTextLength(IntPtr hWnd);
-
-        [DllImport("user32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-
-        // Делегат для обхода окон системы
-        private delegate bool EnumWindowsProc(IntPtr hWnd, IntPtr lParam);
-
-        // Константы Win32 API
-        private const int SW_RESTORE = 9;
-        private const int SW_SHOW = 5;
-
-        // Уникальный идентификатор приложения (Mutex)
-        private static readonly string MutexName = "Local\\GymApplicationV2.0_Unique_Mutex_ID";
-        private static Mutex _appMutex;
-        */
 
         private static bool isNewInstance = true;
-        /// <summary>
-        /// Главная точка входа для приложения.
-        /// </summary>
+
         [STAThread]
         static void Main()
         {
-            // Проверяем, запущено ли уже приложение
-            //_appMutex = new Mutex(true, MutexName, out bool isNewInstance);
 
-            if (!isNewInstance)
+            try
             {
-                // Если приложение УЖЕ запущено, находим его окно и разворачиваем его
-                //ActivateExistingInstance();
-                // Завершаем работу текущего (нового) процесса
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+
+                LoadingScreen splash = new LoadingScreen();
+                splash.Show();
+
+                InitializeApplication(splash);
+
+                splash.Close();
+
+                Application.Run(new Form1());
             }
-            else
+            catch (Exception ex)
             {
-                try
-                {
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-
-                    LoadingScreen splash = new LoadingScreen();
-                    splash.Show();
-
-                    InitializeApplication(splash);
-
-                    splash.Close();
-
-                    Application.Run(new Form1());
-                    //Application.Run(new Design());
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString(), "Ошибка при запуске");
-                }
-                //finally
-                //{
-                //    if (_appMutex != null)
-                //    {
-                //        _appMutex.Close();
-                //   }
-                //}
+                MessageBox.Show(ex.ToString(), "Ошибка при запуске");
             }
         }
-        /*
-        /// <summary>
-        /// Находит уже запущенный процесс программы, восстанавливает его окно и выводит на передний план.
-        /// </summary>
-        private static void ActivateExistingInstance()
-        {
-            Process currentProcess = Process.GetCurrentProcess();
-
-            // Ищем процесс с точно таким же именем (например, "GYM MASTER")
-            foreach (Process process in Process.GetProcessesByName(currentProcess.ProcessName))
-            {
-                if (process.Id != currentProcess.Id)
-                {
-                    // Находим настоящее окно формы по ID процесса
-                    IntPtr windowHandle = FindMainWindowWithTitle(process.Id);
-
-                    if (windowHandle != IntPtr.Zero)
-                    {
-                        // Насильно выводим окно на передний план, обходя блокировки Windows
-                        ForceForegroundWindow(windowHandle);
-                    }
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Сканирует все окна процесса и находит то, у которого есть текстовый заголовок (это наша Form1)
-        /// </summary>
-        private static IntPtr FindMainWindowWithTitle(int processId)
-        {
-            IntPtr foundWindow = IntPtr.Zero;
-            IntPtr fallbackWindow = IntPtr.Zero;
-
-            EnumWindows((hWnd, lParam) =>
-            {
-                GetWindowThreadProcessId(hWnd, out uint windowProcessId);
-                if (windowProcessId == processId)
-                {
-                    fallbackWindow = hWnd; // Запоминаем хоть какое-то окно на крайний случай
-
-                    // Проверяем длину заголовка окна. У служебных окон WinForms длина заголовка всегда 0.
-                    int length = GetWindowTextLength(hWnd);
-                    if (length > 0)
-                    {
-                        foundWindow = hWnd;
-                        return false; // Нашли настоящее окно приложения, прекращаем поиск
-                    }
-                }
-                return true; // Продолжаем обход окон
-            }, IntPtr.Zero);
-
-            return foundWindow != IntPtr.Zero ? foundWindow : fallbackWindow;
-        }
-
-        /// <summary>
-        /// Принудительно восстанавливает окно и выводит его поверх всех остальных окон в ОС
-        /// </summary>
-        private static void ForceForegroundWindow(IntPtr hWnd)
-        {
-            // Если окно свернуто в панель задач — восстанавливаем его
-            if (IsIconic(hWnd))
-            {
-                ShowWindow(hWnd, SW_RESTORE);
-            }
-            else
-            {
-                ShowWindow(hWnd, SW_SHOW);
-            }
-
-            // Трюк для обхода защиты Windows от кражи фокуса (AttachThreadInput)
-            IntPtr foregroundWindow = GetForegroundWindow();
-            uint foregroundThreadId = GetWindowThreadProcessId(foregroundWindow, out _);
-            uint currentThreadId = GetWindowThreadProcessId(hWnd, out _);
-
-            if (foregroundThreadId != currentThreadId)
-            {
-                AttachThreadInput(foregroundThreadId, currentThreadId, true);
-                SetForegroundWindow(hWnd);
-                AttachThreadInput(foregroundThreadId, currentThreadId, false);
-            }
-            else
-            {
-                SetForegroundWindow(hWnd);
-            }
-        }
-        */
 
         private static void InitializeApplication(LoadingScreen splash)
         {

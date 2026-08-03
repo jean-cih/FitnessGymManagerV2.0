@@ -2,6 +2,7 @@
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.FormsServices;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -254,7 +255,7 @@ namespace GymApplicationV2._0
 
             if (!isValid)
 
-                Message.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
 
             return isValid;
         }

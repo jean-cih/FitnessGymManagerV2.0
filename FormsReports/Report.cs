@@ -365,7 +365,7 @@ namespace GymApplicationV2._0
 
             if (!checkBoxOn)
             {
-                Message.MessageWindowOk("Выберите тип отчета");
+                MessageHelper.MessageWindowOk("Выберите тип отчета");
                 return;
             }
 
@@ -405,7 +405,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrEmpty(dbFilePath))
             {
-                Message.MessageWindowOk("Файл не выбран");
+                MessageHelper.MessageWindowOk("Файл не выбран");
                 return;
             }
 
@@ -415,12 +415,12 @@ namespace GymApplicationV2._0
 
             if (sqlQuery == null)
             {
-                Message.MessageWindowOk("Некорректный файл");
+                MessageHelper.MessageWindowOk("Некорректный файл");
                 return;
             }
 
             await ExportDataAsync(outputPath, sqlQuery, connectionString);
-            Message.MessageWindowOk($"Файл {fileName} экспортирован в формат {Path.GetExtension(outputPath)}");
+            MessageHelper.MessageWindowOk($"Файл {fileName} экспортирован в формат {Path.GetExtension(outputPath)}");
             dbFilePath = "";
         }
 
@@ -558,7 +558,7 @@ namespace GymApplicationV2._0
         {
             if (File.Exists(excelFilePath))
             {
-                Message.MessageWindowOk("Файл уже экспортирован");
+                MessageHelper.MessageWindowOk("Файл уже экспортирован");
                 return;
             }
 
@@ -602,7 +602,7 @@ namespace GymApplicationV2._0
         {
             if (File.Exists(txtFilePath))
             {
-                Message.MessageWindowOk("Файл уже экспортирован");
+                MessageHelper.MessageWindowOk("Файл уже экспортирован");
                 return;
             }
 
@@ -654,7 +654,7 @@ namespace GymApplicationV2._0
         {
             if (File.Exists(jsonFilePath))
             {
-                Message.MessageWindowOk("Файл уже экспортирован");
+                MessageHelper.MessageWindowOk("Файл уже экспортирован");
                 return;
             }
 
@@ -684,7 +684,7 @@ namespace GymApplicationV2._0
         {
             if (File.Exists(filePath))
             {
-                Message.MessageWindowOk("Файл уже экспортирован");
+                MessageHelper.MessageWindowOk("Файл уже экспортирован");
                 return;
             }
 

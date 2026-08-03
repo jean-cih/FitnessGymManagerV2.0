@@ -1,6 +1,7 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using System;
 using System.Data.SQLite;
 using System.Drawing;
@@ -73,14 +74,14 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership)) return;
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите удалить услугу?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите удалить услугу?") != DialogResult.Yes)
                 return;
 
             GeneralContext.CommandDataFromDatabase(
                 $"DELETE FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
-            Message.MessageWindowOk("Услуга удалена");
+            MessageHelper.MessageWindowOk("Услуга удалена");
             RefreshServicesData();
         }
 
@@ -88,13 +89,13 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                Message.MessageWindowOk("Нужно сначала выбрать услугу");
+                MessageHelper.MessageWindowOk("Нужно сначала выбрать услугу");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NumberCard))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
@@ -105,7 +106,12 @@ namespace GymApplicationV2._0
 
             if (_existInIssued != null)
             {
-                Message.MessageWindowOk("У клиента уже есть абонемент");
+                DialogResult result = MessageHelper.MessageWindowYesNo("У клиента уже есть абонемент\nПродать еще один?");
+                if(result != DialogResult.Yes) return;
+
+                // 1. Найти срок окончания самого раннего абонемента, если их уже несколько
+                // 2. Сделать следующий день началом следующего абонемента, а конец просто начало плюс срок абонемента
+                // 3. Добавить абонемент в выданные абонементы
                 return;
             }
 
@@ -122,13 +128,8 @@ namespace GymApplicationV2._0
               WHERE Имя LIKE '%{names[0]}%' 
                 AND Фамилия LIKE '%{names[1]}%'";
 
-            var parameters = new SQLiteParameter[]
-            {
-              new SQLiteParameter("@CardNumber", numberCard),
-            };
-
             GeneralContext.CommandDataFromDatabase(updateQuery,
-                ClientsContext.ConnectionStringClients(), parameters);
+                ClientsContext.ConnectionStringClients(), new SQLiteParameter("@CardNumber", numberCard));
         }
 
         private void ProcessServiceSale()
@@ -141,7 +142,7 @@ namespace GymApplicationV2._0
             AddPaymentHistory();
             AddIssuedMembership();
 
-            Message.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены");
         }
 
         private (int? quantityLeft, int clientPurchases) GetClientAndServiceData()
@@ -286,7 +287,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                Message.MessageWindowOk("Выберите услугу из таблицы");
+                MessageHelper.MessageWindowOk("Выберите услугу из таблицы");
                 return;
             }
 

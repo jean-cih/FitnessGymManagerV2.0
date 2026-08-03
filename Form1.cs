@@ -3,20 +3,16 @@ using GymApplicationV2._0.Components;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsSettings;
+using GymApplicationV2._0.Data;
 using GymApplicationV2._0.Helpers;
-using NAudio.MediaFoundation;
-using NAudio.Wave;
 using Shadow;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static GymApplicationV2._0.AppColors.AppColors;
@@ -41,9 +37,6 @@ namespace GymApplicationV2._0
         private int baseSpacing = 10;
         private int baseStartX;
         private int baseButtonHeight = 40;
-
-        private WaveOutEvent outputDevice;
-        private MediaFoundationReader audioFile;
 
         string[] notChangeableTexts = new string[]
             {
@@ -510,7 +503,8 @@ namespace GymApplicationV2._0
                     string[] names = jeanTextBoxNumberCard.Text.Split(' ');
                     if (names.Length < 2)
                     {
-                        PlayErrorSound();
+                        var errorSound = new PlaySoundHelper(false);
+                        errorSound.PlaySound();
                         ShowMessage("Введите фамилию и имя через пробел");
                         ClearCardNumber();
                         return;
@@ -537,7 +531,9 @@ namespace GymApplicationV2._0
                             jeanModernButtonSell.Text = $"💰 Продать\n{names[0]} {names[1]}";
                         }
 
-                        PlayErrorSound();
+                        var errorSound = new PlaySoundHelper(false);
+                        errorSound.PlaySound();
+
                         UpdateDataGrid();
 
                         return;
@@ -582,55 +578,11 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        private void PlayErrorSound()
-        {
-            string soundPath = Properties.Settings.Default.ErrorSoundPath;
-
-            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
-            {
-                try
-                {
-                    MediaFoundationApi.Startup();
-
-                    StopErrorSound();
-
-                    outputDevice = new WaveOutEvent();
-
-                    audioFile = new MediaFoundationReader(soundPath);
-                    outputDevice.Init(audioFile);
-                    outputDevice.Play();
-                }
-                catch (Exception ex)
-                {
-                    SystemSounds.Beep.Play();
-                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    StopErrorSound();
-                }
-            }
-            else
-            {
-                SystemSounds.Beep.Play();
-            }
-        }
-
-        private void StopErrorSound()
-        {
-            outputDevice?.Stop();
-            outputDevice?.Dispose();
-            outputDevice = null;
-            audioFile?.Dispose();
-            audioFile = null;
-        }
-
-        private void PlaySuccessSound()
-        {
-            SystemSounds.Exclamation.Play();
-        }
+        
 
         private void ShowMessage(string message)
         {
-            Message.MessageWindowOk(message);
+            MessageHelper.MessageWindowOk(message);
         }
 
         private void ClearCardNumber()
@@ -702,7 +654,9 @@ namespace GymApplicationV2._0
 
             if (existClient == null)
             {
-                PlayErrorSound();
+                var errorSound = new PlaySoundHelper(false);
+                errorSound.PlaySound();
+
                 if (!userStatus.ContainsKey(cardNumber))
                 {
                     userStatus.Add(cardNumber, "Этого номера нет в действительных абонементах");
@@ -803,7 +757,9 @@ namespace GymApplicationV2._0
 
             ResetClientMembership(cardNumber);
 
-            PlayErrorSound();
+            var errorSound = new PlaySoundHelper(false);
+            errorSound.PlaySound();
+
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Абонемент закончился по времени");
@@ -898,7 +854,9 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
 
-            PlaySuccessSound();
+            var successSound = new PlaySoundHelper();
+            successSound.PlaySound();
+
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
@@ -915,7 +873,9 @@ namespace GymApplicationV2._0
 
             ResetClientMembership(cardNumber);
 
-            PlayErrorSound();
+            var errorSound = new PlaySoundHelper(false);
+            errorSound.PlaySound();
+
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Абонемент закончился. Посещений 0");
@@ -950,7 +910,9 @@ namespace GymApplicationV2._0
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
 
-            PlaySuccessSound();
+            var successSound = new PlaySoundHelper();
+            successSound.PlaySound();
+
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
@@ -1007,7 +969,7 @@ namespace GymApplicationV2._0
         {
             if (nameClient == "")
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
@@ -1181,7 +1143,7 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonReturn_Click(object sender, EventArgs e)
         {
-            if (Message.MessageWindowYesNo("Вы действительно хотите отменить посещение?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите отменить посещение?") != DialogResult.Yes)
                 return;
 
             string selectQuery = @"SELECT Клиент, №Карты, Абонемент, Дата_окончания AS 'Дата окончания', Посещений_осталось AS 'Посещений осталось' FROM Issued WHERE №Карты = @numberCard";

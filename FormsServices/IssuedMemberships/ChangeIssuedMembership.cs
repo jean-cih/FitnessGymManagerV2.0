@@ -2,6 +2,7 @@
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using Shadow;
 using System;
 using System.Drawing;
@@ -146,7 +147,7 @@ namespace GymApplicationV2._0.FormsServices
 
         private void jeanModernButtonChange_Click(object sender, EventArgs e)
         {
-            if (Message.MessageWindowYesNo("Вы уверены что хотите изменить данные?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите изменить данные?") != DialogResult.Yes)
                 return;
 
             var updateQuery = $@"UPDATE Issued SET 
@@ -166,7 +167,7 @@ namespace GymApplicationV2._0.FormsServices
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                Message.MessageWindowOk("Данные в базе обновлены");
+                MessageHelper.MessageWindowOk("Данные в базе обновлены");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

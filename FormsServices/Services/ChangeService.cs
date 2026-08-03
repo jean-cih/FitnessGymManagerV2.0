@@ -2,6 +2,7 @@
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using Shadow;
 using System;
 using System.Drawing;
@@ -149,11 +150,11 @@ namespace GymApplicationV2._0
                 string.IsNullOrWhiteSpace(jeanTextBoxTerm.Text) ||
                 string.IsNullOrWhiteSpace(jeanTextBoxVisited.Text))
             {
-                Message.MessageWindowOk("Заполните все поля");
+                MessageHelper.MessageWindowOk("Заполните все поля");
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Вы уверены что хотите изменить услугу?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите изменить услугу?") != DialogResult.Yes)
                 return;
 
             var updateQuery = $@"UPDATE Descriptions SET 
@@ -175,7 +176,7 @@ namespace GymApplicationV2._0
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                Message.MessageWindowOk("Услуга изменена");
+                MessageHelper.MessageWindowOk("Услуга изменена");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

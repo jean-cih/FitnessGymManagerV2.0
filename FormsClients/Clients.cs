@@ -1,5 +1,6 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Data;
 using GymApplicationV2._0.FormsClients;
 using GymApplicationV2._0.Helpers;
 using System;
@@ -139,7 +140,7 @@ namespace GymApplicationV2._0
             }
         }
 
-        private void OpenOrActivatePersonForm(ClientData clientData)
+        private void OpenOrActivatePersonForm(DataClient clientData)
         {
             var existingForm = Application.OpenForms
                 .OfType<Person>()
@@ -158,16 +159,16 @@ namespace GymApplicationV2._0
             }
         }
 
-        private ClientData LoadClientData(DataGridViewRow row)
+        private DataClient LoadClientData(DataGridViewRow row)
         {
-            var clientData = new ClientData
+            var clientData = new DataClient
             {
-                FullName = $"{row.Cells[0].Value} {row.Cells[1].Value}",
+                Surname = row.Cells[0].Value.ToString() ?? "",
+                Name = row.Cells[1].Value.ToString() ?? "",
                 Gender = row.Cells[2].Value?.ToString() ?? "",
                 Phone = row.Cells[3].Value?.ToString() ?? "",
                 CardNumber = row.Cells[4].Value?.ToString() ?? "",
-                Saved = row.Cells[9].Value?.ToString() ?? "",
-                Discount = row.Cells[8].Value?.ToString() ?? "",
+                Discount = Convert.ToInt32(row.Cells[8].Value),
                 Email = row.Cells[7].Value?.ToString() ?? "",
                 Birthday = row.Cells[10].Value?.ToString() ?? "",
             };
@@ -188,8 +189,8 @@ namespace GymApplicationV2._0
             {
                 clientData.VisitDate = table.Rows[0]["Посетил"] != DBNull.Value ? table.Rows[0]["Посетил"].ToString() : "";
                 clientData.VisitsLeft = table.Rows[0]["Посещений осталось"] != DBNull.Value ? table.Rows[0]["Посещений осталось"].ToString() : "";
-                clientData.Membership = table.Rows[0]["Абонемент"] != DBNull.Value ? table.Rows[0]["Абонемент"].ToString() : "";
-                clientData.Visits = table.Rows[0]["Дата окончания"] != DBNull.Value ? table.Rows[0]["Дата окончания"].ToString() : "";
+                clientData.Service = table.Rows[0]["Абонемент"] != DBNull.Value ? table.Rows[0]["Абонемент"].ToString() : "";
+                clientData.TermDate = table.Rows[0]["Дата окончания"] != DBNull.Value ? table.Rows[0]["Дата окончания"].ToString() : "";
             }
 
             return clientData;
@@ -263,7 +264,7 @@ namespace GymApplicationV2._0
             return sortedTable;
         }
 
-        private void ImportPersonFormToPanel(ClientData data)
+        private void ImportPersonFormToPanel(DataClient data)
         {
             panelPerson.Visible = false;
             panelPerson.Controls.Clear();
@@ -363,11 +364,11 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите изменить данные клиента?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите изменить данные клиента?") != DialogResult.Yes)
                 return;
 
             string[] fullName = jeanTextBoxClient.Text.Split(' ');
@@ -413,7 +414,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
 
-            Message.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены");
             RefreshDataAndClearFields();
             jeanTextBoxClient.Text = "";
         }
@@ -422,11 +423,11 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
                 return;
 
             string[] fullName = jeanTextBoxClient.Text.Split(' ');
@@ -449,7 +450,7 @@ namespace GymApplicationV2._0
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
-            Message.MessageWindowOk("Клиент удален");
+            MessageHelper.MessageWindowOk("Клиент удален");
             RefreshDataAndClearFields();
         }
 
@@ -486,21 +487,5 @@ namespace GymApplicationV2._0
             jeanTextBoxBirthday.Text = selectedRow.Cells[10].Value.ToString();
             jeanTextBoxDiscount.Text = selectedRow.Cells[8].Value.ToString();
         }
-    }
-
-    public class ClientData
-    {
-        public string FullName { get; set; }
-        public string Phone { get; set; }
-        public string CardNumber { get; set; }
-        public string Membership { get; set; }
-        public string Birthday { get; set; }
-        public string Visits { get; set; }
-        public string VisitsLeft { get; set; }
-        public string Saved { get; set; }
-        public string Discount { get; set; }
-        public string Email { get; set; }
-        public string Gender { get; set; }
-        public string VisitDate { get; set; }
     }
 }

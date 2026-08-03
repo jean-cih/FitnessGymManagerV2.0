@@ -2,6 +2,7 @@
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using Shadow;
 using System;
 using System.Data.SQLite;
@@ -162,7 +163,7 @@ namespace GymApplicationV2._0
             if (!ValidateInput())
                 return;
 
-            if (Message.MessageWindowYesNo("Вы уверены что хотите добавить новую услугу?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите добавить новую услугу?") != DialogResult.Yes)
                 return;
 
             InsertService();
@@ -176,7 +177,7 @@ namespace GymApplicationV2._0
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                Message.MessageWindowOk("Услуга успешно добавлена");
+                MessageHelper.MessageWindowOk("Услуга успешно добавлена");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();
@@ -214,7 +215,7 @@ namespace GymApplicationV2._0
 
             if (!isValid)
             {
-                Message.MessageWindowOk("Проверьте правильность заполнения полей");
+                MessageHelper.MessageWindowOk("Проверьте правильность заполнения полей");
                 return false;
             }
 
@@ -222,7 +223,7 @@ namespace GymApplicationV2._0
                 jeanTextBoxPrice.Text.Length > 20 ||
                 (!string.IsNullOrEmpty(jeanTextBoxVisited.Text) && jeanTextBoxVisited.Text.Length > 20))
             {
-                Message.MessageWindowOk("Превышен лимит количества символов");
+                MessageHelper.MessageWindowOk("Превышен лимит количества символов");
                 return false;
             }
 

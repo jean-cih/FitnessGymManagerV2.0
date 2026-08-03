@@ -1,5 +1,6 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
+using GymApplicationV2._0.Data;
 using GymApplicationV2._0.Helpers;
 using System;
 using System.Data.SQLite;
@@ -204,7 +205,7 @@ namespace GymApplicationV2._0
             }
 
             ClearForm();
-            Message.MessageWindowOk("Клиент добавлен");
+            MessageHelper.MessageWindowOk("Клиент добавлен");
         }
 
         private bool ValidateInputs()
@@ -214,7 +215,7 @@ namespace GymApplicationV2._0
                 jeanTextBoxPurchase.BackColor != Color.White || jeanTextBoxBirthday.BackColor != Color.White || 
                 jeanTextBoxNumberCard.BackColor != Color.White)
             {
-                Message.MessageWindowOk("Неправильные данные");
+                MessageHelper.MessageWindowOk("Неправильные данные");
                 return false;
             }
 
@@ -222,19 +223,19 @@ namespace GymApplicationV2._0
                 string.IsNullOrEmpty(jeanTextBoxName.Text) ||
                 string.IsNullOrEmpty(jeanTextBoxSurname.Text))
             {
-                Message.MessageWindowOk("Незаполненные данные");
+                MessageHelper.MessageWindowOk("Незаполненные данные");
                 return false;
             }
 
             if (!string.IsNullOrEmpty(jeanTextBoxPurchase.Text) && string.IsNullOrEmpty(jeanTextBoxNumberCard.Text) && jeanTextBoxPurchase.Text != "Разовый")
             {
-                Message.MessageWindowOk("Для абонемента нужен номер карты");
+                MessageHelper.MessageWindowOk("Для абонемента нужен номер карты");
                 return false;
             }
 
             if (string.IsNullOrEmpty(jeanTextBoxPurchase.Text) && jeanTextBoxNumberCard.Text.Length == 13)
             {
-                Message.MessageWindowOk("Выберете услугу");
+                MessageHelper.MessageWindowOk("Выберете услугу");
                 return false;
             }
 
@@ -242,7 +243,7 @@ namespace GymApplicationV2._0
             if (discountParts[0] != "Скидка" &&
                 (!int.TryParse(discountParts[0], out var discount) || discount < 0 || discount > 100))
             {
-                Message.MessageWindowOk("Не правильный формат скидки");
+                MessageHelper.MessageWindowOk("Не правильный формат скидки");
                 return false;
             }
 
@@ -252,7 +253,7 @@ namespace GymApplicationV2._0
                     ClientsContext.ConnectionStringClients());
                 if (cardExist != null)
                 {
-                    Message.MessageWindowOk("Клиент с такой картой уже существует");
+                    MessageHelper.MessageWindowOk("Клиент с такой картой уже существует");
                     return false;
                 }
             }
@@ -261,14 +262,14 @@ namespace GymApplicationV2._0
                 ClientsContext.ConnectionStringClients());
             if (phoneExist != null)
             {
-                Message.MessageWindowOk("Клиент с таким номером уже существует");
+                MessageHelper.MessageWindowOk("Клиент с таким номером уже существует");
                 return false;
             }
 
             return true;
         }
 
-        private NewClientData PrepareClientData()
+        private DataClient PrepareClientData()
         {
             var discountParts = comboBoxFormDiscount.Text.Split(' ');
             var finalPrice = price;
@@ -287,7 +288,7 @@ namespace GymApplicationV2._0
                     .ToShortDateString();
             }
 
-            return new NewClientData
+            return new DataClient
             {
                 Surname = jeanTextBoxSurname.Text,
                 Name = jeanTextBoxName.Text,
@@ -297,11 +298,12 @@ namespace GymApplicationV2._0
                 CardNumber = jeanTextBoxNumberCard.Text,
                 Service = jeanTextBoxPurchase.Text,
                 FinalPrice = finalPrice,
-                VisitedDate = checkBoxVisited.Checked ? DateTime.Now.ToShortDateString() : "",
+                VisitDate = checkBoxVisited.Checked ? DateTime.Now.ToShortDateString() : "",
                 TermDate = termDate,
                 VisitsLeft = lefts,
                 Birthday = FormatBirthdayForDatabase(jeanTextBoxBirthday.Text),
-                Discount = discountParts[0] != "Скидка" && !string.IsNullOrEmpty(discountParts[0]) ? Convert.ToInt32(discountParts[0]) : 0
+                Discount = discountParts[0] != "Скидка" && !string.IsNullOrEmpty(discountParts[0]) ? Convert.ToInt32(discountParts[0]) : 0,
+                Saved = DateTime.Now.Date.ToString()
             };
         }
 
@@ -326,7 +328,7 @@ namespace GymApplicationV2._0
             return "";
         }
 
-        private void SaveClientToDatabase(NewClientData data)
+        private void SaveClientToDatabase(DataClient data)
         {
             using (var conn = new SQLiteConnection(ClientsContext.ConnectionStringClients()))
             using (var cmd = new SQLiteCommand(
@@ -336,7 +338,7 @@ namespace GymApplicationV2._0
                 conn.Open();
 
                 string visitedDate = null;
-                if (!string.IsNullOrEmpty(data.VisitedDate) && DateTime.TryParse(data.VisitedDate, out DateTime tempVisited))
+                if (!string.IsNullOrEmpty(data.VisitDate) && DateTime.TryParse(data.VisitDate, out DateTime tempVisited))
                     visitedDate = tempVisited.ToShortDateString();
 
                 string termDate = null;
@@ -374,7 +376,7 @@ namespace GymApplicationV2._0
                 ServicesContext.ConnectionStringServices());
         }
 
-        private void SavePaymentHistory(NewClientData data)
+        private void SavePaymentHistory(DataClient data)
         {
             using (var conn = new SQLiteConnection(HistoryPaymentContext.ConnectionStringPayment()))
             using (var cmd = new SQLiteCommand(
@@ -395,7 +397,7 @@ namespace GymApplicationV2._0
             }
         }
 
-        private void SaveIssuedMembership(NewClientData data)
+        private void SaveIssuedMembership(DataClient data)
         {
             using (var conn = new SQLiteConnection(IssuedMembershipContext.ConnectionStringIssued()))
             using (var cmd = new SQLiteCommand(
@@ -411,7 +413,7 @@ namespace GymApplicationV2._0
                 cmd.Parameters.AddWithValue("@Дата_окончания", data.TermDate);
                 cmd.Parameters.AddWithValue("@Дата_оформления", jeanDateTimePickerSell.Value.ToShortDateString());
                 cmd.Parameters.AddWithValue("@Абонемент", data.Service);
-                cmd.Parameters.AddWithValue("@Посетил", data.VisitedDate);
+                cmd.Parameters.AddWithValue("@Посетил", data.VisitDate);
                 cmd.Parameters.AddWithValue("@Оплата", data.FinalPrice);
                 cmd.Parameters.AddWithValue("@Статус", "активирован");
                 cmd.Parameters.AddWithValue("@Посещений_осталось", data.VisitsLeft);
@@ -432,22 +434,5 @@ namespace GymApplicationV2._0
             jeanTextBoxBirthday.Text = "";
             comboBoxFormDiscount.Text = "Скидка (%)";
         }
-    }
-
-    public class NewClientData
-    {
-        public string Surname { get; set; }
-        public string Name { get; set; }
-        public string FatherName { get; set; }
-        public string Gender { get; set; }
-        public string Phone { get; set; }
-        public string CardNumber { get; set; }
-        public string Service { get; set; }
-        public string FinalPrice { get; set; }
-        public string VisitedDate { get; set; }
-        public string TermDate { get; set; }
-        public string VisitsLeft { get; set; }
-        public string Birthday { get; set; }
-        public int Discount { get; set; }
     }
 }

@@ -12,9 +12,9 @@ namespace GymApplicationV2._0
 {
     public partial class ChooseClient : Form
     {
-        private string _name = "";
-        private string _surname = "";
-        private string _numberCard = "";
+        private string _name = string.Empty;
+        private string _surname = string.Empty;
+        private string _numberCard = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -178,7 +178,7 @@ namespace GymApplicationV2._0
             if (string.IsNullOrWhiteSpace(_name) ||
                 string.IsNullOrWhiteSpace(_surname))
             {
-                Message.MessageWindowOk("Выберите клиента");
+                MessageHelper.MessageWindowOk("Выберите клиента");
                 return;
             }
 
