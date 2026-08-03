@@ -582,7 +582,7 @@ namespace GymApplicationV2._0
 
         private void ShowMessage(string message)
         {
-            Message.MessageWindowOk(message);
+            MessageHelper.MessageWindowOk(message);
         }
 
         private void ClearCardNumber()
@@ -969,7 +969,7 @@ namespace GymApplicationV2._0
         {
             if (nameClient == "")
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
@@ -1143,7 +1143,7 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonReturn_Click(object sender, EventArgs e)
         {
-            if (Message.MessageWindowYesNo("Вы действительно хотите отменить посещение?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите отменить посещение?") != DialogResult.Yes)
                 return;
 
             string selectQuery = @"SELECT Клиент, №Карты, Абонемент, Дата_окончания AS 'Дата окончания', Посещений_осталось AS 'Посещений осталось' FROM Issued WHERE №Карты = @numberCard";

@@ -205,7 +205,7 @@ namespace GymApplicationV2._0
             }
 
             ClearForm();
-            Message.MessageWindowOk("Клиент добавлен");
+            MessageHelper.MessageWindowOk("Клиент добавлен");
         }
 
         private bool ValidateInputs()
@@ -215,7 +215,7 @@ namespace GymApplicationV2._0
                 jeanTextBoxPurchase.BackColor != Color.White || jeanTextBoxBirthday.BackColor != Color.White || 
                 jeanTextBoxNumberCard.BackColor != Color.White)
             {
-                Message.MessageWindowOk("Неправильные данные");
+                MessageHelper.MessageWindowOk("Неправильные данные");
                 return false;
             }
 
@@ -223,19 +223,19 @@ namespace GymApplicationV2._0
                 string.IsNullOrEmpty(jeanTextBoxName.Text) ||
                 string.IsNullOrEmpty(jeanTextBoxSurname.Text))
             {
-                Message.MessageWindowOk("Незаполненные данные");
+                MessageHelper.MessageWindowOk("Незаполненные данные");
                 return false;
             }
 
             if (!string.IsNullOrEmpty(jeanTextBoxPurchase.Text) && string.IsNullOrEmpty(jeanTextBoxNumberCard.Text) && jeanTextBoxPurchase.Text != "Разовый")
             {
-                Message.MessageWindowOk("Для абонемента нужен номер карты");
+                MessageHelper.MessageWindowOk("Для абонемента нужен номер карты");
                 return false;
             }
 
             if (string.IsNullOrEmpty(jeanTextBoxPurchase.Text) && jeanTextBoxNumberCard.Text.Length == 13)
             {
-                Message.MessageWindowOk("Выберете услугу");
+                MessageHelper.MessageWindowOk("Выберете услугу");
                 return false;
             }
 
@@ -243,7 +243,7 @@ namespace GymApplicationV2._0
             if (discountParts[0] != "Скидка" &&
                 (!int.TryParse(discountParts[0], out var discount) || discount < 0 || discount > 100))
             {
-                Message.MessageWindowOk("Не правильный формат скидки");
+                MessageHelper.MessageWindowOk("Не правильный формат скидки");
                 return false;
             }
 
@@ -253,7 +253,7 @@ namespace GymApplicationV2._0
                     ClientsContext.ConnectionStringClients());
                 if (cardExist != null)
                 {
-                    Message.MessageWindowOk("Клиент с такой картой уже существует");
+                    MessageHelper.MessageWindowOk("Клиент с такой картой уже существует");
                     return false;
                 }
             }
@@ -262,7 +262,7 @@ namespace GymApplicationV2._0
                 ClientsContext.ConnectionStringClients());
             if (phoneExist != null)
             {
-                Message.MessageWindowOk("Клиент с таким номером уже существует");
+                MessageHelper.MessageWindowOk("Клиент с таким номером уже существует");
                 return false;
             }
 

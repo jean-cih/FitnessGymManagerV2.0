@@ -322,7 +322,7 @@ namespace GymApplicationV2._0
 
             if (product != null && _editedProducts.Count > 1)
             {
-                if (Message.MessageWindowYesNo($"Удалить продукт '{product.Name}'?") == DialogResult.Yes)
+                if (MessageHelper.MessageWindowYesNo($"Удалить продукт '{product.Name}'?") == DialogResult.Yes)
                 {
                     var keyToRemove = _editedProducts.First(kvp => kvp.Value == product).Key;
                     _editedProducts.Remove(keyToRemove);
@@ -361,7 +361,7 @@ namespace GymApplicationV2._0
 
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            if (HasChanges() && Message.MessageWindowYesNo("Отменить изменения?") != DialogResult.Yes)
+            if (HasChanges() && MessageHelper.MessageWindowYesNo("Отменить изменения?") != DialogResult.Yes)
             {
                 return;
             }

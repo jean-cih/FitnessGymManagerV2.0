@@ -449,7 +449,7 @@ namespace GymApplicationV2._0
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Продать товары?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Продать товары?") != DialogResult.Yes)
             {
                 return;
             }

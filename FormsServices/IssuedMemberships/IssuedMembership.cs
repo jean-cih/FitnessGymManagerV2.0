@@ -255,7 +255,7 @@ namespace GymApplicationV2._0
 
             if (!isValid)
 
-                Message.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
 
             return isValid;
         }

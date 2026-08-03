@@ -145,7 +145,7 @@ namespace GymApplicationV2._0.FormsServices
 
         private void jeanModernButtonChange_Click(object sender, EventArgs e)
         {
-            if (Message.MessageWindowYesNo("Вы уверены что хотите изменить данные?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите изменить данные?") != DialogResult.Yes)
                 return;
 
             var query = $@"UPDATE Archive SET 
@@ -168,7 +168,7 @@ namespace GymApplicationV2._0.FormsServices
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                Message.MessageWindowOk("Данные в архиве обновлены");
+                MessageHelper.MessageWindowOk("Данные в архиве обновлены");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

@@ -188,7 +188,7 @@ namespace GymApplicationV2._0
         {
             if (!new Regex(@"^\d{13}$").IsMatch(numberCard))
             {
-                Message.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
                 return;
             }
 

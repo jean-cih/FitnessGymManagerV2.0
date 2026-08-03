@@ -178,7 +178,7 @@ namespace GymApplicationV2._0
             if (string.IsNullOrWhiteSpace(_name) ||
                 string.IsNullOrWhiteSpace(_surname))
             {
-                Message.MessageWindowOk("Выберите клиента");
+                MessageHelper.MessageWindowOk("Выберите клиента");
                 return;
             }
 

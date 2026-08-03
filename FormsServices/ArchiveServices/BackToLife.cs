@@ -143,7 +143,7 @@ namespace GymApplicationV2._0.FormsServices
 
         private void jeanModernButtonBackToLife_Click(object sender, EventArgs e)
         {
-            if (Message.MessageWindowYesNo("Вы уверены что хотите восстановить абонемент?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите восстановить абонемент?") != DialogResult.Yes)
                 return;
 
             string updateQuery = @"
@@ -166,7 +166,7 @@ namespace GymApplicationV2._0.FormsServices
                 ArchiveServicesContext.ConnectionStringArchive(),
                 new SQLiteParameter("@cardNumber", labelNubmerCard.Text));
 
-            Message.MessageWindowOk("Абонемент восстановлен");
+            MessageHelper.MessageWindowOk("Абонемент восстановлен");
 
             _fadeAnimation.CloseWithAnimation();
         }

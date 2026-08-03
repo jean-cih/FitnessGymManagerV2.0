@@ -364,11 +364,11 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите изменить данные клиента?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите изменить данные клиента?") != DialogResult.Yes)
                 return;
 
             string[] fullName = jeanTextBoxClient.Text.Split(' ');
@@ -414,7 +414,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
 
-            Message.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены");
             RefreshDataAndClearFields();
             jeanTextBoxClient.Text = "";
         }
@@ -423,11 +423,11 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
                 return;
 
             string[] fullName = jeanTextBoxClient.Text.Split(' ');
@@ -450,7 +450,7 @@ namespace GymApplicationV2._0
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
-            Message.MessageWindowOk("Клиент удален");
+            MessageHelper.MessageWindowOk("Клиент удален");
             RefreshDataAndClearFields();
         }
 

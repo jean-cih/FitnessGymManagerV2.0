@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace GymApplicationV2._0
 {
-    public class Message
+    public class MessageHelper
     {
         public static void MessageWindowOk(string stringMessage)
         {

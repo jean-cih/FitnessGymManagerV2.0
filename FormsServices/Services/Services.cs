@@ -74,14 +74,14 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership)) return;
 
-            if (Message.MessageWindowYesNo("Вы действительно хотите удалить услугу?") != DialogResult.Yes)
+            if (MessageHelper.MessageWindowYesNo("Вы действительно хотите удалить услугу?") != DialogResult.Yes)
                 return;
 
             GeneralContext.CommandDataFromDatabase(
                 $"DELETE FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
-            Message.MessageWindowOk("Услуга удалена");
+            MessageHelper.MessageWindowOk("Услуга удалена");
             RefreshServicesData();
         }
 
@@ -89,13 +89,13 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                Message.MessageWindowOk("Нужно сначала выбрать услугу");
+                MessageHelper.MessageWindowOk("Нужно сначала выбрать услугу");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NumberCard))
             {
-                Message.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран");
                 return;
             }
 
@@ -106,7 +106,7 @@ namespace GymApplicationV2._0
 
             if (_existInIssued != null)
             {
-                DialogResult result = Message.MessageWindowYesNo("У клиента уже есть абонемент\nПродать еще один?");
+                DialogResult result = MessageHelper.MessageWindowYesNo("У клиента уже есть абонемент\nПродать еще один?");
                 if(result != DialogResult.Yes) return;
 
                 // 1. Найти срок окончания самого раннего абонемента, если их уже несколько
@@ -142,7 +142,7 @@ namespace GymApplicationV2._0
             AddPaymentHistory();
             AddIssuedMembership();
 
-            Message.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены");
         }
 
         private (int? quantityLeft, int clientPurchases) GetClientAndServiceData()
@@ -287,7 +287,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                Message.MessageWindowOk("Выберите услугу из таблицы");
+                MessageHelper.MessageWindowOk("Выберите услугу из таблицы");
                 return;
             }
 
