@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
-using System.Media;
 using System.Text.Json;
 using System.Windows.Forms;
 
@@ -24,7 +23,8 @@ namespace GymApplicationV2._0.FormsSettings
 
         Panel titlePanel;
 
-        Label label_sound;
+        Label label_error_sound;
+        Label label_success_sound;
 
         private Action refreshAction;
 
@@ -41,9 +41,6 @@ namespace GymApplicationV2._0.FormsSettings
                 "Пример",
                 "🎨 Настройки дизайна"
             };
-
-        private WaveOutEvent outputDevice;
-        private MediaFoundationReader audioFile;
 
         public Design()
         {
@@ -356,7 +353,7 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            label_sound = new Label
+            label_error_sound = new Label
             {
                 Text = "🔊 Звук ошибки - " + Path.GetFileName(Properties.Settings.Default.ErrorSoundPath),
                 Location = new Point(15, 15),
@@ -370,7 +367,7 @@ namespace GymApplicationV2._0.FormsSettings
             var tooltip = new ToolTip();
             tooltip.SetToolTip(choose, "Выберите файл для звука ошибки");
 
-            settingCard.Controls.Add(label_sound);
+            settingCard.Controls.Add(label_error_sound);
             settingCard.Controls.Add(choose);
             flowLayout.Controls.Add(settingCard);
         }
@@ -396,7 +393,7 @@ namespace GymApplicationV2._0.FormsSettings
                 }
             };
 
-            label_sound = new Label
+            label_success_sound = new Label
             {
                 Text = "🔊 Звук выполнения - " + Path.GetFileName(Properties.Settings.Default.SuccessSoundPath),
                 Location = new Point(15, 15),
@@ -410,7 +407,7 @@ namespace GymApplicationV2._0.FormsSettings
             var tooltip = new ToolTip();
             tooltip.SetToolTip(choose, "Выберите файл для звука выполнения");
 
-            settingCard.Controls.Add(label_sound);
+            settingCard.Controls.Add(label_success_sound);
             settingCard.Controls.Add(choose);
             flowLayout.Controls.Add(settingCard);
         }
@@ -466,7 +463,7 @@ namespace GymApplicationV2._0.FormsSettings
             var errorSound = new PlaySoundHelper(false);
             errorSound.PlaySound();
 
-            label_sound.Text = "🔊 Звук ошибки - " + Path.GetFileName(selectedFile);
+            label_error_sound.Text = "🔊 Звук ошибки - " + Path.GetFileName(selectedFile);
         }
         
         private void SetSuccessSound(string selectedFile)
@@ -480,7 +477,7 @@ namespace GymApplicationV2._0.FormsSettings
             var successSound = new PlaySoundHelper();
             successSound.PlaySound();
 
-            label_sound.Text = "🔊 Звук выполнения - " + Path.GetFileName(selectedFile);
+            label_success_sound.Text = "🔊 Звук выполнения - " + Path.GetFileName(selectedFile);
         }
 
         private void AddBackgroundStyleSetting()
@@ -654,12 +651,10 @@ namespace GymApplicationV2._0.FormsSettings
                 ConfigManager.UpdateSetting(key, jsonElement);
                 LoadSettings();
 
-                // Вызываем обновление главной формы
                 refreshAction?.Invoke();
 
                 FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
-                // Показываем индикатор сохранения
                 ShowSaveIndicator();
             }
             catch (Exception ex)
