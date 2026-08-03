@@ -1,6 +1,7 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using System;
 using System.Data.SQLite;
 using System.Drawing;
@@ -105,7 +106,12 @@ namespace GymApplicationV2._0
 
             if (_existInIssued != null)
             {
-                Message.MessageWindowOk("У клиента уже есть абонемент");
+                DialogResult result = Message.MessageWindowYesNo("У клиента уже есть абонемент\nПродать еще один?");
+                if(result != DialogResult.Yes) return;
+
+                // 1. Найти срок окончания самого раннего абонемента, если их уже несколько
+                // 2. Сделать следующий день началом следующего абонемента, а конец просто начало плюс срок абонемента
+                // 3. Добавить абонемент в выданные абонементы
                 return;
             }
 
@@ -122,13 +128,8 @@ namespace GymApplicationV2._0
               WHERE Имя LIKE '%{names[0]}%' 
                 AND Фамилия LIKE '%{names[1]}%'";
 
-            var parameters = new SQLiteParameter[]
-            {
-              new SQLiteParameter("@CardNumber", numberCard),
-            };
-
             GeneralContext.CommandDataFromDatabase(updateQuery,
-                ClientsContext.ConnectionStringClients(), parameters);
+                ClientsContext.ConnectionStringClients(), new SQLiteParameter("@CardNumber", numberCard));
         }
 
         private void ProcessServiceSale()

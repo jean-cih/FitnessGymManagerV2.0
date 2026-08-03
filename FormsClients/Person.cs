@@ -1,6 +1,8 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
+using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Drawing;
@@ -11,7 +13,7 @@ using System.Windows.Forms;
 
 namespace GymApplicationV2._0.FormsClients
 {
-    public partial class Person : ShadowedForm
+    internal partial class Person : ShadowedForm
     {
         private string path = "\\Photos\\";
 
@@ -29,7 +31,7 @@ namespace GymApplicationV2._0.FormsClients
 
         public string CardNumber { get; private set; }
 
-        public Person(ClientData data, Panel panelPerson)
+        public Person(DataClient data, Panel panelPerson)
         {
             InitializeComponent();
 
@@ -43,9 +45,11 @@ namespace GymApplicationV2._0.FormsClients
 
             _fadeAnimation = new FadeAnimation(this);
             _fadeAnimation.FadeIn();
+
+            this.EnableDrag(this);
         }
 
-        private void CreateControls(ClientData data, Panel personPanel)
+        private void CreateControls(DataClient data, Panel personPanel)
         {
             // Header Panel
             headerPanel = new JeanPanel
@@ -72,7 +76,7 @@ namespace GymApplicationV2._0.FormsClients
             // User Name
             userName = new Label
             {
-                Text = data.FullName,
+                Text = data.Surname + " " + data.Name + " " + data.FatherName,
                 AutoSize = false,
                 Size = new Size(300, 30),
                 Location = new Point(120, 25),
@@ -157,7 +161,7 @@ namespace GymApplicationV2._0.FormsClients
             this.Controls.Add(closeButton);
         }
 
-        private void InitializeCustomDesign(ClientData data, Panel personPanel)
+        private void InitializeCustomDesign(DataClient data, Panel personPanel)
         {
             // Настройка формы
             this.Size = new Size(460, 840);
@@ -194,9 +198,6 @@ namespace GymApplicationV2._0.FormsClients
             StyleButton(closeButton, "➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0));
 
             // Обработчики событий
-            this.MouseDown += Person_MouseDown;
-            this.MouseMove += Person_MouseMove;
-            this.MouseUp += Person_MouseUp;
             this.KeyPreview = true;
             this.KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) CloseWithAnimation(personPanel); };
         }
@@ -243,7 +244,7 @@ namespace GymApplicationV2._0.FormsClients
             };
         }
 
-        private void FillInfoPanel(ClientData data)
+        private void FillInfoPanel(DataClient data)
         {
             var titleLabel = new Label
             {
@@ -310,7 +311,7 @@ namespace GymApplicationV2._0.FormsClients
             }
         }
 
-        private void FillMembershipPanel(ClientData data)
+        private void FillMembershipPanel(DataClient data)
         {
             var titleLabel = new Label
             {
@@ -323,11 +324,11 @@ namespace GymApplicationV2._0.FormsClients
 
             var membershipItems = new[]
             {
-                new { Icon = "🎯", Label = "Тип:", Value = data.Membership, Y = 40 },
+                new { Icon = "🎯", Label = "Тип:", Value = data.Service, Y = 40 },
                 new { Icon = "🔢", Label = "Номер:", Value = data.CardNumber, Y = 70 },
-                new { Icon = "📅", Label = "Окончание:", Value = data.Visits, Y = 100 },
+                new { Icon = "📅", Label = "Окончание:", Value = data.TermDate, Y = 100 },
                 new { Icon = "👣", Label = "Осталось посещений:", Value = data.VisitsLeft, Y = 130 },
-                new { Icon = "🎫", Label = "Скидка:", Value = data.Discount, Y = 160 }
+                new { Icon = "🎫", Label = "Скидка:", Value = data.Discount.ToString(), Y = 160 }
             };
 
             membershipPanel.Controls.Add(titleLabel);
@@ -370,7 +371,7 @@ namespace GymApplicationV2._0.FormsClients
             }
         }
 
-        private void FillStatsPanel(ClientData data)
+        private void FillStatsPanel(DataClient data)
         {
             var statsItems = new[]
             {
@@ -571,34 +572,6 @@ namespace GymApplicationV2._0.FormsClients
         {
             _fadeAnimation.CloseWithAnimation();
             personPanel.Visible = false;
-        }
-
-        private bool _isMousePressed;
-        private Point _clickPoint;
-
-        private void Person_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Y < 40)
-            {
-                _isMousePressed = true;
-                _clickPoint = e.Location;
-            }
-        }
-
-        private void Person_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isMousePressed)
-            {
-                this.Location = new Point(
-                    this.Location.X + e.X - _clickPoint.X,
-                    this.Location.Y + e.Y - _clickPoint.Y
-                );
-            }
-        }
-
-        private void Person_MouseUp(object sender, MouseEventArgs e)
-        {
-            _isMousePressed = false;
         }
     }
 }

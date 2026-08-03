@@ -4,6 +4,7 @@ using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
 using Shadow;
@@ -41,9 +42,6 @@ namespace GymApplicationV2._0
         private int baseSpacing = 10;
         private int baseStartX;
         private int baseButtonHeight = 40;
-
-        private WaveOutEvent outputDevice;
-        private MediaFoundationReader audioFile;
 
         string[] notChangeableTexts = new string[]
             {
@@ -510,7 +508,8 @@ namespace GymApplicationV2._0
                     string[] names = jeanTextBoxNumberCard.Text.Split(' ');
                     if (names.Length < 2)
                     {
-                        PlayErrorSound();
+                        var errorSound = new PlaySoundHelper(false);
+                        errorSound.PlaySound();
                         ShowMessage("Введите фамилию и имя через пробел");
                         ClearCardNumber();
                         return;
@@ -537,7 +536,9 @@ namespace GymApplicationV2._0
                             jeanModernButtonSell.Text = $"💰 Продать\n{names[0]} {names[1]}";
                         }
 
-                        PlayErrorSound();
+                        var errorSound = new PlaySoundHelper(false);
+                        errorSound.PlaySound();
+
                         UpdateDataGrid();
 
                         return;
@@ -582,51 +583,7 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        private void PlayErrorSound()
-        {
-            string soundPath = Properties.Settings.Default.ErrorSoundPath;
-
-            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
-            {
-                try
-                {
-                    MediaFoundationApi.Startup();
-
-                    StopErrorSound();
-
-                    outputDevice = new WaveOutEvent();
-
-                    audioFile = new MediaFoundationReader(soundPath);
-                    outputDevice.Init(audioFile);
-                    outputDevice.Play();
-                }
-                catch (Exception ex)
-                {
-                    SystemSounds.Beep.Play();
-                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    StopErrorSound();
-                }
-            }
-            else
-            {
-                SystemSounds.Beep.Play();
-            }
-        }
-
-        private void StopErrorSound()
-        {
-            outputDevice?.Stop();
-            outputDevice?.Dispose();
-            outputDevice = null;
-            audioFile?.Dispose();
-            audioFile = null;
-        }
-
-        private void PlaySuccessSound()
-        {
-            SystemSounds.Exclamation.Play();
-        }
+        
 
         private void ShowMessage(string message)
         {
@@ -702,7 +659,9 @@ namespace GymApplicationV2._0
 
             if (existClient == null)
             {
-                PlayErrorSound();
+                var errorSound = new PlaySoundHelper(false);
+                errorSound.PlaySound();
+
                 if (!userStatus.ContainsKey(cardNumber))
                 {
                     userStatus.Add(cardNumber, "Этого номера нет в действительных абонементах");
@@ -803,7 +762,9 @@ namespace GymApplicationV2._0
 
             ResetClientMembership(cardNumber);
 
-            PlayErrorSound();
+            var errorSound = new PlaySoundHelper(false);
+            errorSound.PlaySound();
+
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Абонемент закончился по времени");
@@ -898,7 +859,9 @@ namespace GymApplicationV2._0
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
 
-            PlaySuccessSound();
+            var successSound = new PlaySoundHelper();
+            successSound.PlaySound();
+
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 
@@ -915,7 +878,9 @@ namespace GymApplicationV2._0
 
             ResetClientMembership(cardNumber);
 
-            PlayErrorSound();
+            var errorSound = new PlaySoundHelper(false);
+            errorSound.PlaySound();
+
             if (!userStatus.ContainsKey(cardNumber))
             {
                 userStatus.Add(cardNumber, "Абонемент закончился. Посещений 0");
@@ -950,7 +915,9 @@ namespace GymApplicationV2._0
             numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
 
-            PlaySuccessSound();
+            var successSound = new PlaySoundHelper();
+            successSound.PlaySound();
+
             picture_status.Image = Properties.Resources.greenSuccess;
         }
 

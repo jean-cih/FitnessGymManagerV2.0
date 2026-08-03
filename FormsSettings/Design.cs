@@ -1,6 +1,7 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Data;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
 using Shadow;
@@ -168,6 +169,7 @@ namespace GymApplicationV2._0.FormsSettings
             AddFormStyleSetting();
             AddBackgroundStyleSetting();
             AddErrorSetting();
+            AddSuccessSetting();
 
             titlePanel.Controls.Add(titleLabel);
 
@@ -363,7 +365,7 @@ namespace GymApplicationV2._0.FormsSettings
             };
 
             var choose = CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
-            choose.Click += (s, e) => SelectErrorSoundFile(s, e);
+            choose.Click += (s, e) => SelectSoundFile(s, e, false);
 
             var tooltip = new ToolTip();
             tooltip.SetToolTip(choose, "Выберите файл для звука ошибки");
@@ -373,51 +375,47 @@ namespace GymApplicationV2._0.FormsSettings
             flowLayout.Controls.Add(settingCard);
         }
 
-
-        private void PlayErrorSound()
+        private void AddSuccessSetting()
         {
-            string soundPath = Properties.Settings.Default.ErrorSoundPath;
-
-            if (!string.IsNullOrEmpty(soundPath) && File.Exists(soundPath))
+            var settingCard = new JeanPanel
             {
-                try
-                {
-                    MediaFoundationApi.Startup();
+                Size = new Size(500, 100),
+                Margin = new Padding(0, 0, 0, 20),
+                BackColor = Color.FromArgb(55, 55, 58),
+                GradientBottomColor = Color.FromArgb(55, 55, 58),
+                GradientTapColor = Color.FromArgb(55, 55, 58),
+                Padding = new Padding(20),
+                BorderRadius = 20
+            };
 
-                    StopErrorSound();
-
-                    outputDevice = new WaveOutEvent();
-
-                    audioFile = new MediaFoundationReader(soundPath);
-                    outputDevice.Init(audioFile);
-                    outputDevice.Play();
-
-                    label_sound.Text = "🔊 Звук ошибки - " + Path.GetFileName(soundPath);
-                }
-                catch (Exception ex)
-                {
-                    SystemSounds.Beep.Play();
-                    MessageBox.Show($"Не удалось воспроизвести звук ошибки: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    StopErrorSound();
-                }
-            }
-            else
+            settingCard.Paint += (s, e) =>
             {
-                SystemSounds.Beep.Play();
-            }
+                using (var pen = new Pen(Color.FromArgb(255, 140, 0), 1))
+                {
+                    e.Graphics.DrawRectangle(pen, new Rectangle(0, 0, settingCard.Width - 1, settingCard.Height - 1));
+                }
+            };
+
+            label_sound = new Label
+            {
+                Text = "🔊 Звук выполнения - " + Path.GetFileName(Properties.Settings.Default.SuccessSoundPath),
+                Location = new Point(15, 15),
+                Size = new Size(300, 70),
+                ForeColor = Color.FromArgb(255, 140, 0),
+            };
+
+            var choose = CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
+            choose.Click += (s, e) => SelectSoundFile(s, e);
+
+            var tooltip = new ToolTip();
+            tooltip.SetToolTip(choose, "Выберите файл для звука выполнения");
+
+            settingCard.Controls.Add(label_sound);
+            settingCard.Controls.Add(choose);
+            flowLayout.Controls.Add(settingCard);
         }
 
-        private void StopErrorSound()
-        {
-            outputDevice?.Stop();
-            outputDevice?.Dispose();
-            outputDevice = null;
-            audioFile?.Dispose();
-            audioFile = null;
-        }
-
-        public void SelectErrorSoundFile(object sender, EventArgs e)
+        public void SelectSoundFile(object sender, EventArgs e, bool isSuccess = true)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -438,13 +436,14 @@ namespace GymApplicationV2._0.FormsSettings
                             {
                             }
 
-                            Properties.Settings.Default.ErrorSoundPath = selectedFile;
-                            Properties.Settings.Default.Save();
-
-                            MessageBox.Show("Звук ошибки успешно установлен!", "Успех",
-                                MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                            PlayErrorSound();
+                            if (isSuccess)
+                            {
+                                SetSuccessSound(selectedFile);
+                            }
+                            else
+                            {
+                                SetErrorSound(selectedFile);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -456,19 +455,32 @@ namespace GymApplicationV2._0.FormsSettings
             }
         }
 
-        public void ResetErrorSound()
+        private void SetErrorSound(string selectedFile)
         {
-            StopErrorSound();
-            Properties.Settings.Default.ErrorSoundPath = string.Empty;
+            Properties.Settings.Default.ErrorSoundPath = selectedFile;
             Properties.Settings.Default.Save();
-            MessageBox.Show("Звук ошибки сброшен на стандартный", "Информация",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
 
-        public bool HasCustomErrorSound()
+            MessageBox.Show("Звук ошибки успешно установлен!", "Успех",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            var errorSound = new PlaySoundHelper(false);
+            errorSound.PlaySound();
+
+            label_sound.Text = "🔊 Звук ошибки - " + Path.GetFileName(selectedFile);
+        }
+        
+        private void SetSuccessSound(string selectedFile)
         {
-            string soundPath = Properties.Settings.Default.ErrorSoundPath;
-            return !string.IsNullOrEmpty(soundPath) && File.Exists(soundPath);
+            Properties.Settings.Default.SuccessSoundPath = selectedFile;
+            Properties.Settings.Default.Save();
+
+            MessageBox.Show("Звук выполнения успешно установлен!", "Успех",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            var successSound = new PlaySoundHelper();
+            successSound.PlaySound();
+
+            label_sound.Text = "🔊 Звук выполнения - " + Path.GetFileName(selectedFile);
         }
 
         private void AddBackgroundStyleSetting()
@@ -688,106 +700,6 @@ namespace GymApplicationV2._0.FormsSettings
             base.OnFormClosed(e);
             _fadeAnimation?.Dispose();
             _fadeAnimation = null;
-        }
-    }
-
-    public class ModernComboBox : ComboBox
-    {
-        public Color BorderColor { get; set; } = Color.Gray;
-        public Color ArrowColor { get; set; } = Color.Black;
-        public int BorderRadius { get; set; } = 6;
-
-        public ModernComboBox()
-        {
-            SetStyle(ControlStyles.AllPaintingInWmPaint |
-                    ControlStyles.UserPaint |
-                    ControlStyles.DoubleBuffer |
-                    ControlStyles.ResizeRedraw, true);
-
-            DrawMode = DrawMode.OwnerDrawFixed;
-            DropDownStyle = ComboBoxStyle.DropDownList;
-            FlatStyle = FlatStyle.Flat;
-            Cursor = Cursors.Hand;
-            Font = new Font("Segoe UI", 10);
-        }
-
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            var graphics = e.Graphics;
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-
-            // Фон
-            using (var backBrush = new SolidBrush(BackColor))
-            using (var borderPen = new Pen(BorderColor, 2))
-            using (var path = GetRoundRectPath(ClientRectangle, BorderRadius))
-            {
-                graphics.FillPath(backBrush, path);
-                graphics.DrawPath(borderPen, path);
-            }
-
-            // Текст
-            if (SelectedItem != null)
-            {
-                TextRenderer.DrawText(graphics, SelectedItem.ToString(), Font,
-                    new Rectangle(10, 0, Width - 30, Height), ForeColor,
-                    TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
-            }
-
-            // Стрелка
-            DrawArrow(graphics);
-        }
-
-        protected override void OnDrawItem(DrawItemEventArgs e)
-        {
-            if (e.Index < 0) return;
-
-            e.DrawBackground();
-
-            // Выделенный элемент
-            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-            {
-                using (var selectionBrush = new SolidBrush(Color.FromArgb(0, 122, 204)))
-                {
-                    e.Graphics.FillRectangle(selectionBrush, e.Bounds);
-                }
-            }
-
-            // Текст элемента
-            var itemText = Items[e.Index].ToString();
-            TextRenderer.DrawText(e.Graphics, itemText, Font, e.Bounds,
-                (e.State & DrawItemState.Selected) == DrawItemState.Selected ? Color.White : ForeColor,
-                TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
-
-            e.DrawFocusRectangle();
-        }
-
-        private void DrawArrow(Graphics graphics)
-        {
-            var arrowX = Width - 20;
-            var arrowY = Height / 2 - 2;
-
-            var points = new Point[]
-            {
-                new Point(arrowX, arrowY),
-                new Point(arrowX + 7, arrowY),
-                new Point(arrowX + 3, arrowY + 4)
-            };
-
-            using (var arrowBrush = new SolidBrush(ArrowColor))
-            {
-                graphics.FillPolygon(arrowBrush, points);
-            }
-        }
-
-        private GraphicsPath GetRoundRectPath(Rectangle rect, int radius)
-        {
-            var path = new GraphicsPath();
-            path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
-            path.AddArc(rect.X + rect.Width - radius, rect.Y, radius, radius, 270, 90);
-            path.AddArc(rect.X + rect.Width - radius, rect.Y + rect.Height - radius, radius, radius, 0, 90);
-            path.AddArc(rect.X, rect.Y + rect.Height - radius, radius, radius, 90, 90);
-            path.CloseFigure();
-            return path;
         }
     }
 }

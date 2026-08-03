@@ -223,9 +223,13 @@
     <Compile Include="Controls\JeanToggleButton.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\ModernComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\ShadowedForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Data\DataClient.cs" />
     <Compile Include="FormsClients\Person.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -324,7 +328,7 @@
     <Compile Include="FormsClients\Clients.Designer.cs">
       <DependentUpon>Clients.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataConfig.cs" />
+    <Compile Include="Data\DataConfig.cs" />
     <Compile Include="FormsServices\Services\FieldForService.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -366,6 +370,7 @@
     </Compile>
     <Compile Include="Helpers\FontHelper.cs" />
     <Compile Include="Helpers\FormDragHelper.cs" />
+    <Compile Include="Helpers\PlaySoundHelper.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="FormsClients\NewClient.cs">
       <SubType>Form</SubType>
