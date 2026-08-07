@@ -374,7 +374,7 @@ namespace GymApplicationV2._0
                 infoReport.periodForMonth = radioForMonth.Checked;
                 infoReport.periodForWeek = radioForWeek.Checked;
                 infoReport.periodForDay = radioForDay.Checked;
-                infoReport.otherPeriond = radioOtherPeriod.Checked;
+                infoReport.otherPeriod = radioOtherPeriod.Checked;
 
                 infoReport.dateBegin = jeanDateTimePickerBegin.Value;
                 infoReport.dateEnd = jeanDateTimePickerEnd.Value;

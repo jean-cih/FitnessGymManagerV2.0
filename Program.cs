@@ -57,6 +57,10 @@ namespace GymApplicationV2._0
             CheckIfDataExistsIssued(splash);
             CheckIfDataExistsProducts(splash);
 
+            splash.UpdateProgress("Миграция данных...", "Обновление", 85);
+            DatabaseMigration.MigrateDatesToIsoFormat();
+            Thread.Sleep(100);
+
             LoadSettings();
 
             splash.UpdateProgress("Готово!", "Запуск приложения", 100);
@@ -184,7 +188,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsIssued(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД абонементов...", "Базы данных", 80);
+            splash.UpdateProgress("Проверка БД абонементов...", "Базы данных", 75);
 
             if (!File.Exists(GetDatabasePath("Databases", "IssuedMembership.db")))
             {
@@ -195,7 +199,7 @@ namespace GymApplicationV2._0
 
         private static void CheckIfDataExistsProducts(LoadingScreen splash)
         {
-            splash.UpdateProgress("Проверка БД товаров...", "Базы данных", 90);
+            splash.UpdateProgress("Проверка БД товаров...", "Базы данных", 80);
 
             if (!File.Exists(GetDatabasePath("Databases", "Products.db")))
             {
