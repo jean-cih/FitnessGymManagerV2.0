@@ -280,12 +280,12 @@ namespace GymApplicationV2._0
                 finalPrice = (Convert.ToDecimal(price) * (1 - discount / 100)).ToString("0");
             }
 
-            // Форматируем даты правильно
+            // Форматируем даты в ISO формате
             string termDate = "";
             if (!string.IsNullOrEmpty(jeanTextBoxPurchase.Text))
             {
                 termDate = jeanDateTimePickerSell.Value.AddMonths(Convert.ToInt32(termMembership))
-                    .ToShortDateString();
+                    .ToString("yyyy-MM-dd"); // ISO формат
             }
 
             return new DataClient
@@ -298,12 +298,12 @@ namespace GymApplicationV2._0
                 CardNumber = jeanTextBoxNumberCard.Text,
                 Service = jeanTextBoxPurchase.Text,
                 FinalPrice = finalPrice,
-                VisitDate = checkBoxVisited.Checked ? DateTime.Now.ToShortDateString() : "",
+                VisitDate = checkBoxVisited.Checked ? DateTime.Now.ToString("yyyy-MM-dd") : "", // ISO формат
                 TermDate = termDate,
                 VisitsLeft = lefts,
-                Birthday = FormatBirthdayForDatabase(jeanTextBoxBirthday.Text),
+                Birthday = FormatBirthdayForDatabase(jeanTextBoxBirthday.Text), // Убедитесь, что этот метод тоже возвращает ISO
                 Discount = discountParts[0] != "Скидка" && !string.IsNullOrEmpty(discountParts[0]) ? Convert.ToInt32(discountParts[0]) : 0,
-                Saved = DateTime.Now.Date.ToString()
+                Saved = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") // ISO формат с временем
             };
         }
 
@@ -339,15 +339,15 @@ namespace GymApplicationV2._0
 
                 string visitedDate = null;
                 if (!string.IsNullOrEmpty(data.VisitDate) && DateTime.TryParse(data.VisitDate, out DateTime tempVisited))
-                    visitedDate = tempVisited.ToShortDateString();
+                    visitedDate = tempVisited.ToString("yyyy-MM-dd");
 
                 string termDate = null;
                 if (!string.IsNullOrEmpty(data.TermDate) && DateTime.TryParse(data.TermDate, out DateTime tempTerm))
-                    termDate = tempTerm.ToShortDateString();
+                    termDate = tempTerm.ToString("yyyy-MM-dd");
 
                 string birthday = null;
                 if (!string.IsNullOrEmpty(data.Birthday) && DateTime.TryParse(data.Birthday, out DateTime tempBirthday))
-                    birthday = tempBirthday.ToShortDateString();
+                    birthday = tempBirthday.ToString("yyyy-MM-dd");
 
                 cmd.Parameters.AddWithValue("@Фамилия", data.Surname);
                 cmd.Parameters.AddWithValue("@Имя", data.Name);
@@ -358,7 +358,7 @@ namespace GymApplicationV2._0
                 cmd.Parameters.AddWithValue("@Отчество", data.FatherName ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Дата_рождения", birthday ?? (object)DBNull.Value);
                 cmd.Parameters.AddWithValue("@Скидка", data.Discount);
-                cmd.Parameters.AddWithValue("@Сохранено", DateTime.Now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Сохранено", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 cmd.ExecuteNonQuery();
             }
@@ -388,10 +388,10 @@ namespace GymApplicationV2._0
 
                 cmd.Parameters.AddWithValue("@Клиент", $"{data.Surname} {data.Name} {data.FatherName}");
                 cmd.Parameters.AddWithValue("@Абонемент", data.Service);
-                cmd.Parameters.AddWithValue("@Дата_начала", jeanDateTimePickerSell.Value.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_начала", jeanDateTimePickerSell.Value.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Дата_окончания", data.TermDate);
                 cmd.Parameters.AddWithValue("@Цена", data.FinalPrice);
-                cmd.Parameters.AddWithValue("@Дата_платежа", DateTime.Now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_платежа", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 cmd.ExecuteNonQuery();
             }
@@ -411,7 +411,7 @@ namespace GymApplicationV2._0
                 cmd.Parameters.AddWithValue("@Клиент", $"{data.Surname} {data.Name} {data.FatherName}");
                 cmd.Parameters.AddWithValue("@№Карты", data.CardNumber);
                 cmd.Parameters.AddWithValue("@Дата_окончания", data.TermDate);
-                cmd.Parameters.AddWithValue("@Дата_оформления", jeanDateTimePickerSell.Value.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_оформления", jeanDateTimePickerSell.Value.ToString("yyyy-MM-dd HH:mm:ss"));
                 cmd.Parameters.AddWithValue("@Абонемент", data.Service);
                 cmd.Parameters.AddWithValue("@Посетил", data.VisitDate);
                 cmd.Parameters.AddWithValue("@Оплата", data.FinalPrice);

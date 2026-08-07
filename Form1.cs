@@ -2,8 +2,8 @@
 using GymApplicationV2._0.Components;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
@@ -16,6 +16,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static GymApplicationV2._0.AppColors.AppColors;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
 
 
 namespace GymApplicationV2._0
@@ -493,10 +494,22 @@ namespace GymApplicationV2._0
                     if (!ValidateMembershipStatus(cardNumber_trim))
                         return;
 
-                    TryHandleFrozenMembership(cardNumber_trim);
-                    DisplayClientData(cardNumber_trim);
+                    string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
+                        WHERE №Карты = @cardNumber
+                        ORDER BY date(Дата_окончания) ASC
+                        LIMIT 1";
+                    var data = GeneralContext.GetDataFromDatabase(query_help,
+                        IssuedMembershipContext.ConnectionStringIssued(),
+                        new SQLiteParameter("@cardNumber", cardNumber_trim));
 
-                    ProcessClientVisit(cardNumber_trim);
+                    string membership = data.Rows[0]["Абонемент"].ToString();
+                    string date = data.Rows[0]["Дата_окончания"].ToString();
+
+                    TryHandleFrozenMembership(cardNumber_trim, date);
+
+                    ProcessClientVisit(cardNumber_trim, membership, date);
+
+                    DisplayClientData(cardNumber_trim);
                 }
                 else
                 {
@@ -510,9 +523,13 @@ namespace GymApplicationV2._0
                         return;
                     }
 
+
                     var searchQuery = BuildSearchQuery(names);
                     object existClient = GeneralContext.GetElementFromDatabase(searchQuery,
                 IssuedMembershipContext.ConnectionStringIssued());
+
+                    nameClient = names[0] + " " + names[1];
+                    jeanModernButtonSell.Text = $"💰 Продать\n{names[0]} {names[1]}";
 
                     if (existClient == null)
                     { 
@@ -526,9 +543,7 @@ namespace GymApplicationV2._0
 
                         if (archiveClientNumber != null)
                         {
-                            nameClient = names[0] + " " + names[1];
                             numberCard = archiveClientNumber.ToString();
-                            jeanModernButtonSell.Text = $"💰 Продать\n{names[0]} {names[1]}";
                         }
 
                         var errorSound = new PlaySoundHelper(false);
@@ -540,15 +555,28 @@ namespace GymApplicationV2._0
                     }
 
                     string numberCardExist = existClient.ToString();
+                    numberCard = numberCardExist;
+
                     if (!ValidateIssuedExists(numberCardExist))
                         return;
 
                     if (!ValidateMembershipStatus(numberCardExist))
                         return;
 
-                    TryHandleFrozenMembership(numberCardExist);
+                    string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
+                        WHERE №Карты = @cardNumber
+                        ORDER BY date(Дата_окончания) ASC
+                        LIMIT 1";
+                    var data = GeneralContext.GetDataFromDatabase(query_help,
+                        IssuedMembershipContext.ConnectionStringIssued(),
+                        new SQLiteParameter("@cardNumber", numberCardExist));
+
+                    string membership = data.Rows[0]["Абонемент"].ToString();
+                    string date = data.Rows[0]["Дата_окончания"].ToString();
+
+                    TryHandleFrozenMembership(numberCardExist, date);
                     
-                    ProcessClientVisit(numberCardExist);
+                    ProcessClientVisit(numberCardExist, membership, date);
 
                     DisplayClientData(numberCardExist);
                 }
@@ -637,9 +665,21 @@ namespace GymApplicationV2._0
             if (!ValidateMembershipStatus(cardNumber))
                 return;
 
-            TryHandleFrozenMembership(cardNumber);
+            string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
+                WHERE №Карты = @cardNumber
+                ORDER BY date(Дата_окончания) ASC
+                LIMIT 1";
+            var data = GeneralContext.GetDataFromDatabase(query,
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@cardNumber", cardNumber));
 
-            ProcessClientVisit(cardNumber);
+            string membership = data.Rows[0]["Абонемент"].ToString();
+            string date = data.Rows[0]["Дата_окончания"].ToString();
+
+            ShowMessage(date + "Пу Пу Пу");
+            TryHandleFrozenMembership(cardNumber, date);
+
+            ProcessClientVisit(cardNumber, membership, date);
 
             DisplayClientData(cardNumber);
         }
@@ -675,16 +715,17 @@ namespace GymApplicationV2._0
         }
 
         // Обработка замороженного абонемента
-        private void TryHandleFrozenMembership(string cardNumber)
+        private void TryHandleFrozenMembership(string cardNumber, string date)
         {
-            object status = GeneralContext.GetElementFromDatabase("SELECT Статус FROM Issued WHERE №Карты = @cardNumber",
+            object status = GeneralContext.GetElementFromDatabase("SELECT Статус FROM Issued WHERE №Карты = @cardNumber AND Дата_окончания = @endDate",
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@endDate", date));
 
             if (status?.ToString() != "заморожен")
                 return;
 
-            UnfreezeMembership(cardNumber);
+            UnfreezeMembership(cardNumber, date);
 
             if (!userStatus.ContainsKey(cardNumber))
             {
@@ -697,21 +738,18 @@ namespace GymApplicationV2._0
         }
 
         // Разморозка абонемента
-        private void UnfreezeMembership(string cardNumber)
+        private void UnfreezeMembership(string cardNumber, string date)
         {
-            object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Окончание_заморозки FROM Issued WHERE №Карты = @cardNumber",
+            object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Окончание_заморозки FROM Issued WHERE №Карты = @cardNumber AND Дата_окончания = @endDate",
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@endDate", date));
 
             DateTime endDate = Convert.ToDateTime(timeLeft);
             int daysLeft = (int)(endDate - DateTime.Now).TotalDays;
 
             if (daysLeft > 0)
             {
-                object timeLeftMem = GeneralContext.GetElementFromDatabase("SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber",
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
-
                 string updateIssuedQueryDate = @"
                 UPDATE Issued SET 
                     Дата_окончания = @endDate,
@@ -721,7 +759,7 @@ namespace GymApplicationV2._0
 
                 GeneralContext.CommandDataFromDatabase(updateIssuedQueryDate,
                     IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@endDate", Convert.ToDateTime(timeLeftMem).AddDays(-daysLeft-1).ToShortDateString()),
+                    new SQLiteParameter("@endDate", Convert.ToDateTime(date).AddDays(-daysLeft-1).ToString("yyyy-MM-dd")),
                     new SQLiteParameter("@status", "активирован"),
                     new SQLiteParameter("@stopFreeze", DBNull.Value),
                     new SQLiteParameter("@cardNumber", cardNumber));
@@ -731,13 +769,15 @@ namespace GymApplicationV2._0
         // Валидация статуса абонемента
         private bool ValidateMembershipStatus(string cardNumber)
         {
-            object timeLeft = GeneralContext.GetElementFromDatabase("SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber",
+            object timeLeft = GeneralContext.GetElementFromDatabase(@"SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber
+                ORDER BY date(Дата_окончания) ASC
+                LIMIT 1",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
             if (DateTime.Compare(Convert.ToDateTime(timeLeft), DateTime.Now) < 0)
             {
-                HandleExpiredMembership(cardNumber);
+                HandleExpiredMembership(cardNumber, timeLeft.ToString());
                 return false;
             }
 
@@ -745,17 +785,17 @@ namespace GymApplicationV2._0
         }
 
         // Обработка просроченного абонемента
-        private void HandleExpiredMembership(string cardNumber)
+        private void HandleExpiredMembership(string cardNumber, string date)
         {
             DisplayClientData(cardNumber);
             picture_status.Image = Properties.Resources.redError;
 
-            IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
+            IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber, date);
             UpdateSellButton(issuedInfo);
 
             ArchiveExpiredMembership(cardNumber, issuedInfo);
 
-            ResetClientMembership(cardNumber);
+            ResetClientMembership(cardNumber, date);
 
             var errorSound = new PlaySoundHelper(false);
             errorSound.PlaySound();
@@ -772,12 +812,13 @@ namespace GymApplicationV2._0
         }
 
         // Сброс данных абонемента клиента
-        private void ResetClientMembership(string cardNumber)
+        private void ResetClientMembership(string cardNumber, string date)
         {
-            string resetQuery = @"DELETE FROM Issued WHERE №Карты = @cardNumber";
+            string resetQuery = @"DELETE FROM Issued WHERE №Карты = @cardNumber AND Дата_окончания = @endDate";
             GeneralContext.CommandDataFromDatabase(resetQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@endDate", date));
         }
 
         // Архивация просроченного абонемента
@@ -807,43 +848,53 @@ namespace GymApplicationV2._0
         }
 
         // Обработка посещения клиента
-        private void ProcessClientVisit(string cardNumber)
+        private void ProcessClientVisit(string cardNumber, string membership, string date)
         {
-            string membershipQuery = "SELECT Абонемент FROM Issued WHERE №Карты = @cardNumber";
-            object membership = GeneralContext.GetElementFromDatabase(membershipQuery,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
-
             if (membership.ToString() == "Безлимитный")
             {
-                ProcessUnlimitedVisit(cardNumber);
+                ProcessUnlimitedVisit(cardNumber, membership, date);
                 return;
             }
 
-            string visitsQuery = "SELECT Посещений_осталось FROM Issued WHERE №Карты = @cardNumber";
+            string visitsQuery = "SELECT Посещений_осталось FROM Issued WHERE №Карты = @cardNumber AND Дата_окончания = @dateEnd";
             object visitsLeft = GeneralContext.GetElementFromDatabase(visitsQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@dateEnd", date));
 
-            int remainingVisits = Convert.ToInt32(visitsLeft);
-            if (remainingVisits <= 0)
+            numberLeft = Convert.ToInt32(visitsLeft);
+            if (numberLeft <= 0)
             {
-                HandleNoVisitsLeft(cardNumber);
-                return;
+                HandleNoVisitsLeft(cardNumber, date);
+
+                var dataNew = GeneralContext.GetDataFromDatabase(@"
+                    SELECT Посещений_осталось, Дата_окончания
+                        FROM Issued 
+                        WHERE №Карты = @cardNumber
+                        ORDER BY date(Дата_окончания) ASC
+                        LIMIT 1",
+                    IssuedMembershipContext.ConnectionStringIssued(),
+                    new SQLiteParameter("@cardNumber", cardNumber));
+
+                if (dataNew == null || dataNew.Rows.Count == 0) return;
+
+                numberLeft = Convert.ToInt32(dataNew.Rows[0]["Посещений_осталось"]);
+                date = dataNew.Rows[0]["Дата_окончания"].ToString();
             }
 
-            numberLeft = remainingVisits;
-            ProcessLimitedVisit(cardNumber, remainingVisits);
+            ProcessLimitedVisit(cardNumber, numberLeft, date);
         }
 
         // Обработка безлимитного посещения
-        private void ProcessUnlimitedVisit(string cardNumber)
+        private void ProcessUnlimitedVisit(string cardNumber, string membership, string date)
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посетил = '" + DateTime.Now + "' " +
-                "WHERE №Карты = @cardNumber",
+                "WHERE №Карты = @cardNumber" +
+                "AND Дата_окончания = @dateEnd",
                 IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@cardNumber", cardNumber));
+                    new SQLiteParameter("@cardNumber", cardNumber),
+                    new SQLiteParameter("@dateEnd", date));
 
             if (!userStatus.ContainsKey(cardNumber))
             {
@@ -861,17 +912,17 @@ namespace GymApplicationV2._0
         }
 
         // Обработка отсутствия посещений
-        private void HandleNoVisitsLeft(string cardNumber)
+        private void HandleNoVisitsLeft(string cardNumber, string date)
         {
             DisplayClientData(cardNumber);
             picture_status.Image = Properties.Resources.redError;
 
-            IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber);
+            IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber, date);
             UpdateSellButton(issuedInfo);
 
             ArchiveExpiredMembership(cardNumber, issuedInfo);
 
-            ResetClientMembership(cardNumber);
+            ResetClientMembership(cardNumber, date);
 
             var errorSound = new PlaySoundHelper(false);
             errorSound.PlaySound();
@@ -889,14 +940,16 @@ namespace GymApplicationV2._0
         }
 
         // Обработка ограниченного посещения
-        private void ProcessLimitedVisit(string cardNumber, int remainingVisits)
+        private void ProcessLimitedVisit(string cardNumber, int remainingVisits, string date)
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посещений_осталось = '" + (remainingVisits - 1).ToString() + "', " +
                 "Посетил = '" + DateTime.Now + "' " +
-                "WHERE №Карты = @cardNumber",
+                "WHERE №Карты = @cardNumber " +
+                "AND Дата_окончания = @endDate",
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@endDate", date));
 
             if (!userStatus.ContainsKey(cardNumber))
             {
@@ -925,22 +978,27 @@ namespace GymApplicationV2._0
                        Дата_окончания AS 'Дата окончания', 
                        Посещений_осталось AS 'Посещений осталось' 
                 FROM Issued 
-                WHERE №Карты = @cardNumber";
+                WHERE №Карты = @cardNumber
+                ORDER BY date(Дата_окончания) ASC
+                LIMIT 1";
 
             dataGridViewClient.DataSource = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
         }
 
-        private IssuedMembershipContext.IssuedInfo GetIssuedInfo(string cardNumber)
+        private IssuedMembershipContext.IssuedInfo GetIssuedInfo(string cardNumber, string date)
         {
             string clientQuery = @"
                 SELECT Клиент, Абонемент, Дата_окончания, Посещений_осталось 
                 FROM Issued 
-                WHERE №Карты = @cardNumber";
+                WHERE №Карты = @cardNumber 
+                AND Дата_окончания = @endDate";
 
+            // Почему-то result null даже когда есть данные в таблице
             var result = IssuedMembershipContext.GetIssuedData(clientQuery,
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", cardNumber),
+                new SQLiteParameter("@endDate", date));
 
             string priceQuery = "SELECT Цена FROM Descriptions WHERE Абонемент = @membership";
             object price = GeneralContext.GetElementFromDatabase(priceQuery,

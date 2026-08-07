@@ -74,11 +74,11 @@ namespace GymApplicationV2._0
             _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 ClientsContext.ConnectionStringClients());
 
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
 
             dataGridViewClients.DataSource = _currentDataTable;
 
-            GeneralContext.FormatData(dataGridViewClients);
+            //GeneralContext.FormatData(dataGridViewClients);
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)

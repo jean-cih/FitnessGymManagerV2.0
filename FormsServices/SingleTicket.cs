@@ -73,9 +73,9 @@ namespace GymApplicationV2._0
                 " FROM Contacts",
                 ClientsContext.ConnectionStringClients());
 
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
             dataGridViewClients.DataSource = _currentDataTable;
-            GeneralContext.FormatData(dataGridViewClients);
+            //GeneralContext.FormatData(dataGridViewClients);
         }
 
         private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -166,7 +166,7 @@ namespace GymApplicationV2._0
                 cmd.Parameters.AddWithValue("@Дата_начала", string.Empty);
                 cmd.Parameters.AddWithValue("@Дата_окончания", string.Empty);
                 cmd.Parameters.AddWithValue("@Цена", SingleTicketPrice);
-                cmd.Parameters.AddWithValue("@Дата_платежа", DateTime.Now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_платежа", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 conn.Open();
                 cmd.ExecuteNonQuery();

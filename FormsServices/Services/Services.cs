@@ -108,11 +108,6 @@ namespace GymApplicationV2._0
             {
                 DialogResult result = MessageHelper.MessageWindowYesNo("У клиента уже есть абонемент\nПродать еще один?");
                 if(result != DialogResult.Yes) return;
-
-                // 1. Найти срок окончания самого раннего абонемента, если их уже несколько
-                // 2. Сделать следующий день началом следующего абонемента, а конец просто начало плюс срок абонемента
-                // 3. Добавить абонемент в выданные абонементы
-                return;
             }
 
             UpdateClientDataCard(NumberCard);
@@ -132,24 +127,25 @@ namespace GymApplicationV2._0
                 ClientsContext.ConnectionStringClients(), new SQLiteParameter("@CardNumber", numberCard));
         }
 
-        private void ProcessServiceSale()
+        private void UpdateClientData()
         {
-            var (quantityLeft, clientPurchases) = GetClientAndServiceData();
-            var visitDate = checkBoxVisited.Checked ? DateTime.Now.ToString() : string.Empty;
+            int clientPurchases = GetClientPurchases();
 
-            UpdateClientData(clientPurchases);
-            UpdateServiceStatistics();
-            AddPaymentHistory();
-            AddIssuedMembership();
-
-            MessageHelper.MessageWindowOk("Данные клиента обновлены");
+            GeneralContext.CommandDataFromDatabase($@"
+                UPDATE Contacts SET 
+                Покупки = '{clientPurchases + _servicesCost}'
+                WHERE №Карты = '{NumberCard}'",
+                ClientsContext.ConnectionStringClients());
         }
 
-        private (int? quantityLeft, int clientPurchases) GetClientAndServiceData()
+        private void ProcessServiceSale()
         {
-            var quantityLeft = GetServiceQuantityLeft();
-            var clientPurchases = GetClientPurchases();
-            return (quantityLeft, clientPurchases);
+            UpdateClientData();
+            UpdateServiceStatistics();
+            AddIssuedMembership();
+            AddPaymentHistory();
+
+            MessageHelper.MessageWindowOk("Данные клиента обновлены");
         }
 
         private int? GetServiceQuantityLeft()
@@ -171,18 +167,6 @@ namespace GymApplicationV2._0
                 ClientsContext.ConnectionStringClients());
 
             return purchase == null ? Convert.ToInt32(purchase) : 0;
-        }
-
-        private void UpdateClientData(int clientPurchases)
-        {
-            var now = DateTime.Now;
-            var endDate = now.AddMonths(Convert.ToInt32(_termMembership));
-
-            GeneralContext.CommandDataFromDatabase($@"
-                UPDATE Contacts SET 
-                Покупки = '{clientPurchases + _servicesCost}'
-                WHERE №Карты = '{NumberCard}'",
-                ClientsContext.ConnectionStringClients());
         }
 
         private void UpdateServiceStatistics()
@@ -220,10 +204,10 @@ namespace GymApplicationV2._0
             {
                 cmd.Parameters.AddWithValue("@Клиент", clientName);
                 cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
-                cmd.Parameters.AddWithValue("@Дата_начала", now.ToShortDateString());
-                cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_начала", now.ToString("yyyy-MM-dd"));
+                cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Цена", _servicesCost);
-                cmd.Parameters.AddWithValue("@Дата_платежа", now.ToShortDateString());
+                cmd.Parameters.AddWithValue("@Дата_платежа", now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -237,32 +221,68 @@ namespace GymApplicationV2._0
                 ClientsContext.ConnectionStringClients())?.ToString() ?? string.Empty;
 
             var now = DateTime.Now;
-            var endDate = now.AddMonths(Convert.ToInt32(_termMembership));
             var clientName = $"{labelName.Text} {fatherName}";
             var quantityLeft = GetServiceQuantityLeft();
+            var termMonths = Convert.ToInt32(_termMembership);
+
+            DateTime endDate;
 
             using (var conn = new SQLiteConnection(IssuedMembershipContext.ConnectionStringIssued()))
-            using (var cmd = new SQLiteCommand(
-                @"INSERT INTO Issued (
-                    [Клиент],[№Карты],[Дата_окончания],[Дата_оформления],
-                    [Абонемент],[Оплата],[Статус],[Посещений_осталось],[Окончание_заморозки]
-                ) VALUES (
-                    @Клиент,@№Карты,@Дата_окончания,@Дата_оформления,
-                    @Абонемент,@Оплата,@Статус,@Посещений_осталось,@Окончание_заморозки
-                )", conn))
             {
-                cmd.Parameters.AddWithValue("@Клиент", clientName);
-                cmd.Parameters.AddWithValue("@№Карты", NumberCard);
-                cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToShortDateString());
-                cmd.Parameters.AddWithValue("@Дата_оформления", now.ToShortDateString());
-                cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
-                cmd.Parameters.AddWithValue("@Оплата", _servicesCost);
-                cmd.Parameters.AddWithValue("@Статус", "активирован");
-                cmd.Parameters.AddWithValue("@Посещений_осталось", quantityLeft?.ToString() ?? string.Empty);
-                cmd.Parameters.AddWithValue("@Окончание_заморозки", string.Empty);
-
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                // Проверяем последний абонемент
+                using (var checkCmd = new SQLiteCommand(
+                    @"SELECT Дата_окончания FROM Issued 
+              WHERE №Карты = @№Карты 
+              ORDER BY Дата_окончания DESC LIMIT 1", conn))
+                {
+                    checkCmd.Parameters.AddWithValue("@№Карты", NumberCard);
+
+                    var lastEndDateStr = checkCmd.ExecuteScalar()?.ToString();
+
+                    if (!string.IsNullOrEmpty(lastEndDateStr) && DateTime.TryParse(lastEndDateStr, out DateTime lastEndDate))
+                    {
+                        if (lastEndDate.Date >= now.Date)
+                        {
+                            endDate = lastEndDate.Date.AddDays(1).AddMonths(termMonths);
+                        }
+                        else
+                        {
+                            endDate = now.Date.AddMonths(termMonths);
+                        }
+                    }
+                    else
+                    {
+                        endDate = now.Date.AddMonths(termMonths);
+                    }
+                }
+
+                var visitDate = checkBoxVisited.Checked ? DateTime.Now.ToString() : string.Empty;
+
+                // Вставляем новую запись
+                using (var cmd = new SQLiteCommand(
+                    @"INSERT INTO Issued (
+                [Клиент],[№Карты],[Дата_окончания],[Дата_оформления],
+                [Абонемент],[Посетил],[Оплата],[Статус],[Посещений_осталось],[Окончание_заморозки]
+            ) VALUES (
+                @Клиент,@№Карты,@Дата_окончания,@Дата_оформления,
+                @Абонемент,@Посетил,@Оплата,@Статус,@Посещений_осталось,@Окончание_заморозки
+            )", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Клиент", clientName);
+                    cmd.Parameters.AddWithValue("@№Карты", NumberCard);
+                    cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToString("yyyy-MM-dd"));
+                    cmd.Parameters.AddWithValue("@Дата_оформления", now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
+                    cmd.Parameters.AddWithValue("@Посетил", visitDate);
+                    cmd.Parameters.AddWithValue("@Оплата", _servicesCost);
+                    cmd.Parameters.AddWithValue("@Статус", "активирован");
+                    cmd.Parameters.AddWithValue("@Посещений_осталось", quantityLeft?.ToString() ?? string.Empty);
+                    cmd.Parameters.AddWithValue("@Окончание_заморозки", string.Empty);
+
+                    cmd.ExecuteNonQuery();
+                }
             }
         }
 

@@ -15,7 +15,7 @@ namespace GymApplicationV2._0
         public bool periodForMonth;
         public bool periodForWeek;
         public bool periodForDay;
-        public bool otherPeriond;
+        public bool otherPeriod;
 
 
         public DateTime dateBegin;
@@ -67,7 +67,7 @@ namespace GymApplicationV2._0
                 startDate = new DateTime(today.Year, today.Month, 1);
                 DateTime endDate = today.AddDays(1).AddSeconds(-1);
 
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForWeek)
@@ -79,19 +79,22 @@ namespace GymApplicationV2._0
                 startDate = today.AddDays(-daysOffset);
                 DateTime endDate = today.AddDays(1).AddSeconds(-1);
 
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForDay)
             {
                 startDate = DateTime.Now.Date;
                 DateTime endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения за {startDate.ToShortDateString()}";
             }
-            else if (otherPeriond)
+            else if (otherPeriod)
             {
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{dateBegin}' AND '{dateEnd}' ORDER BY Посетил";
+                // Для произвольного периода
+                DateTime beginDate = dateBegin.Date;
+                DateTime endDate = dateEnd.Date.AddDays(1).AddSeconds(-1); // Конец дня
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{beginDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {dateBegin.ToShortDateString()} по {dateEnd.ToShortDateString()}";
             }
 

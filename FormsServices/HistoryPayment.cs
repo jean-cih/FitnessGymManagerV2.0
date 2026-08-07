@@ -44,9 +44,9 @@ namespace GymApplicationV2._0
 
             var _currentDataTable = GeneralContext.GetDataFromDatabase(BaseQuery,
     HistoryPaymentContext.ConnectionStringPayment());
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
             dataGridViewHistory.DataSource = _currentDataTable;
-            GeneralContext.FormatData(dataGridViewHistory);
+            //GeneralContext.FormatData(dataGridViewHistory);
 
             this.Location = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - this.Width / 2,
                 Screen.PrimaryScreen.Bounds.Height / 2 - this.Height / 2);
@@ -68,11 +68,11 @@ namespace GymApplicationV2._0
                 HistoryPaymentContext.ConnectionStringPayment());
             radioOtherPeriod.Checked = true;
 
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
 
             dataGridViewHistory.DataSource = _currentDataTable;
 
-            GeneralContext.FormatData(dataGridViewHistory);
+            //GeneralContext.FormatData(dataGridViewHistory);
         }
 
         private void LoadHistoryData()
@@ -84,25 +84,27 @@ namespace GymApplicationV2._0
             if (radioForMonth.Checked)
             {
                 var beginMonth = new DateTime(now.Year, now.Month, 1);
-                filter = $"WHERE Дата_платежа BETWEEN '{beginMonth}' AND '{now}' ORDER BY Дата_платежа";
-                countFilter = $"WHERE Дата_платежа BETWEEN '{beginMonth}' AND '{now}'";
+                filter = $"WHERE Дата_платежа BETWEEN '{beginMonth:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}' ORDER BY Дата_платежа";
+                countFilter = $"WHERE Дата_платежа BETWEEN '{beginMonth:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}'";
             }
             else if (radioForWeek.Checked)
             {
                 var startLastWeek = now.AddDays(-(int)now.DayOfWeek + 1);
-                filter = $"WHERE Дата_платежа BETWEEN '{startLastWeek}' AND '{now}' ORDER BY Дата_платежа";
-                countFilter = $"WHERE Дата_платежа BETWEEN '{startLastWeek}' AND '{now}'";
+                filter = $"WHERE Дата_платежа BETWEEN '{startLastWeek:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}' ORDER BY Дата_платежа";
+                countFilter = $"WHERE Дата_платежа BETWEEN '{startLastWeek:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}'";
             }
             else if (radioForDay.Checked)
             {
                 var startDay = new DateTime(now.Year, now.Month, now.Day);
-                filter = $"WHERE Дата_платежа BETWEEN '{startDay}' AND '{now}' ORDER BY Дата_платежа";
-                countFilter = $"WHERE Дата_платежа BETWEEN '{startDay}' AND '{now}'";
+                filter = $"WHERE Дата_платежа BETWEEN '{startDay:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}' ORDER BY Дата_платежа";
+                countFilter = $"WHERE Дата_платежа BETWEEN '{startDay:yyyy-MM-dd HH:mm:ss}' AND '{now:yyyy-MM-dd HH:mm:ss}'";
             }
             else if (radioOtherPeriod.Checked)
             {
-                filter = $"WHERE Дата_платежа BETWEEN '{jeanDateTimePickerBegin.Value.ToShortDateString()}' AND '{jeanDateTimePickerEnd.Value.ToShortDateString()}' ORDER BY Дата_платежа";
-                countFilter = $"WHERE Дата_платежа BETWEEN '{jeanDateTimePickerBegin.Value.ToShortDateString()}' AND '{jeanDateTimePickerEnd.Value.ToShortDateString()}'";
+                var beginDate = jeanDateTimePickerBegin.Value;
+                var endDate = jeanDateTimePickerEnd.Value;
+                filter = $"WHERE Дата_платежа BETWEEN '{beginDate:yyyy-MM-dd}' AND '{endDate:yyyy-MM-dd}' ORDER BY Дата_платежа";
+                countFilter = $"WHERE Дата_платежа BETWEEN '{beginDate:yyyy-MM-dd}' AND '{endDate:yyyy-MM-dd}'";
             }
 
             var dataQuery = string.IsNullOrEmpty(filter) ? BaseQuery : $"{BaseQuery} {filter}";
@@ -110,12 +112,12 @@ namespace GymApplicationV2._0
 
             var _currentDataTable = GeneralContext.GetDataFromDatabase(dataQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
             dataGridViewHistory.DataSource = _currentDataTable;
-            GeneralContext.FormatData(dataGridViewHistory);
+            //GeneralContext.FormatData(dataGridViewHistory);
 
-            labelPayments.Text = $"Платежей{(string.IsNullOrEmpty(countFilter) ? " за все время" : " за период")}: " + GeneralContext.GetElementFromDatabase(countQuery,
-                HistoryPaymentContext.ConnectionStringPayment());
+            labelPayments.Text = $"Платежей{(string.IsNullOrEmpty(countFilter) ? " за все время" : " за период")}: " +
+                GeneralContext.GetElementFromDatabase(countQuery, HistoryPaymentContext.ConnectionStringPayment());
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
@@ -125,9 +127,9 @@ namespace GymApplicationV2._0
                 jeanModernButtonErase.Visible = false;
                 var _currentDataTableBase = GeneralContext.GetDataFromDatabase(BaseQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
-                GeneralContext.FormatDateColumns(_currentDataTableBase);
+                //GeneralContext.FormatDateColumns(_currentDataTableBase);
                 dataGridViewHistory.DataSource = _currentDataTableBase;
-                GeneralContext.FormatData(dataGridViewHistory);
+                //GeneralContext.FormatData(dataGridViewHistory);
                 return;
             }
 
@@ -135,9 +137,9 @@ namespace GymApplicationV2._0
             var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
             var _currentDataTable = GeneralContext.GetDataFromDatabase(searchQuery,
                 HistoryPaymentContext.ConnectionStringPayment());
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
             dataGridViewHistory.DataSource = _currentDataTable;
-            GeneralContext.FormatData(dataGridViewHistory);
+            //GeneralContext.FormatData(dataGridViewHistory);
         }
 
         private string BuildSearchQuery(string searchText)

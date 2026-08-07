@@ -113,11 +113,11 @@ namespace GymApplicationV2._0
             _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
 
-            GeneralContext.FormatDateColumns(_currentDataTable);
+            //GeneralContext.FormatDateColumns(_currentDataTable);
 
             dataGridViewIssued.DataSource = _currentDataTable;
 
-            GeneralContext.FormatData(dataGridViewIssued);
+            //GeneralContext.FormatData(dataGridViewIssued);
         }
         private void jeanModernButtonRefresh_Click(object sender, EventArgs e) =>
             RefreshDataGrid();
@@ -200,11 +200,11 @@ namespace GymApplicationV2._0
             var row = dataGridViewIssued.SelectedRows[0];
             _client = row.Cells[0].Value.ToString();
             _numberCard = row.Cells[1].Value.ToString();
-            _dateOver = row.Cells[6].Value.ToString();
-            _membership = row.Cells[2].Value.ToString();
-            _cost = row.Cells[3].Value.ToString();
-            _status = row.Cells[4].Value.ToString();
-            _visits = row.Cells[5].Value.ToString();
+            _dateOver = row.Cells[2].Value.ToString();
+            _membership = row.Cells[4].Value.ToString();
+            _cost = row.Cells[6].Value.ToString();
+            _status = row.Cells[7].Value.ToString();
+            _visits = row.Cells[8].Value.ToString();
 
             card.Text = _numberCard;
             nameClient.Text = _client;
@@ -212,7 +212,11 @@ namespace GymApplicationV2._0
 
         private void ShowFreezeDialog()
         {
-            if (!ValidateCardNumber()) return;
+            if (_numberCard == "") 
+            {
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
+                return; 
+            }
 
             using (var freezeDialog = new FreezeMembership())
             {
@@ -230,7 +234,11 @@ namespace GymApplicationV2._0
 
         private void ShowChangeDialog()
         {
-            if (!ValidateCardNumber()) return;
+            if (_numberCard == "")
+            {
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
+                return;
+            }
 
             using (var changeDialog = new ChangeIssuedMembership())
             {
@@ -247,17 +255,6 @@ namespace GymApplicationV2._0
                     RefreshDataGrid();
                 }
             }
-        }
-
-        private bool ValidateCardNumber()
-        {
-            var isValid = new Regex(@"^\d{13}$").IsMatch(_numberCard);
-
-            if (!isValid)
-
-                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
-
-            return isValid;
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.Helpers;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
+using System.Data.SQLite;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace GymApplicationV2._0.FormsServices
@@ -182,10 +184,10 @@ namespace GymApplicationV2._0.FormsServices
 
             // Кнопки
             btnCancel = CreateStyledButton("Отмена", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(120, 320), new Size(120, 40));
-            btnSave = CreateStyledButton("Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
+            btnSave = CreateStyledButton("Заморозить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
 
-            btnSave.Click += BtnSave_Click;
             btnCancel.Click += BtnCancel_Click;
+            btnSave.Click += BtnFreeze_Click;
 
             // Добавляем все элементы на главную панель
             this.Controls.AddRange(new Control[]
@@ -304,43 +306,76 @@ namespace GymApplicationV2._0.FormsServices
             return button;
         }
 
-        private void BtnSave_Click(object sender, EventArgs e)
+        private void BtnFreeze_Click(object sender, EventArgs e)
         {
-            if (ValidateForm())
+            if (!ValidateForm()) return;
+
+            try
             {
-                try
+                // Парсим дату окончания заморозки
+                if (!DateTime.TryParseExact(txtFreezeDate.Text, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime freezeDate))
                 {
-                    DateTime freezeDate = DateTime.ParseExact(txtFreezeDate.Text, "dd.MM.yy", null);
-                    string reason = cmbFreezeReason.SelectedItem.ToString().Substring(2);
-                    int days = (int)numFreezeDays.Value;
+                    MessageBox.Show("❌ Неверный формат даты! Используйте ДД.ММ.ГГ", "Ошибка",
+                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
 
-                    var updateQuery = $@"UPDATE Issued SET 
-                               Статус = 'заморожен',
-                               Дата_окончания = '{Convert.ToDateTime(_dateOver).AddDays(days).ToShortDateString()}',
-                               Окончание_заморозки = '{freezeDate.AddDays(days).ToShortDateString()}'
-                               WHERE №Карты = '{txtCardNumber.Text}'";
+                string reason = cmbFreezeReason.SelectedItem.ToString().Substring(2);
+                int days = (int)numFreezeDays.Value;
 
-                    GeneralContext.CommandDataFromDatabase(updateQuery,
-                IssuedMembershipContext.ConnectionStringIssued());
+                // Рассчитываем новую дату окончания
+                DateTime newFreezeEndDate = freezeDate.AddDays(days);
 
-                    MessageBox.Show($"✅ Абонемент успешно заморожен!\n\n" +
-                                  $"👤 Клиент: {txtClientName.Text}\n" +
-                                  $"📅 Дата: {freezeDate:dd.MM.yyyy}\n" +
-                                  $"⏰ Срок: {days} дней\n" +
-                                  $"📋 Причина: {reason}",
-                                  "Успешно",
-                                  MessageBoxButtons.OK,
-                                  MessageBoxIcon.Information);
+                // Используем параметризованный запрос
+                using (var conn = new SQLiteConnection(IssuedMembershipContext.ConnectionStringIssued()))
+                {
+                    conn.Open();
 
-                    
+                    using (var cmd = new SQLiteCommand(
+                        @"UPDATE Issued SET 
+                        Статус = @status,
+                        Дата_окончания = date(Дата_окончания, '+' || @days || ' days'),
+                        Окончание_заморозки = @freezeEndDate
+                    WHERE №Карты = @cardNumber 
+                        AND Дата_окончания IS NOT NULL
+                        AND Дата_окончания != ''", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@status", "заморожен");
+                        cmd.Parameters.AddWithValue("@days", days);
+                        cmd.Parameters.AddWithValue("@freezeEndDate", newFreezeEndDate.ToString("yyyy-MM-dd"));
+                        cmd.Parameters.AddWithValue("@cardNumber", txtCardNumber.Text);
+                        cmd.Parameters.AddWithValue("@oldEndDate", _dateOver);
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+
+                        if (rowsAffected == 0)
+                        {
+                            MessageBox.Show("❌ Абонемент не найден!", "Ошибка",
+                                          MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                    }
+                }
+
+                // Показываем сообщение об успехе
+                MessageBox.Show($"✅ Абонемент успешно заморожен!\n\n" +
+                                   $"👤 Клиент: {txtClientName.Text}\n" +
+                                   $"📅 Дата заморозки: {freezeDate:dd.MM.yyyy}\n" +
+                                   $"⏰ Срок: {days} дней\n" +
+                                   $"📋 Причина: {reason}",
+                                   "Успешно",
+                                   MessageBoxButtons.OK,
+                                   MessageBoxIcon.Information);
+
                     this.DialogResult = DialogResult.OK;
                     this.Close();
-                }
-                catch (FormatException)
-                {
-                    MessageBox.Show("❌ Неверный формат даты!", "Ошибка",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Ошибка при заморозке абонемента:\n{ex.Message}",
+                               "Ошибка",
+                               MessageBoxButtons.OK,
+                               MessageBoxIcon.Error);
             }
         }
 
