@@ -135,8 +135,7 @@ namespace GymApplicationV2._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при открытии клиента: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk($"Ошибка при открытии клиента: {ex.Message}", "Ошибка");
             }
         }
 
@@ -364,7 +363,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                MessageHelper.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран", "Предупреждение");
                 return;
             }
 
@@ -375,7 +374,7 @@ namespace GymApplicationV2._0
 
             if (fullName.Length < 2)
             {
-                MessageBox.Show("Введите имя и фамилию");
+                MessageHelper.MessageWindowOk("Введите имя и фамилию", "Предупреждение");
                 return;
             }
 
@@ -414,7 +413,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
 
-            MessageHelper.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены", "Сообщение");
             RefreshDataAndClearFields();
             jeanTextBoxClient.Text = "";
         }
@@ -423,7 +422,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(jeanTextBoxClient.Text))
             {
-                MessageHelper.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран", "Предупреждение");
                 return;
             }
 
@@ -450,7 +449,7 @@ namespace GymApplicationV2._0
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
                 ClientsContext.ConnectionStringClients(), parameters);
-            MessageHelper.MessageWindowOk("Клиент удален");
+            MessageHelper.MessageWindowOk("Клиент удален", "Сообщение");
             RefreshDataAndClearFields();
         }
 

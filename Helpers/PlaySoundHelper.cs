@@ -44,8 +44,7 @@ namespace GymApplicationV2._0.Helpers
                 catch (Exception ex)
                 {
                     typeSound.Play();
-                    MessageBox.Show($"Не удалось воспроизвести звук: {ex.Message}", "Ошибка",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageHelper.MessageWindowOk($"Не удалось воспроизвести звук: {ex.Message}", "Ошибка");
                     StopSound();
                 }
             }

@@ -99,7 +99,7 @@ namespace GymApplicationV2._0
 
             if (_clientId == "")
             {
-                MessageHelper.MessageWindowOk("Выберите клиента");
+                MessageHelper.MessageWindowOk("Выберите клиента", "Предупреждение");
                 return;
             }
 
@@ -112,7 +112,7 @@ namespace GymApplicationV2._0
             {
                 UpdateClientRecord();
                 AddPaymentHistory();
-                MessageHelper.MessageWindowOk("Разовое посещение продано");
+                MessageHelper.MessageWindowOk("Разовое посещение продано", "Сообщение");
             }
         }
 
@@ -123,7 +123,7 @@ namespace GymApplicationV2._0
 
             if (_membershipId != DBNull.Value && DateTime.Now < Convert.ToDateTime(_membershipId))
             {
-                MessageHelper.MessageWindowOk("У клиента еще действителен абонемент");
+                MessageHelper.MessageWindowOk("У клиента еще действителен абонемент", "Предупреждение");
                 return false;
             }
 

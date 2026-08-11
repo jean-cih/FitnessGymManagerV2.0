@@ -92,11 +92,9 @@ namespace GymApplicationV2._0.FormsServices
         private void StyleTextBox(JeanTextBox textBox)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
         private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
@@ -150,11 +148,10 @@ namespace GymApplicationV2._0.FormsServices
 
             var query = $@"UPDATE Archive SET 
                         Клиент = '{jeanTextBoxClient.Text}',
-                        Дата_окончания = '{jeanTextBoxTerm.Text}',
                         Абонемент = '{jeanTextBoxMembership.Text}',
                         Оплата = '{jeanTextBoxCost.Text}',
                         Посещений_осталось = '{jeanTextBoxVisits.Text}'
-                        WHERE №Карты = '{jeanTextBoxCard.Text}';";
+                        WHERE №Карты = '{jeanTextBoxCard.Text}'  AND Дата_окончания = '{jeanTextBoxTerm.Text}';";
 
             GeneralContext.CommandDataFromDatabase(query,
                 ArchiveServicesContext.ConnectionStringArchive());
@@ -168,7 +165,7 @@ namespace GymApplicationV2._0.FormsServices
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                MessageHelper.MessageWindowOk("Данные в архиве обновлены");
+                MessageHelper.MessageWindowOk("Данные в архиве обновлены", "Сообщение");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

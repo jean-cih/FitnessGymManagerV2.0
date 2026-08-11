@@ -177,7 +177,7 @@ namespace GymApplicationV2._0
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                MessageHelper.MessageWindowOk("Услуга успешно добавлена");
+                MessageHelper.MessageWindowOk("Услуга успешно добавлена", "Сообщение");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();
@@ -215,7 +215,7 @@ namespace GymApplicationV2._0
 
             if (!isValid)
             {
-                MessageHelper.MessageWindowOk("Проверьте правильность заполнения полей");
+                MessageHelper.MessageWindowOk("Проверьте правильность заполнения полей", "Предупреждение");
                 return false;
             }
 
@@ -223,7 +223,7 @@ namespace GymApplicationV2._0
                 jeanTextBoxPrice.Text.Length > 20 ||
                 (!string.IsNullOrEmpty(jeanTextBoxVisited.Text) && jeanTextBoxVisited.Text.Length > 20))
             {
-                MessageHelper.MessageWindowOk("Превышен лимит количества символов");
+                MessageHelper.MessageWindowOk("Превышен лимит количества символов", "Предупреждение");
                 return false;
             }
 

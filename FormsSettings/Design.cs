@@ -444,8 +444,7 @@ namespace GymApplicationV2._0.FormsSettings
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Выбранный файл не является корректным аудио файлом: {ex.Message}",
-                                "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageHelper.MessageWindowOk($"Выбранный файл не является корректным аудио файлом: {ex.Message}", "Ошибка");
                         }
                     }
                 }
@@ -457,8 +456,7 @@ namespace GymApplicationV2._0.FormsSettings
             Properties.Settings.Default.ErrorSoundPath = selectedFile;
             Properties.Settings.Default.Save();
 
-            MessageBox.Show("Звук ошибки успешно установлен!", "Успех",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageHelper.MessageWindowOk("Звук ошибки успешно установлен!", "Успех");
 
             var errorSound = new PlaySoundHelper(false);
             errorSound.PlaySound();
@@ -471,8 +469,7 @@ namespace GymApplicationV2._0.FormsSettings
             Properties.Settings.Default.SuccessSoundPath = selectedFile;
             Properties.Settings.Default.Save();
 
-            MessageBox.Show("Звук выполнения успешно установлен!", "Успех",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageHelper.MessageWindowOk("Звук выполнения успешно установлен!", "Успех");
 
             var successSound = new PlaySoundHelper();
             successSound.PlaySound();
@@ -659,8 +656,7 @@ namespace GymApplicationV2._0.FormsSettings
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка сохранения настроек: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk($"Ошибка сохранения настроек: {ex.Message}", "Ошибка");
             }
         }
 

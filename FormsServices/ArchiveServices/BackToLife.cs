@@ -1,10 +1,11 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.Helpers;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -23,8 +24,11 @@ namespace GymApplicationV2._0.FormsServices
                 "⚡ ВОЗВРАТ ИЗ АРХИВА"
             };
 
+        string pastTerm = null;
+
         public BackToLife()
         {
+
             InitializeComponent();
             InitializeCustomDesign();
 
@@ -37,6 +41,8 @@ namespace GymApplicationV2._0.FormsServices
             FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
             this.EnableDrag(this);
+
+            pastTerm = jeanTextBoxTerm.Text;
         }
 
         private void InitializeCustomDesign()
@@ -90,11 +96,9 @@ namespace GymApplicationV2._0.FormsServices
         private void StyleTextBox(JeanTextBox textBox)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
         private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
@@ -146,27 +150,49 @@ namespace GymApplicationV2._0.FormsServices
             if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите восстановить абонемент?") != DialogResult.Yes)
                 return;
 
-            string updateQuery = @"
-                UPDATE Contacts SET 
-                    Абонемент = @membership, 
-                    Срок_абонемента = @term, 
-                    Посещений_осталось = @visits 
-                WHERE №Карты = @cardNumber;";
+            string insertQuery = @"
+                INSERT INTO Issued (
+                    Клиент,
+                    №Карты,
+                    Дата_окончания,
+                    Дата_оформления,
+                    Абонемент,
+                    Посетил,
+                    Статус,
+                    Посещений_осталось,
+                    Окончание_заморозки
+                ) VALUES (
+                    @client,
+                    @cardNumber,
+                    @endDate,
+                    @registrationDate,
+                    @membership,
+                    @visited,
+                    @status,
+                    @visitsLeft,
+                    @freezeEnd
+                )";
 
-            GeneralContext.CommandDataFromDatabase(updateQuery,
-                ArchiveServicesContext.ConnectionStringArchive(),
+            GeneralContext.CommandDataFromDatabase(insertQuery,
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@client", labelNameClient.Text),
+                new SQLiteParameter("@cardNumber", labelNubmerCard.Text),
+                new SQLiteParameter("@endDate", jeanTextBoxTerm.Text),
+                new SQLiteParameter("@registrationDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
                 new SQLiteParameter("@membership", jeanTextBoxMembership.Text),
-                new SQLiteParameter("@term", jeanTextBoxTerm.Text),
-                new SQLiteParameter("@visits", jeanTextBoxVisits.Text),
-                new SQLiteParameter("@cardNumber", labelNubmerCard.Text));
+                new SQLiteParameter("@visited", string.Empty),
+                new SQLiteParameter("@status", "активирован"),
+                new SQLiteParameter("@visitsLeft", jeanTextBoxVisits.Text),
+                new SQLiteParameter("@freezeEnd", string.Empty));
 
-            string deleteQuery = "DELETE FROM Archive WHERE №Карты = @cardNumber;";
+            string deleteQuery = "DELETE FROM Archive WHERE №Карты = @cardNumber AND Дата_окончания = @pastEndDate;";
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
                 ArchiveServicesContext.ConnectionStringArchive(),
-                new SQLiteParameter("@cardNumber", labelNubmerCard.Text));
+                new SQLiteParameter("@cardNumber", labelNubmerCard.Text),
+                new SQLiteParameter("@pastEndDate", pastTerm));
 
-            MessageHelper.MessageWindowOk("Абонемент восстановлен");
+            MessageHelper.MessageWindowOk("Абонемент восстановлен", "Сообщение");
 
             _fadeAnimation.CloseWithAnimation();
         }

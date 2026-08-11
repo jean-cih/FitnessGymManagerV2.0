@@ -363,8 +363,7 @@ namespace GymApplicationV2._0.FormsSettings
         {
             if (string.IsNullOrEmpty(_selectedFilePath))
             {
-                ShowMessage("⚠️ Файл не выбран", "Пожалуйста, выберите файл для импорта",
-                    MessageBoxIcon.Warning);
+                MessageHelper.MessageWindowOk("⚠️ Файл не выбран\nПожалуйста, выберите файл для импорта", "Предупреждение");
                 return;
             }
 
@@ -385,9 +384,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             if (fileExists)
             {
-                var result = ShowMessageYesNo("⚠️ База данных уже существует",
-                    $"База данных '{fileName}.db' уже существует. Хотите удалить её и импортировать заново?",
-                    MessageBoxIcon.Warning);
+                var result = MessageHelper.MessageWindowYesNo($"⚠️ База данных уже существует\nБаза данных '{fileName}.db' уже существует. Хотите удалить её и импортировать заново?");
 
                 if (result == DialogResult.Yes)
                 {
@@ -400,9 +397,7 @@ namespace GymApplicationV2._0.FormsSettings
                     }
                     catch (Exception ex)
                     {
-                        ShowMessage("❌ Ошибка удаления",
-                            $"Не удалось удалить базу данных: {ex.Message}",
-                            MessageBoxIcon.Error);
+                        MessageHelper.MessageWindowOk($"❌ Ошибка удаления\nНе удалось удалить базу данных: {ex.Message}", "Ошибка");
                         return false;
                     }
                 }
@@ -414,12 +409,6 @@ namespace GymApplicationV2._0.FormsSettings
             }
 
             return true;
-        }
-
-
-        private DialogResult ShowMessageYesNo(string title, string message, MessageBoxIcon icon)
-        {
-            return MessageBox.Show(message, title, MessageBoxButtons.YesNo, icon);
         }
 
         private async Task ImportDataAsync()
@@ -438,15 +427,13 @@ namespace GymApplicationV2._0.FormsSettings
 
                     await Task.Run(() => ImportExcelData(progress));
 
-                    ShowMessage("✅ Импорт завершен", "Данные успешно импортированы в базу данных!",
-                        MessageBoxIcon.Information);
+                    MessageHelper.MessageWindowOk("✅ Импорт завершен\nДанные успешно импортированы в базу данных!", "Успех");
 
                     ResetForm();
                 }
                 catch (Exception ex)
                 {
-                    ShowMessage("❌ Ошибка импорта", $"Произошла ошибка: {ex.Message}",
-                        MessageBoxIcon.Error);
+                    MessageHelper.MessageWindowOk($"❌ Ошибка импорта\nПроизошла ошибка: {ex.Message}", "Ошибка");
                 }
                 finally
                 {
@@ -550,8 +537,7 @@ namespace GymApplicationV2._0.FormsSettings
                 }
                 else
                 {
-                    ShowMessage("⚠️ Неверный формат", "Пожалуйста, выберите Excel файл",
-                        MessageBoxIcon.Warning);
+                    MessageHelper.MessageWindowOk("⚠️ Неверный формат\nПожалуйста, выберите Excel файл", "Ошибка");
                 }
             }
             dropZonePanel.BackColor = Color.FromArgb(65, 65, 68);
@@ -561,11 +547,6 @@ namespace GymApplicationV2._0.FormsSettings
         {
             var ext = Path.GetExtension(filePath).ToLower();
             return ext == ".xls" || ext == ".xlsx" || ext == ".xlsm";
-        }
-
-        private void ShowMessage(string title, string message, MessageBoxIcon icon)
-        {
-            MessageBox.Show(message, title, MessageBoxButtons.OK, icon);
         }
 
         private void ResetForm()

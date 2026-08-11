@@ -34,7 +34,7 @@ namespace GymApplicationV2._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.ToString(), "Ошибка при запуске");
+                MessageHelper.MessageWindowOk(ex.ToString() + " Ошибка при запуске", "Ошибка");
             }
         }
 
@@ -80,8 +80,7 @@ namespace GymApplicationV2._0
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки настроек: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk($"Ошибка загрузки настроек: {ex.Message}", "Ошибка");
             }
         }
 
@@ -130,6 +129,9 @@ namespace GymApplicationV2._0
             {
                 Directory.CreateDirectory(appFilesPath);
             }
+
+            Logger.Initialize(appFilesPath);
+            Logger.Info("\n=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО: " + DateTime.Now + " ===\n");
         }
 
         private static void CheckIfConfigExists(LoadingScreen splash)
