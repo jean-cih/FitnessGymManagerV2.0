@@ -8,6 +8,5 @@
         public static int sizeFontText { get; set; }
         public static string styleForm { get; set; }
         public static string styleBackground { get; set; }
-        public static string membershipId { get; set; }
     }
 }

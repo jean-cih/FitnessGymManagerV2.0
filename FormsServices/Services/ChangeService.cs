@@ -13,6 +13,8 @@ namespace GymApplicationV2._0
 {
     public partial class ChangeService : ShadowedForm
     {
+        public string _id = string.Empty;
+
         private FadeAnimation _fadeAnimation;
 
         Panel titlePanel;
@@ -92,11 +94,9 @@ namespace GymApplicationV2._0
         private void StyleTextBox(JeanTextBox textBox, string placeholder)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
         private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
@@ -162,7 +162,7 @@ namespace GymApplicationV2._0
                               Цена = '{jeanTextBoxPrice.Text.Trim()}',
                               Срок_действия = '{jeanTextBoxTerm.Text.Trim()}',
                               Посещений = '{jeanTextBoxVisited.Text.Trim()}'
-                              WHERE Id = '{DataConfig.membershipId}'";
+                              WHERE Id = '{_id}'";
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ServicesContext.ConnectionStringServices());

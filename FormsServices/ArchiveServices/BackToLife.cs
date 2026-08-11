@@ -15,6 +15,10 @@ namespace GymApplicationV2._0.FormsServices
 {
     public partial class BackToLife : ShadowedForm
     {
+        public string _id = string.Empty;
+        public string _numberCard = string.Empty;
+        public string _client = string.Empty;
+
         private FadeAnimation _fadeAnimation;
 
         Panel titlePanel;
@@ -175,8 +179,8 @@ namespace GymApplicationV2._0.FormsServices
 
             GeneralContext.CommandDataFromDatabase(insertQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@client", labelNameClient.Text),
-                new SQLiteParameter("@cardNumber", labelNubmerCard.Text),
+                new SQLiteParameter("@client", _client),
+                new SQLiteParameter("@cardNumber", _numberCard),
                 new SQLiteParameter("@endDate", jeanTextBoxTerm.Text),
                 new SQLiteParameter("@registrationDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
                 new SQLiteParameter("@membership", jeanTextBoxMembership.Text),
@@ -185,12 +189,11 @@ namespace GymApplicationV2._0.FormsServices
                 new SQLiteParameter("@visitsLeft", jeanTextBoxVisits.Text),
                 new SQLiteParameter("@freezeEnd", string.Empty));
 
-            string deleteQuery = "DELETE FROM Archive WHERE №Карты = @cardNumber AND Дата_окончания = @pastEndDate;";
+            string deleteQuery = "DELETE FROM Archive WHERE Id = @id;";
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
                 ArchiveServicesContext.ConnectionStringArchive(),
-                new SQLiteParameter("@cardNumber", labelNubmerCard.Text),
-                new SQLiteParameter("@pastEndDate", pastTerm));
+                new SQLiteParameter("@id", _id));
 
             MessageHelper.MessageWindowOk("Абонемент восстановлен", "Сообщение");
 

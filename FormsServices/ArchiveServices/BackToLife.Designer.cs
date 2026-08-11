@@ -31,8 +31,6 @@ namespace GymApplicationV2._0.FormsServices
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BackToLife));
-            this.labelNameClient = new System.Windows.Forms.Label();
-            this.labelNubmerCard = new System.Windows.Forms.Label();
             this.jeanModernButtonBackToLife = new GymApplicationV2._0.Controls.JeanModernButton();
             this.titleLabel = new System.Windows.Forms.Label();
             this.hintLabel = new System.Windows.Forms.Label();
@@ -40,29 +38,6 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxTerm = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxMembership = new GymApplicationV2._0.JeanTextBox();
             this.SuspendLayout();
-            // 
-            // labelNameClient
-            // 
-            this.labelNameClient.AutoSize = true;
-            this.labelNameClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelNameClient.Location = new System.Drawing.Point(49, 108);
-            this.labelNameClient.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.labelNameClient.Name = "labelNameClient";
-            this.labelNameClient.Size = new System.Drawing.Size(135, 17);
-            this.labelNameClient.TabIndex = 0;
-            this.labelNameClient.Text = "Почекутов Евгений";
-            // 
-            // labelNubmerCard
-            // 
-            this.labelNubmerCard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelNubmerCard.AutoSize = true;
-            this.labelNubmerCard.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.labelNubmerCard.Location = new System.Drawing.Point(212, 108);
-            this.labelNubmerCard.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.labelNubmerCard.Name = "labelNubmerCard";
-            this.labelNubmerCard.Size = new System.Drawing.Size(112, 17);
-            this.labelNubmerCard.TabIndex = 1;
-            this.labelNubmerCard.Text = "2000000012345";
             // 
             // jeanModernButtonBackToLife
             // 
@@ -91,7 +66,6 @@ namespace GymApplicationV2._0.FormsServices
             this.titleLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.titleLabel.BackColor = System.Drawing.Color.Transparent;
-            this.titleLabel.AutoSize = false;
             this.titleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.titleLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(255)))));
             this.titleLabel.Location = new System.Drawing.Point(0, 0);
@@ -106,7 +80,6 @@ namespace GymApplicationV2._0.FormsServices
             // 
             this.hintLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.hintLabel.AutoSize = false;
             this.hintLabel.BackColor = System.Drawing.Color.Transparent;
             this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
             this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
@@ -190,8 +163,6 @@ namespace GymApplicationV2._0.FormsServices
             this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.jeanModernButtonBackToLife);
-            this.Controls.Add(this.labelNubmerCard);
-            this.Controls.Add(this.labelNameClient);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -199,14 +170,10 @@ namespace GymApplicationV2._0.FormsServices
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Возврат из архива";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
-
-        protected internal System.Windows.Forms.Label labelNameClient;
-        protected internal System.Windows.Forms.Label labelNubmerCard;
         private Controls.JeanModernButton jeanModernButtonBackToLife;
         protected internal System.Windows.Forms.Label titleLabel;
         protected internal System.Windows.Forms.Label hintLabel;

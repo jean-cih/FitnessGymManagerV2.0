@@ -12,6 +12,7 @@ namespace GymApplicationV2._0
 {
     public partial class Services : Form
     {
+        private string _id = string.Empty;
         private string _termMembership = string.Empty;
         private string _servicesQuantity = string.Empty;
         private string _servicesCost = string.Empty;
@@ -41,6 +42,7 @@ namespace GymApplicationV2._0
         private void RefreshServicesData()
         {
             dataGridViewServices.DataSource = GeneralContext.GetDataFromDatabase("SELECT" +
+                " Id," +
                 " Абонемент," +
                 " Цена," +
                 " Срок_действия AS 'Срок действия'," +
@@ -48,6 +50,11 @@ namespace GymApplicationV2._0
                 " FROM Descriptions",
                 ServicesContext.ConnectionStringServices()
             );
+
+            if (dataGridViewServices.Columns["Id"] != null)
+            {
+                dataGridViewServices.Columns["Id"].Visible = false;
+            }
         }
 
         private void dataGridViewServices_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
@@ -55,10 +62,11 @@ namespace GymApplicationV2._0
             if (dataGridViewServices.SelectedRows.Count == 0) return;
 
             var selectedRow = dataGridViewServices.SelectedRows[0];
-            _labelMembership = selectedRow.Cells[0].Value?.ToString();
-            _termMembership = selectedRow.Cells[2].Value?.ToString();
-            _servicesCost = selectedRow.Cells[1].Value.ToString();
-            _servicesQuantity = selectedRow.Cells[3].Value.ToString();
+            _id = selectedRow.Cells[0].Value?.ToString();
+            _labelMembership = selectedRow.Cells[1].Value?.ToString();
+            _servicesCost = selectedRow.Cells[2].Value.ToString();
+            _termMembership = selectedRow.Cells[3].Value?.ToString();
+            _servicesQuantity = selectedRow.Cells[4].Value.ToString();
         }
 
         private void buttonAddService_Click(object sender, EventArgs e)
@@ -78,7 +86,7 @@ namespace GymApplicationV2._0
                 return;
 
             GeneralContext.CommandDataFromDatabase(
-                $"DELETE FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
+                $"DELETE FROM Descriptions WHERE Id = '{_id}'",
                 ServicesContext.ConnectionStringServices());
 
             MessageHelper.MessageWindowOk("Услуга удалена", "Сообщение");
@@ -148,7 +156,7 @@ namespace GymApplicationV2._0
         private int? GetServiceQuantityLeft()
         {
             var left = GeneralContext.GetElementFromDatabase(
-                $"SELECT Посещений FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
+                $"SELECT Посещений FROM Descriptions WHERE Id = '{_id}'",
                 ServicesContext.ConnectionStringServices());
 
             if (string.IsNullOrEmpty(left?.ToString())) return null;
@@ -169,7 +177,7 @@ namespace GymApplicationV2._0
         private void UpdateServiceStatistics()
         {
             var quantity = GeneralContext.GetElementFromDatabase(
-                $"SELECT Проданных_за_месяц FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
+                $"SELECT Проданных_за_месяц FROM Descriptions WHERE Id = '{_id}'",
                 ServicesContext.ConnectionStringServices());
 
             int numbers = (quantity != DBNull.Value && quantity != null) ? Convert.ToInt32(quantity) : 0;
@@ -177,7 +185,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase($@"
                 UPDATE Descriptions SET 
                 Проданных_за_месяц = '{numbers + 1}' 
-                WHERE Абонемент = '{_labelMembership}'",
+                WHERE Id = '{_id}'",
                 ServicesContext.ConnectionStringServices());
         }
 
@@ -286,15 +294,13 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            DataConfig.membershipId = GeneralContext.GetElementFromDatabase("SELECT Id FROM Descriptions",
-                ServicesContext.ConnectionStringServices()).ToString();
-
             ShowFormWithData(new ChangeService(), form => {
                 var f = (ChangeService)form;
                 f.jeanTextBoxPrice.Text = _servicesCost;
                 f.jeanTextBoxTerm.Text = _termMembership;
                 f.jeanTextBoxVisited.Text = _servicesQuantity;
                 f.jeanTextBoxName.Text = _labelMembership;
+                f._id = _id;
             });
 
             RefreshServicesData();

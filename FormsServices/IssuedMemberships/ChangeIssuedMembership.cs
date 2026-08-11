@@ -13,7 +13,7 @@ namespace GymApplicationV2._0.FormsServices
 {
     public partial class ChangeIssuedMembership : ShadowedForm
     {
-        public string _numberCard;
+        public string _id = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -66,9 +66,10 @@ namespace GymApplicationV2._0.FormsServices
             StyleTextBox(jeanTextBoxCost);
             StyleTextBox(jeanTextBoxVisits);
             StyleTextBox(jeanTextBoxStatus);
+            StyleTextBox(jeanTextBoxFreezeDate);
 
             // Стилизация кнопок
-            StyleButton(jeanModernButtonChange, "Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonChange.Width) / 2, this.Height - jeanModernButtonChange.Height - 60));
+            StyleButton(jeanModernButtonChange, "Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonChange.Width) / 2, this.Height - jeanModernButtonChange.Height - 50));
 
             hintLabel.Location = new Point((this.Width - 250) / 2, this.Height - hintLabel.Height - 10);
 
@@ -94,11 +95,9 @@ namespace GymApplicationV2._0.FormsServices
         private void StyleTextBox(JeanTextBox textBox)
         {
             textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            //textBox.BorderFocusColor = Color.FromArgb(120, 180, 255);
             textBox.BackColor = Color.White;
             textBox.ForeColor = Color.Black;
             textBox.Font = new Font("Montserrat", 9);
-            //textBox.PlaceholderColor = Color.FromArgb(120, 120, 150);
         }
 
         private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
@@ -152,11 +151,12 @@ namespace GymApplicationV2._0.FormsServices
 
             var updateQuery = $@"UPDATE Issued SET 
                         Клиент = '{jeanTextBoxClient.Text}',
+                        Дата_окончания = '{jeanTextBoxTerm.Text}',
                         Абонемент = '{jeanTextBoxMembership.Text}',
                         Оплата = '{jeanTextBoxCost.Text}',
                         Статус = '{jeanTextBoxStatus.Text}',
                         Посещений_осталось = '{jeanTextBoxVisits.Text}'
-                        WHERE №Карты = '{_numberCard}' AND Дата_окончания = '{jeanTextBoxTerm.Text}';";
+                        WHERE Id = '{_id}';";
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 IssuedMembershipContext.ConnectionStringIssued());

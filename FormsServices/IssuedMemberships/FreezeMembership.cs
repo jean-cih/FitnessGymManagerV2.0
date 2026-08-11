@@ -15,14 +15,15 @@ namespace GymApplicationV2._0.FormsServices
     public partial class FreezeMembership : ShadowedForm
     {
         public Label txtClientName;
-        public Label txtCardNumber;
         public Label txtFreezeDate;
         private ComboBox cmbFreezeReason;
         private NumericUpDown numFreezeDays;
         private JeanModernButton btnSave;
         private JeanModernButton btnCancel;
         private Label lblTitle;
-        public string _dateOver;
+
+        public string _id = string.Empty;
+        public string _numberCard = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -101,8 +102,6 @@ namespace GymApplicationV2._0.FormsServices
                 AutoSize = true,
                 BackColor = Color.Transparent
             };
-
-            txtCardNumber = CreateStyledTextBox(new Point(130, 130), 200);
 
             // Детали заморозки
             Label lblFreezeDetails = new Label
@@ -195,7 +194,6 @@ namespace GymApplicationV2._0.FormsServices
                 lblClientInfo,
                 txtClientName,
                 lblCard,
-                txtCardNumber,
                 lblFreezeDetails,
                 lblFreezeDate,
                 txtFreezeDate,
@@ -342,8 +340,7 @@ namespace GymApplicationV2._0.FormsServices
                         cmd.Parameters.AddWithValue("@status", "заморожен");
                         cmd.Parameters.AddWithValue("@days", days);
                         cmd.Parameters.AddWithValue("@freezeEndDate", newFreezeEndDate.ToString("yyyy-MM-dd"));
-                        cmd.Parameters.AddWithValue("@cardNumber", txtCardNumber.Text);
-                        cmd.Parameters.AddWithValue("@oldEndDate", _dateOver);
+                        cmd.Parameters.AddWithValue("@cardNumber", _numberCard);
 
                         int rowsAffected = cmd.ExecuteNonQuery();
 
@@ -393,12 +390,6 @@ namespace GymApplicationV2._0.FormsServices
             }
 
             return true;
-        }
-
-        public void SetClientData(string clientName, string cardNumber)
-        {
-            txtClientName.Text = clientName;
-            txtCardNumber.Text = cardNumber;
         }
     }
 }

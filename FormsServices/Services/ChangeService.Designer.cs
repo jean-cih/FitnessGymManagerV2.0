@@ -30,7 +30,6 @@ namespace GymApplicationV2._0
         /// </summary>
         private void InitializeComponent()
         {
-            this.hintLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.titleLabel = new System.Windows.Forms.Label();
             this.jeanModernButtonSave = new GymApplicationV2._0.Controls.JeanModernButton();
@@ -38,20 +37,8 @@ namespace GymApplicationV2._0
             this.jeanTextBoxTerm = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxPrice = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxName = new GymApplicationV2._0.JeanTextBox();
+            this.hintLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // hintLabel
-            // 
-            this.hintLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.hintLabel.BackColor = System.Drawing.Color.Transparent;
-            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
-            this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
-            this.hintLabel.Location = new System.Drawing.Point(0, 0);
-            this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.hintLabel.Name = "hintLabel";
-            this.hintLabel.Size = new System.Drawing.Size(155, 25);
-            this.hintLabel.TabIndex = 67;
-            this.hintLabel.Text = "Измените параметры услуги";
             // 
             // label1
             // 
@@ -180,17 +167,31 @@ namespace GymApplicationV2._0
             this.jeanTextBoxName.TextPreview = "Наименование";
             this.jeanTextBoxName.UseSystemPasswordChar = false;
             // 
+            // hintLabel
+            // 
+            this.hintLabel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.hintLabel.BackColor = System.Drawing.Color.Transparent;
+            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
+            this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
+            this.hintLabel.Location = new System.Drawing.Point(74, 328);
+            this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.hintLabel.Name = "hintLabel";
+            this.hintLabel.Size = new System.Drawing.Size(250, 25);
+            this.hintLabel.TabIndex = 72;
+            this.hintLabel.Text = "Измените параметры услуги";
+            this.hintLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // ChangeService
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(398, 362);
+            this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.jeanTextBoxVisited);
             this.Controls.Add(this.jeanTextBoxTerm);
             this.Controls.Add(this.jeanTextBoxPrice);
             this.Controls.Add(this.jeanTextBoxName);
-            this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.jeanModernButtonSave);
@@ -208,10 +209,10 @@ namespace GymApplicationV2._0
         protected internal Controls.JeanModernButton jeanModernButtonSave;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label hintLabel;
         public JeanTextBox jeanTextBoxVisited;
         public JeanTextBox jeanTextBoxTerm;
         public JeanTextBox jeanTextBoxPrice;
         public JeanTextBox jeanTextBoxName;
+        private System.Windows.Forms.Label hintLabel;
     }
 }

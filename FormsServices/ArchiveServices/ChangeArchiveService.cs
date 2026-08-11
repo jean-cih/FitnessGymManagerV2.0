@@ -13,6 +13,8 @@ namespace GymApplicationV2._0.FormsServices
 {
     public partial class ChangeArhiveService : ShadowedForm
     {
+        public string _id = string.Empty;
+
         private FadeAnimation _fadeAnimation;
 
         Panel titlePanel;
@@ -148,10 +150,12 @@ namespace GymApplicationV2._0.FormsServices
 
             var query = $@"UPDATE Archive SET 
                         Клиент = '{jeanTextBoxClient.Text}',
+                        №Карты = '{jeanTextBoxCard.Text}',
+                        Дата_окончания = '{jeanTextBoxTerm.Text}',
                         Абонемент = '{jeanTextBoxMembership.Text}',
                         Оплата = '{jeanTextBoxCost.Text}',
-                        Посещений_осталось = '{jeanTextBoxVisits.Text}'
-                        WHERE №Карты = '{jeanTextBoxCard.Text}'  AND Дата_окончания = '{jeanTextBoxTerm.Text}';";
+                        Посещений_осталось = '{jeanTextBoxVisits.Text}' 
+                        WHERE Id = '{_id}';";
 
             GeneralContext.CommandDataFromDatabase(query,
                 ArchiveServicesContext.ConnectionStringArchive());
