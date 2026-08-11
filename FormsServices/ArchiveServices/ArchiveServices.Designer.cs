@@ -34,13 +34,11 @@
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
             this.nameClient = new System.Windows.Forms.Label();
-            this.card = new System.Windows.Forms.Label();
             this.jeanPanel = new GymApplicationV2._0.Controls.JeanPanel();
             this.dataGridViewArchive = new System.Windows.Forms.DataGridView();
             this.jeanModernButtonChangeData = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanModernButtonErase = new GymApplicationV2._0.Controls.JeanModernButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.jeanSoftTextBoxSearch = new GymApplicationV2._0.Controls.jeanSoftTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
             this.jeanPanel.SuspendLayout();
@@ -62,20 +60,11 @@
             // nameClient
             // 
             this.nameClient.AutoSize = true;
-            this.nameClient.Location = new System.Drawing.Point(90, 25);
+            this.nameClient.Location = new System.Drawing.Point(99, 52);
             this.nameClient.Name = "nameClient";
             this.nameClient.Size = new System.Drawing.Size(10, 13);
             this.nameClient.TabIndex = 50;
             this.nameClient.Text = "-";
-            // 
-            // card
-            // 
-            this.card.AutoSize = true;
-            this.card.Location = new System.Drawing.Point(131, 50);
-            this.card.Name = "card";
-            this.card.Size = new System.Drawing.Size(10, 13);
-            this.card.TabIndex = 55;
-            this.card.Text = "-";
             // 
             // jeanPanel
             // 
@@ -186,21 +175,11 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(21, 23);
+            this.label1.Location = new System.Drawing.Point(21, 50);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(68, 16);
             this.label1.TabIndex = 56;
             this.label1.Text = "Клиент: ";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label2.Location = new System.Drawing.Point(21, 48);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(111, 16);
-            this.label2.TabIndex = 57;
-            this.label2.Text = "Номер карты: ";
             // 
             // jeanSoftTextBoxSearch
             // 
@@ -230,9 +209,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(1023, 570);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.card);
             this.Controls.Add(this.nameClient);
             this.Controls.Add(this.jeanPanel);
             this.Controls.Add(this.jeanModernButtonChangeData);
@@ -261,9 +238,7 @@
         private Controls.JeanPanel jeanPanel;
         protected internal System.Windows.Forms.DataGridView dataGridViewArchive;
         private System.Windows.Forms.Label nameClient;
-        private System.Windows.Forms.Label card;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
         protected internal Controls.jeanSoftTextBox jeanSoftTextBoxSearch;
     }
 }

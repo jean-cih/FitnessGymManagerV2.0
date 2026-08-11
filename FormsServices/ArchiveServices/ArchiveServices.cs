@@ -14,7 +14,13 @@ namespace GymApplicationV2._0
     public partial class ArchiveServices : Form
     {
         private ToolStripDropDownMenu _menu;
-        private string client = "", membership = "", term = "", cost = "", numberCard = "", visits = "";
+        private string _id = string.Empty;
+        private string _client = string.Empty;
+        private string _membership = string.Empty;
+        private string _term = string.Empty;
+        private string _cost = string.Empty;
+        private string _numberCard = string.Empty;
+        private string _visits = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -76,6 +82,7 @@ namespace GymApplicationV2._0
         private void LoadArchiveData()
         {
             string query = "SELECT " +
+            "Id, " +
             "Клиент, " +
             "№Карты, " +
             "Дата_окончания AS 'Дата окончания', " +
@@ -92,6 +99,11 @@ namespace GymApplicationV2._0
             dataGridViewArchive.DataSource = _currentDataTable;
 
             //GeneralContext.FormatData(dataGridViewArchive);
+
+            if (dataGridViewArchive.Columns["Id"] != null)
+            {
+                dataGridViewArchive.Columns["Id"].Visible = false;
+            }
         }
 
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
@@ -174,20 +186,20 @@ namespace GymApplicationV2._0
             if (e.RowIndex < 0) return;
 
             var row = dataGridViewArchive.Rows[e.RowIndex];
-            client = row.Cells[0].Value?.ToString() ?? "";
-            numberCard = row.Cells[1].Value?.ToString() ?? "";
-            term = row.Cells[2].Value?.ToString() ?? "";
-            membership = row.Cells[3].Value?.ToString() ?? "";
-            cost = row.Cells[4].Value?.ToString() ?? "";
-            visits = row.Cells[5].Value?.ToString() ?? "";
+            _id = row.Cells[0].Value?.ToString() ?? "";
+            _client = row.Cells[1].Value?.ToString() ?? "";
+            _numberCard = row.Cells[2].Value?.ToString() ?? "";
+            _term = row.Cells[3].Value?.ToString() ?? "";
+            _membership = row.Cells[4].Value?.ToString() ?? "";
+            _cost = row.Cells[5].Value?.ToString() ?? "";
+            _visits = row.Cells[6].Value?.ToString() ?? "";
 
-            nameClient.Text = client;
-            card.Text = numberCard;
+            nameClient.Text = _client;
         }
 
         private void ShowFormWithData(Form form, Action<Form> setData)
         {
-            if (!new Regex(@"^\d{13}$").IsMatch(numberCard))
+            if (!new Regex(@"^\d{13}$").IsMatch(_numberCard))
             {
                 MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return;
@@ -202,11 +214,12 @@ namespace GymApplicationV2._0
         {
             ShowFormWithData(new BackToLife(), form => {
                 var f = (BackToLife)form;
-                f.labelNameClient.Text = client;
-                f.labelNubmerCard.Text = numberCard;
-                f.jeanTextBoxMembership.Text = membership;
-                f.jeanTextBoxTerm.Text = term;
-                f.jeanTextBoxVisits.Text = visits;
+                f._client = _client;
+                f._numberCard = _numberCard;
+                f.jeanTextBoxMembership.Text = _membership;
+                f.jeanTextBoxTerm.Text = _term;
+                f.jeanTextBoxVisits.Text = _visits;
+                f._id = _id;
             });
         }
 
@@ -214,12 +227,13 @@ namespace GymApplicationV2._0
         {
             ShowFormWithData(new ChangeArhiveService(), form => {
                 var f = (ChangeArhiveService)form;
-                f.jeanTextBoxClient.Text = client;
-                f.jeanTextBoxCard.Text = numberCard;
-                f.jeanTextBoxMembership.Text = membership;
-                f.jeanTextBoxTerm.Text = term;
-                f.jeanTextBoxCost.Text = cost;
-                f.jeanTextBoxVisits.Text = visits;
+                f.jeanTextBoxClient.Text = _client;
+                f.jeanTextBoxCard.Text = _numberCard;
+                f.jeanTextBoxMembership.Text = _membership;
+                f.jeanTextBoxTerm.Text = _term;
+                f.jeanTextBoxCost.Text = _cost;
+                f.jeanTextBoxVisits.Text = _visits;
+                f._id = _id;
             });
         }
     }

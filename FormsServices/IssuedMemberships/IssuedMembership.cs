@@ -15,13 +15,15 @@ namespace GymApplicationV2._0
     public partial class IssuedMembership : Form
     {
         private ToolStripDropDownMenu _menu;
-        private string _numberCard = string.Empty;
         private string _dateOver = string.Empty;
         private string _client = string.Empty;
         private string _membership = string.Empty;
         private string _cost = string.Empty;
         private string _status = string.Empty;
         private string _visits = string.Empty;
+        private string _id = string.Empty;
+        private string _freezeDate = string.Empty;
+        private string _numberCard = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -97,7 +99,7 @@ namespace GymApplicationV2._0
         private void RefreshDataGrid()
         {
             string query = @"
-        SELECT 
+        SELECT Id, 
             Клиент,
             №Карты,
             Дата_окончания AS 'Дата окончания',
@@ -118,6 +120,11 @@ namespace GymApplicationV2._0
             dataGridViewIssued.DataSource = _currentDataTable;
 
             //GeneralContext.FormatData(dataGridViewIssued);
+
+            if (dataGridViewIssued.Columns["Id"] != null)
+            {
+                dataGridViewIssued.Columns["Id"].Visible = false;
+            }
         }
         private void jeanModernButtonRefresh_Click(object sender, EventArgs e) =>
             RefreshDataGrid();
@@ -198,21 +205,22 @@ namespace GymApplicationV2._0
             if (dataGridViewIssued.SelectedRows.Count == 0) return;
 
             var row = dataGridViewIssued.SelectedRows[0];
-            _client = row.Cells[0].Value.ToString();
-            _numberCard = row.Cells[1].Value.ToString();
-            _dateOver = row.Cells[2].Value.ToString();
-            _membership = row.Cells[4].Value.ToString();
-            _cost = row.Cells[6].Value.ToString();
-            _status = row.Cells[7].Value.ToString();
-            _visits = row.Cells[8].Value.ToString();
+            _id = row.Cells[0].Value.ToString();
+            _client = row.Cells[1].Value.ToString();
+            _numberCard = row.Cells[2].Value.ToString();
+            _dateOver = row.Cells[3].Value.ToString();
+            _membership = row.Cells[5].Value.ToString();
+            _cost = row.Cells[7].Value.ToString();
+            _status = row.Cells[8].Value.ToString();
+            _visits = row.Cells[9].Value.ToString();
+            _freezeDate = row.Cells[10].Value.ToString();
 
-            card.Text = _numberCard;
             nameClient.Text = _client;
         }
 
         private void ShowFreezeDialog()
         {
-            if (_numberCard == "") 
+            if (_id == "") 
             {
                 MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return; 
@@ -221,9 +229,9 @@ namespace GymApplicationV2._0
             using (var freezeDialog = new FreezeMembership())
             {
                 freezeDialog.txtClientName.Text = _client;
-                freezeDialog.txtCardNumber.Text = _numberCard;
                 freezeDialog.txtFreezeDate.Text = DateTime.Now.ToString("dd.MM.yy");
-                freezeDialog._dateOver = _dateOver;
+                freezeDialog._id = _id;
+                freezeDialog._numberCard = _numberCard;
 
                 freezeDialog.ShowDialog();
             }
@@ -233,7 +241,7 @@ namespace GymApplicationV2._0
 
         private void ShowChangeDialog()
         {
-            if (_numberCard == "")
+            if (_id == "")
             {
                 MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return;
@@ -247,7 +255,8 @@ namespace GymApplicationV2._0
                 changeDialog.jeanTextBoxTerm.Text = _dateOver;
                 changeDialog.jeanTextBoxCost.Text = _cost;
                 changeDialog.jeanTextBoxVisits.Text = _visits;
-                changeDialog._numberCard = _numberCard;
+                changeDialog.jeanTextBoxFreezeDate.Text = _freezeDate;
+                changeDialog._id = _id;
 
                 changeDialog.ShowDialog();
             }

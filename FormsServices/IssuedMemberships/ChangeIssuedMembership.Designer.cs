@@ -41,6 +41,7 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxClient = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxVisits = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxCost = new GymApplicationV2._0.JeanTextBox();
+            this.jeanTextBoxFreezeDate = new GymApplicationV2._0.JeanTextBox();
             this.SuspendLayout();
             // 
             // jeanModernButtonChange
@@ -69,32 +70,31 @@ namespace GymApplicationV2._0.FormsServices
             // 
             this.titleLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.titleLabel.AutoSize = false;
+            this.titleLabel.BackColor = System.Drawing.Color.Transparent;
+            this.titleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold);
+            this.titleLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(220)))), ((int)(((byte)(220)))), ((int)(((byte)(255)))));
+            this.titleLabel.Location = new System.Drawing.Point(0, 0);
             this.titleLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.titleLabel.Name = "titleLabel";
             this.titleLabel.Size = new System.Drawing.Size(250, 25);
             this.titleLabel.TabIndex = 34;
             this.titleLabel.Text = "✏️ РЕДАКТИРОВАНИЕ";
             this.titleLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            titleLabel.Font = new Font("Montserrat", 13, FontStyle.Bold);
-            titleLabel.ForeColor = Color.FromArgb(220, 220, 255);
-            titleLabel.BackColor = Color.Transparent;
             // 
             // hintLabel
             // 
             this.hintLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.hintLabel.AutoSize = false;
             this.hintLabel.BackColor = System.Drawing.Color.Transparent;
+            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
+            this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
+            this.hintLabel.Location = new System.Drawing.Point(0, 0);
             this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.hintLabel.Name = "hintLabel";
             this.hintLabel.Size = new System.Drawing.Size(280, 25);
             this.hintLabel.TabIndex = 35;
             this.hintLabel.Text = "Измените необходимые данные";
             this.hintLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            hintLabel.Font = new Font("Montserrat", 7, FontStyle.Italic);
-            hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
-            hintLabel.BackColor = Color.Transparent;
             // 
             // jeanFormStyle1
             // 
@@ -235,12 +235,33 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxCost.TextPreview = "Цена";
             this.jeanTextBoxCost.UseSystemPasswordChar = false;
             // 
+            // jeanTextBoxFreezeDate
+            // 
+            this.jeanTextBoxFreezeDate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.jeanTextBoxFreezeDate.BackColor = System.Drawing.Color.White;
+            this.jeanTextBoxFreezeDate.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(52)))), ((int)(((byte)(152)))), ((int)(((byte)(219)))));
+            this.jeanTextBoxFreezeDate.BorderColorNotActive = System.Drawing.Color.FromArgb(((int)(((byte)(127)))), ((int)(((byte)(140)))), ((int)(((byte)(141)))));
+            this.jeanTextBoxFreezeDate.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.jeanTextBoxFreezeDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.jeanTextBoxFreezeDate.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
+            this.jeanTextBoxFreezeDate.ForeColor = System.Drawing.Color.Black;
+            this.jeanTextBoxFreezeDate.Location = new System.Drawing.Point(66, 321);
+            this.jeanTextBoxFreezeDate.Margin = new System.Windows.Forms.Padding(2);
+            this.jeanTextBoxFreezeDate.Name = "jeanTextBoxFreezeDate";
+            this.jeanTextBoxFreezeDate.SelectionStart = 0;
+            this.jeanTextBoxFreezeDate.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxFreezeDate.TabIndex = 49;
+            this.jeanTextBoxFreezeDate.TextInput = "";
+            this.jeanTextBoxFreezeDate.TextPreview = "Окончание заморозки";
+            this.jeanTextBoxFreezeDate.UseSystemPasswordChar = false;
+            // 
             // ChangeIssuedMembership
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(410, 450);
+            this.Controls.Add(this.jeanTextBoxFreezeDate);
             this.Controls.Add(this.jeanTextBoxCost);
             this.Controls.Add(this.jeanTextBoxVisits);
             this.Controls.Add(this.jeanTextBoxTerm);
@@ -256,7 +277,6 @@ namespace GymApplicationV2._0.FormsServices
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ChangeArchiveService";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -272,5 +292,6 @@ namespace GymApplicationV2._0.FormsServices
         public JeanTextBox jeanTextBoxClient;
         public JeanTextBox jeanTextBoxVisits;
         public JeanTextBox jeanTextBoxCost;
+        public JeanTextBox jeanTextBoxFreezeDate;
     }
 }

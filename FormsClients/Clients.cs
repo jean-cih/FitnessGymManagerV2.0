@@ -17,6 +17,8 @@ namespace GymApplicationV2._0
 {
     public partial class Clients : Form
     {
+        private string _id = string.Empty;
+
         private FadeAnimation _fadeAnimation;
 
         private DataTable _currentDataTable;
@@ -73,6 +75,7 @@ namespace GymApplicationV2._0
         private void LoadClientData()
         {
             string query = "SELECT " +
+                "Id," +
                 "Фамилия," +
                 "Имя," +
                 "Пол," +
@@ -95,12 +98,18 @@ namespace GymApplicationV2._0
 
             //GeneralContext.FormatData(dataGridViewClients);
 
+
             if (dataGridViewClients.Columns.Count > 0)
             {
                 dataGridViewClients.Columns[0].DefaultCellStyle.ForeColor = Color.FromArgb(30, 41, 59);
                 dataGridViewClients.Columns[0].DefaultCellStyle.Font = new Font(
             dataGridViewClients.DefaultCellStyle.Font, FontStyle.Bold);
                 dataGridViewClients.CellClick += DataGridViewClients_CellClick;
+            }
+
+            if (dataGridViewClients.Columns["Id"] != null)
+            {
+                dataGridViewClients.Columns["Id"].Visible = false;
             }
         }
 
@@ -178,7 +187,9 @@ namespace GymApplicationV2._0
                  Посещений_осталось AS 'Посещений осталось',
                  Посетил
           FROM Issued 
-          WHERE №Карты = @cardNumber";
+          WHERE №Карты = @cardNumber 
+                ORDER BY date(Дата_окончания) ASC
+                LIMIT 1";
 
             DataTable table = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued(),
@@ -391,9 +402,7 @@ namespace GymApplicationV2._0
               Email = @Email,
               Дата_рождения = @BirthDate,
               Скидка = @Discount
-              WHERE (Фамилия = @LastName AND Имя = @FirstName) 
-                 OR (Телефон = @Phone AND NULLIF(@Phone, '') IS NOT NULL) 
-                 OR (№Карты = @CardNumber AND NULLIF(@CardNumber, '') IS NOT NULL)";
+              WHERE Id = @id";
 
             var parameters = new SQLiteParameter[]
             {
@@ -407,7 +416,7 @@ namespace GymApplicationV2._0
               new SQLiteParameter("@Email", jeanTextBoxEmail.Text.Trim()),
               new SQLiteParameter("@BirthDate", jeanTextBoxBirthday.Text.Trim()),
               new SQLiteParameter("@Discount", jeanTextBoxDiscount.Text.Trim()),
-              new SQLiteParameter("@WhereCardNumber", jeanTextBoxNumberCard.Text.Trim())
+              new SQLiteParameter("@id", _id)
             };
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
@@ -429,26 +438,11 @@ namespace GymApplicationV2._0
             if (MessageHelper.MessageWindowYesNo("Вы действительно хотите удалить клиента?") != DialogResult.Yes)
                 return;
 
-            string[] fullName = jeanTextBoxClient.Text.Split(' ');
-
-            string lastName = fullName.Length > 0 ? fullName[0].Trim() : "";
-            string firstName = fullName.Length > 1 ? fullName[1].Trim() : "";
-
-            var deleteQuery = @"DELETE FROM Contacts 
-              WHERE (Фамилия = @LastName AND Имя = @FirstName) 
-                 OR (@Phone != '' AND Телефон = @Phone) 
-                 OR (@CardNumber != '' AND №Карты = @CardNumber)";
-
-            var parameters = new SQLiteParameter[]
-            {
-              new SQLiteParameter("@LastName", lastName),
-              new SQLiteParameter("@FirstName", firstName),
-              new SQLiteParameter("@Phone", jeanTextBoxPhone.Text.Trim()),
-              new SQLiteParameter("@CardNumber", jeanTextBoxNumberCard.Text.Trim())
-            };
+            var deleteQuery = @"DELETE FROM Contacts WHERE Id = @id";
 
             GeneralContext.CommandDataFromDatabase(deleteQuery,
-                ClientsContext.ConnectionStringClients(), parameters);
+                ClientsContext.ConnectionStringClients(),
+                new SQLiteParameter("@id", _id));
             MessageHelper.MessageWindowOk("Клиент удален", "Сообщение");
             RefreshDataAndClearFields();
         }
@@ -461,14 +455,14 @@ namespace GymApplicationV2._0
 
         private void ClearAllFields()
         {
-            jeanTextBoxClient.Text =
-            jeanTextBoxGender.Text =
-            jeanTextBoxPhone.Text =
-            jeanTextBoxNumberCard.Text =
-            jeanTextBoxEmail.Text =
-            jeanTextBoxBirthday.Text =
-            jeanTextBoxDiscount.Text =
-            jeanTextBoxPurchase.Text = "";
+            jeanTextBoxClient.Text = string.Empty;
+            jeanTextBoxGender.Text = string.Empty;
+            jeanTextBoxPhone.Text = string.Empty;
+            jeanTextBoxNumberCard.Text = string.Empty;
+            jeanTextBoxEmail.Text = string.Empty;
+            jeanTextBoxBirthday.Text = string.Empty;
+            jeanTextBoxDiscount.Text = string.Empty;
+            jeanTextBoxPurchase.Text = string.Empty;
         }
 
         private void dataGridViewClients_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -477,14 +471,15 @@ namespace GymApplicationV2._0
 
             var selectedRow = dataGridViewClients.SelectedRows[0];
 
-            jeanTextBoxClient.Text = $"{selectedRow.Cells[0].Value} {selectedRow.Cells[1].Value} {selectedRow.Cells[6].Value}";
-            jeanTextBoxGender.Text = selectedRow.Cells[2].Value.ToString();
-            jeanTextBoxPhone.Text = selectedRow.Cells[3].Value.ToString();
-            jeanTextBoxNumberCard.Text = selectedRow.Cells[4].Value.ToString();
-            jeanTextBoxPurchase.Text = selectedRow.Cells[5].Value.ToString();
-            jeanTextBoxEmail.Text = selectedRow.Cells[7].Value.ToString();
-            jeanTextBoxBirthday.Text = selectedRow.Cells[10].Value.ToString();
-            jeanTextBoxDiscount.Text = selectedRow.Cells[8].Value.ToString();
+            _id = selectedRow.Cells[0].Value.ToString();
+            jeanTextBoxClient.Text = $"{selectedRow.Cells[1].Value} {selectedRow.Cells[2].Value} {selectedRow.Cells[7].Value}";
+            jeanTextBoxGender.Text = selectedRow.Cells[3].Value.ToString();
+            jeanTextBoxPhone.Text = selectedRow.Cells[4].Value.ToString();
+            jeanTextBoxNumberCard.Text = selectedRow.Cells[5].Value.ToString();
+            jeanTextBoxPurchase.Text = selectedRow.Cells[6].Value.ToString();
+            jeanTextBoxEmail.Text = selectedRow.Cells[8].Value.ToString();
+            jeanTextBoxBirthday.Text = selectedRow.Cells[11].Value.ToString();
+            jeanTextBoxDiscount.Text = selectedRow.Cells[9].Value.ToString();
         }
     }
 }
