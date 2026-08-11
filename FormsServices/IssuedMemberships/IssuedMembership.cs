@@ -214,7 +214,7 @@ namespace GymApplicationV2._0
         {
             if (_numberCard == "") 
             {
-                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return; 
             }
 
@@ -225,18 +225,17 @@ namespace GymApplicationV2._0
                 freezeDialog.txtFreezeDate.Text = DateTime.Now.ToString("dd.MM.yy");
                 freezeDialog._dateOver = _dateOver;
 
-                if (freezeDialog.ShowDialog() == DialogResult.OK)
-                {
-                    RefreshDataGrid();
-                }
+                freezeDialog.ShowDialog();
             }
+
+            RefreshDataGrid();
         }
 
         private void ShowChangeDialog()
         {
             if (_numberCard == "")
             {
-                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return;
             }
 
@@ -250,11 +249,10 @@ namespace GymApplicationV2._0
                 changeDialog.jeanTextBoxVisits.Text = _visits;
                 changeDialog._numberCard = _numberCard;
 
-                if (changeDialog.ShowDialog() == DialogResult.OK)
-                {
-                    RefreshDataGrid();
-                }
+                changeDialog.ShowDialog();
             }
+
+            RefreshDataGrid();
         }
     }
 }

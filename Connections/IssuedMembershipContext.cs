@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GymApplicationV2._0.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -79,13 +80,11 @@ namespace GymApplicationV2._0.Connections
             }
             catch (SQLiteException ex)
             {
-                MessageBox.Show($"SQLite error in GetClientData: {ex.Message}");
-                //return null;
+                MessageHelper.MessageWindowOk($"SQLite error in GetClientData: {ex.Message}", "Ошибка");
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"General error in GetClientData: {ex.Message}");
-                //return null;
+                MessageHelper.MessageWindowOk($"General error in GetClientData: {ex.Message}", "Ошибка");
             }
 
             return issuedInfo;

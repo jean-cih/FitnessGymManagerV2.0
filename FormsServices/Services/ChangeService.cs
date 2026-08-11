@@ -150,7 +150,7 @@ namespace GymApplicationV2._0
                 string.IsNullOrWhiteSpace(jeanTextBoxTerm.Text) ||
                 string.IsNullOrWhiteSpace(jeanTextBoxVisited.Text))
             {
-                MessageHelper.MessageWindowOk("Заполните все поля");
+                MessageHelper.MessageWindowOk("Заполните все поля", "Предупреждение");
                 return;
             }
 
@@ -176,7 +176,7 @@ namespace GymApplicationV2._0
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                MessageHelper.MessageWindowOk("Услуга изменена");
+                MessageHelper.MessageWindowOk("Услуга изменена", "Сообщение");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

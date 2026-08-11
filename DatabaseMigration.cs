@@ -32,8 +32,7 @@ namespace GymApplicationV2._0.Helpers
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при миграции данных: {ex.Message}", "Ошибка",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk($"Ошибка при миграции данных: {ex.Message}", "Ошибка");
             }
         }
 

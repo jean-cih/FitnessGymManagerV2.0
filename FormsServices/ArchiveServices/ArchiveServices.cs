@@ -93,6 +93,7 @@ namespace GymApplicationV2._0
 
             //GeneralContext.FormatData(dataGridViewArchive);
         }
+
         private void jeanSoftTextBoxSearch__TextChanged(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(jeanSoftTextBoxSearch.Texts))
@@ -188,7 +189,7 @@ namespace GymApplicationV2._0
         {
             if (!new Regex(@"^\d{13}$").IsMatch(numberCard))
             {
-                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы");
+                MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return;
             }
 

@@ -315,8 +315,7 @@ namespace GymApplicationV2._0.FormsServices
                 // Парсим дату окончания заморозки
                 if (!DateTime.TryParseExact(txtFreezeDate.Text, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime freezeDate))
                 {
-                    MessageBox.Show("❌ Неверный формат даты! Используйте ДД.ММ.ГГ", "Ошибка",
-                                  MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageHelper.MessageWindowOk("❌ Неверный формат даты! Используйте ДД.ММ.ГГ", "Ошибка");
                     return;
                 }
 
@@ -350,32 +349,26 @@ namespace GymApplicationV2._0.FormsServices
 
                         if (rowsAffected == 0)
                         {
-                            MessageBox.Show("❌ Абонемент не найден!", "Ошибка",
-                                          MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageHelper.MessageWindowOk("❌ Абонемент не найден!", "Ошибка");
                             return;
                         }
                     }
                 }
 
                 // Показываем сообщение об успехе
-                MessageBox.Show($"✅ Абонемент успешно заморожен!\n\n" +
+                MessageHelper.MessageWindowOk($"✅ Абонемент успешно заморожен!\n\n" +
                                    $"👤 Клиент: {txtClientName.Text}\n" +
                                    $"📅 Дата заморозки: {freezeDate:dd.MM.yyyy}\n" +
                                    $"⏰ Срок: {days} дней\n" +
                                    $"📋 Причина: {reason}",
-                                   "Успешно",
-                                   MessageBoxButtons.OK,
-                                   MessageBoxIcon.Information);
+                                   "Успешно");
 
                     this.DialogResult = DialogResult.OK;
                     this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка при заморозке абонемента:\n{ex.Message}",
-                               "Ошибка",
-                               MessageBoxButtons.OK,
-                               MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk($"❌ Ошибка при заморозке абонемента:\n{ex.Message}", "Ошибка");
             }
         }
 
@@ -389,15 +382,13 @@ namespace GymApplicationV2._0.FormsServices
         {
             if (string.IsNullOrEmpty(txtFreezeDate.Text))
             {
-                MessageBox.Show("❌ Укажите дату заморозки", "Ошибка",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk("❌ Укажите дату заморозки", "Ошибка");
                 return false;
             }
 
             if (cmbFreezeReason.SelectedItem == null)
             {
-                MessageBox.Show("❌ Выберите причину заморозки", "Ошибка",
-                              MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageHelper.MessageWindowOk("❌ Выберите причину заморозки", "Ошибка");
                 return false;
             }
 

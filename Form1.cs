@@ -72,6 +72,8 @@ namespace GymApplicationV2._0
             SetBackgroundColor();
 
             this.EnableDrag(this);
+
+            Logger.Info("Запуск основного окна");
         }
 
         private void SubscribeEvents()
@@ -486,12 +488,13 @@ namespace GymApplicationV2._0
             {
                 if (Regex.IsMatch(jeanTextBoxNumberCard.Text, @"^-?\d+(\d+)?$") || jeanTextBoxNumberCard.Text.Length == 0)
                 {
-                    string cardNumber_trim = jeanTextBoxNumberCard.Text.Trim();
+                    numberCard = jeanTextBoxNumberCard.Text.Trim();
+                    ClearCardNumber();
 
-                    if (!ValidateIssuedExists(cardNumber_trim))
+                    if (!ValidateIssuedExists(numberCard))
                         return;
 
-                    if (!ValidateMembershipStatus(cardNumber_trim))
+                    if (!ValidateMembershipStatus(numberCard))
                         return;
 
                     string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
@@ -500,16 +503,16 @@ namespace GymApplicationV2._0
                         LIMIT 1";
                     var data = GeneralContext.GetDataFromDatabase(query_help,
                         IssuedMembershipContext.ConnectionStringIssued(),
-                        new SQLiteParameter("@cardNumber", cardNumber_trim));
+                        new SQLiteParameter("@cardNumber", numberCard));
 
                     string membership = data.Rows[0]["Абонемент"].ToString();
                     string date = data.Rows[0]["Дата_окончания"].ToString();
 
-                    TryHandleFrozenMembership(cardNumber_trim, date);
+                    TryHandleFrozenMembership(numberCard, date);
 
-                    ProcessClientVisit(cardNumber_trim, membership, date);
+                    ProcessClientVisit(numberCard, membership);
 
-                    DisplayClientData(cardNumber_trim);
+                    DisplayClientData(numberCard);
                 }
                 else
                 {
@@ -518,7 +521,7 @@ namespace GymApplicationV2._0
                     {
                         var errorSound = new PlaySoundHelper(false);
                         errorSound.PlaySound();
-                        ShowMessage("Введите фамилию и имя через пробел");
+                        MessageHelper.MessageWindowOk("Введите фамилию и имя через пробел", "Cообщение");
                         ClearCardNumber();
                         return;
                     }
@@ -554,13 +557,13 @@ namespace GymApplicationV2._0
                         return;
                     }
 
-                    string numberCardExist = existClient.ToString();
-                    numberCard = numberCardExist;
+                    numberCard = existClient.ToString();
+                    ClearCardNumber();
 
-                    if (!ValidateIssuedExists(numberCardExist))
+                    if (!ValidateIssuedExists(numberCard))
                         return;
 
-                    if (!ValidateMembershipStatus(numberCardExist))
+                    if (!ValidateMembershipStatus(numberCard))
                         return;
 
                     string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
@@ -569,16 +572,16 @@ namespace GymApplicationV2._0
                         LIMIT 1";
                     var data = GeneralContext.GetDataFromDatabase(query_help,
                         IssuedMembershipContext.ConnectionStringIssued(),
-                        new SQLiteParameter("@cardNumber", numberCardExist));
+                        new SQLiteParameter("@cardNumber", numberCard));
 
                     string membership = data.Rows[0]["Абонемент"].ToString();
                     string date = data.Rows[0]["Дата_окончания"].ToString();
 
-                    TryHandleFrozenMembership(numberCardExist, date);
+                    TryHandleFrozenMembership(numberCard, date);
                     
-                    ProcessClientVisit(numberCardExist, membership, date);
+                    ProcessClientVisit(numberCard, membership);
 
-                    DisplayClientData(numberCardExist);
+                    DisplayClientData(numberCard);
                 }
             }
         }
@@ -606,13 +609,6 @@ namespace GymApplicationV2._0
                     AND Клиент LIKE '%{names[1]}%'";
         }
 
-        
-
-        private void ShowMessage(string message)
-        {
-            MessageHelper.MessageWindowOk(message);
-        }
-
         private void ClearCardNumber()
         {
             jeanTextBoxNumberCard.Text = "";
@@ -623,7 +619,6 @@ namespace GymApplicationV2._0
             if (issuedInfo != null)
             {
                 nameClient = issuedInfo.FullName;
-                numberCard = issuedInfo.NumberCard;
                 jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
             }
         }
@@ -656,13 +651,13 @@ namespace GymApplicationV2._0
             if (jeanTextBoxNumberCard.Text.Length != 13)
                 return;
 
-            string cardNumber = jeanTextBoxNumberCard.Text.Trim();
+            numberCard = jeanTextBoxNumberCard.Text.Trim();
             ClearCardNumber();
 
-            if (!ValidateIssuedExists(cardNumber))
+            if (!ValidateIssuedExists(numberCard))
                 return;
 
-            if (!ValidateMembershipStatus(cardNumber))
+            if (!ValidateMembershipStatus(numberCard))
                 return;
 
             string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
@@ -671,17 +666,16 @@ namespace GymApplicationV2._0
                 LIMIT 1";
             var data = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", cardNumber));
+                new SQLiteParameter("@cardNumber", numberCard));
 
             string membership = data.Rows[0]["Абонемент"].ToString();
             string date = data.Rows[0]["Дата_окончания"].ToString();
 
-            ShowMessage(date + "Пу Пу Пу");
-            TryHandleFrozenMembership(cardNumber, date);
+            TryHandleFrozenMembership(numberCard, date);
 
-            ProcessClientVisit(cardNumber, membership, date);
+            ProcessClientVisit(numberCard, membership);
 
-            DisplayClientData(cardNumber);
+            DisplayClientData(numberCard);
         }
 
         // Валидация существования клиента
@@ -707,7 +701,7 @@ namespace GymApplicationV2._0
                 }
 
                 UpdateDataGrid();
-                //ShowMessage("Этого номера нет в действительных абонементах");
+                Logger.Info(cardNumber + " Этого номера нет в действительных абонементах");
                 return false;
             }
 
@@ -735,6 +729,8 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Заморозка снята (Повторно)";
             }
+
+            Logger.Info(cardNumber + " Заморозка снята");
         }
 
         // Разморозка абонемента
@@ -746,20 +742,20 @@ namespace GymApplicationV2._0
                 new SQLiteParameter("@endDate", date));
 
             DateTime endDate = Convert.ToDateTime(timeLeft);
-            int daysLeft = (int)(endDate - DateTime.Now).TotalDays;
+            int daysLeft = (int)(endDate - DateTime.Now).TotalDays + 1;
 
             if (daysLeft > 0)
             {
                 string updateIssuedQueryDate = @"
-                UPDATE Issued SET 
-                    Дата_окончания = @endDate,
-                    Статус = @status,
-                    Окончание_заморозки = @stopFreeze
-                WHERE №Карты = @cardNumber";
+                    UPDATE Issued SET 
+                        Дата_окончания = date(Дата_окончания, '-' || @daysLeftPlusOne || ' days'),
+                        Статус = @status,
+                        Окончание_заморозки = @stopFreeze
+                    WHERE №Карты = @cardNumber";
 
                 GeneralContext.CommandDataFromDatabase(updateIssuedQueryDate,
                     IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@endDate", Convert.ToDateTime(date).AddDays(-daysLeft-1).ToString("yyyy-MM-dd")),
+                    new SQLiteParameter("@daysLeftPlusOne", daysLeft),
                     new SQLiteParameter("@status", "активирован"),
                     new SQLiteParameter("@stopFreeze", DBNull.Value),
                     new SQLiteParameter("@cardNumber", cardNumber));
@@ -808,7 +804,7 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
             }
-            //ShowMessage("Абонемент закончился по времени");
+            Logger.Info(cardNumber + " Абонемент закончился по времени");
         }
 
         // Сброс данных абонемента клиента
@@ -848,11 +844,22 @@ namespace GymApplicationV2._0
         }
 
         // Обработка посещения клиента
-        private void ProcessClientVisit(string cardNumber, string membership, string date)
+        private void ProcessClientVisit(string cardNumber, string membership)
         {
+            string query = @"SELECT Дата_окончания 
+                        FROM Issued 
+                        WHERE №Карты = @cardNumber 
+                        ORDER BY date(Дата_окончания) ASC
+                        LIMIT 1";
+            var date = GeneralContext.GetElementFromDatabase(query,
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@cardNumber", cardNumber));
+
+            string new_date_after_unfreeze = date.ToString();
+
             if (membership.ToString() == "Безлимитный")
             {
-                ProcessUnlimitedVisit(cardNumber, membership, date);
+                ProcessUnlimitedVisit(cardNumber, membership, new_date_after_unfreeze);
                 return;
             }
 
@@ -860,15 +867,15 @@ namespace GymApplicationV2._0
             object visitsLeft = GeneralContext.GetElementFromDatabase(visitsQuery,
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber),
-                new SQLiteParameter("@dateEnd", date));
+                new SQLiteParameter("@dateEnd", new_date_after_unfreeze));
 
             numberLeft = Convert.ToInt32(visitsLeft);
             if (numberLeft <= 0)
             {
-                HandleNoVisitsLeft(cardNumber, date);
+                HandleNoVisitsLeft(cardNumber, new_date_after_unfreeze);
 
                 var dataNew = GeneralContext.GetDataFromDatabase(@"
-                    SELECT Посещений_осталось, Дата_окончания
+                    SELECT Посещений_осталось, Дата_окончания 
                         FROM Issued 
                         WHERE №Карты = @cardNumber
                         ORDER BY date(Дата_окончания) ASC
@@ -879,10 +886,10 @@ namespace GymApplicationV2._0
                 if (dataNew == null || dataNew.Rows.Count == 0) return;
 
                 numberLeft = Convert.ToInt32(dataNew.Rows[0]["Посещений_осталось"]);
-                date = dataNew.Rows[0]["Дата_окончания"].ToString();
+                new_date_after_unfreeze = dataNew.Rows[0]["Дата_окончания"].ToString();
             }
 
-            ProcessLimitedVisit(cardNumber, numberLeft, date);
+            ProcessLimitedVisit(cardNumber, numberLeft, new_date_after_unfreeze);
         }
 
         // Обработка безлимитного посещения
@@ -890,7 +897,7 @@ namespace GymApplicationV2._0
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посетил = '" + DateTime.Now + "' " +
-                "WHERE №Карты = @cardNumber" +
+                "WHERE №Карты = @cardNumber " +
                 "AND Дата_окончания = @dateEnd",
                 IssuedMembershipContext.ConnectionStringIssued(),
                     new SQLiteParameter("@cardNumber", cardNumber),
@@ -904,6 +911,7 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
+            Logger.Info(cardNumber + " | " + date + " Активен");
 
             var successSound = new PlaySoundHelper();
             successSound.PlaySound();
@@ -935,8 +943,7 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Абонемент закончился. Посещений 0 (Повторно)";
             }
-
-            //ShowMessage("Абонемент закончился. Посещений 0");
+            Logger.Info(cardNumber + "Абонемент закончился. Посещений 0");
         }
 
         // Обработка ограниченного посещения
@@ -959,8 +966,8 @@ namespace GymApplicationV2._0
             {
                 userStatus[cardNumber] = "Активен (Повторно)";
             }
+            Logger.Info(cardNumber + " | " + date + " Активен");
 
-            numberCard = cardNumber;
             jeanModernButtonReturn.Visible = true;
 
             var successSound = new PlaySoundHelper();
@@ -990,12 +997,11 @@ namespace GymApplicationV2._0
         private IssuedMembershipContext.IssuedInfo GetIssuedInfo(string cardNumber, string date)
         {
             string clientQuery = @"
-                SELECT Клиент, Абонемент, Дата_окончания, Посещений_осталось 
+                SELECT Клиент, Дата_окончания, Абонемент, Посещений_осталось 
                 FROM Issued 
                 WHERE №Карты = @cardNumber 
                 AND Дата_окончания = @endDate";
 
-            // Почему-то result null даже когда есть данные в таблице
             var result = IssuedMembershipContext.GetIssuedData(clientQuery,
                 new SQLiteParameter("@cardNumber", cardNumber),
                 new SQLiteParameter("@endDate", date));
@@ -1018,6 +1024,8 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonPurchase_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма товаров");
+
             Products products = new Products();
             products.ShowDialog();
         }
@@ -1027,7 +1035,7 @@ namespace GymApplicationV2._0
         {
             if (nameClient == "")
             {
-                MessageHelper.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран", "Сообщение");
                 return;
             }
 
@@ -1071,11 +1079,15 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonClients_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма клиентов");
+
             ShowOrActivateForm<Clients>();
         }
 
         private void jeanModernButtonReport_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма отчета");
+
             using (var report = new Report())
             {
                 report.userStatus = userStatus;
@@ -1085,36 +1097,50 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonNewMember_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма нового клиента");
+
             ShowOrActivateForm<NewClient>();
         }
 
         private void jeanModernButtonSingleTicket_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма продажи разового посещения");
+
             ShowOrActivateForm<SingleTicket>();
         }
 
         private void jeanModernButtonChooseClient_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма выбора клиентов");
+
             ShowOrActivateForm<ChooseClient>();
         }
 
         private void jeanModernButtonService_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма услуг");
+
             ShowOrActivateForm<Services>();
         }
 
         private void jeanModernButtonChange_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма выданных абонементов");
+
             ShowOrActivateForm<IssuedMembership>();
         }
 
         private void jeanModernButtonArchive_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма архива");
+
             ShowOrActivateForm<ArchiveServices>();
         }
 
         private void jeanModernButtonHistoryPayment_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта история платежей");
+
             ShowOrActivateForm<HistoryPayment>();
         }
 
@@ -1182,6 +1208,8 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonDesign_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма настройки");
+
             Design design = new Design();
             design.SetRefreshAction(ApplyAllSettings);
             design.ShowDialog();
@@ -1189,12 +1217,16 @@ namespace GymApplicationV2._0
 
         private void jeanModernButtonImport_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма импорта");
+
             Import import = new Import();
             import.ShowDialog();
         }
 
         private void jeanModernButtonDocumentation_Click(object sender, EventArgs e)
         {
+            Logger.Info("Открыта форма документации");
+
             Documentation documentation = new Documentation();
             documentation.ShowDialog();
         }
@@ -1204,58 +1236,16 @@ namespace GymApplicationV2._0
             if (MessageHelper.MessageWindowYesNo("Вы действительно хотите отменить посещение?") != DialogResult.Yes)
                 return;
 
-            string selectQuery = @"SELECT Клиент, №Карты, Абонемент, Дата_окончания AS 'Дата окончания', Посещений_осталось AS 'Посещений осталось' FROM Issued WHERE №Карты = @numberCard";
-            if (Regex.IsMatch(numberCard, @"^-?\d+(\d+)?$") || numberCard.Length == 0)
-            {
-                GeneralContext.CommandDataFromDatabase("UPDATE Issued SET " +
+            GeneralContext.CommandDataFromDatabase("UPDATE Issued SET " +
                         "Посещений_осталось = '" + numberLeft.ToString() + "' " +
-                        "WHERE №Карты = '" + numberCard + "';",
+                        "WHERE №Карты = '" + numberCard + "' " +
+                        "ORDER BY date(Дата_окончания) ASC " +
+                        "LIMIT 1;",
                 IssuedMembershipContext.ConnectionStringIssued());
 
-                MessageBox.Show("Посещения обновлены!");
+            MessageHelper.MessageWindowOk("Посещения обновлены!", "Сообщение");
 
-
-                dataGridViewClient.DataSource = GeneralContext.GetDataFromDatabase(selectQuery,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@numberCard", numberCard));
-            }
-            else
-            {
-                string[] nameParts = Regex.Split(numberCard, @"\s+");
-                TextInfo textInfo = CultureInfo.CurrentCulture.TextInfo;
-
-                for (int i = 0; i < nameParts.Length; i++)
-                {
-                    if (!string.IsNullOrEmpty(nameParts[i]))
-                    {
-                        nameParts[i] = textInfo.ToTitleCase(nameParts[i].ToLower());
-                    }
-                }
-
-                if (nameParts.Length < 2)
-                {
-                    MessageBox.Show("Некорректный формат данных клиента.");
-                    return;
-                }
-                ;
-
-                GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
-                        "Посещений_осталось = '" + numberLeft.ToString() + "' " +
-                        "WHERE LOWER(Клиент) LIKE LOWER(@surname) || '%' || LOWER(@name) OR LOWER(Клиент) LIKE LOWER(@name) || '%' || LOWER(@surname)",
-                    IssuedMembershipContext.ConnectionStringIssued(),
-                        new SQLiteParameter("@surname", nameParts[0]),
-                        new SQLiteParameter("@name", nameParts[1]));
-
-                selectQuery = @"SELECT Клиент, №Карты, Абонемент, Дата_окончания AS 'Дата окончания', Посещений_осталось AS 'Посещений осталось' FROM Issued WHERE LOWER(Клиент) LIKE LOWER(@surname) || '%' || LOWER(@name) OR LOWER(Клиент) LIKE LOWER(@name) || '%' || LOWER(@surname)";
-
-
-                dataGridViewClient.DataSource = GeneralContext.GetDataFromDatabase(selectQuery,
-                    IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@surname", nameParts[0]),
-                    new SQLiteParameter("@name", nameParts[1]));
-
-                MessageBox.Show("Посещения обновлены!");
-            }
+            DisplayClientData(numberCard);
 
             jeanModernButtonReturn.Visible = false;
         }

@@ -9,17 +9,32 @@ namespace GymApplicationV2._0.Helpers
 {
     public class MessageHelper
     {
-        public static void MessageWindowOk(string stringMessage)
+        public static void MessageWindowOk(string stringMessage, string status)
         {
+            if (status == "Ошибка")
+            {
+                Logger.Error(stringMessage);
+            }
+            else if(status == "Предупреждение")
+            {
+                Logger.Warning(stringMessage);
+            }
+            else
+            {
+                Logger.Info(stringMessage);
+            }
+                
             MessageBox.Show(
                 stringMessage,
-                "Сообщение",
+                status,
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
 
         public static DialogResult MessageWindowYesNo(string stringMessage)
         {
+            Logger.Info(stringMessage);
+
             return MessageBox.Show(
                 stringMessage,
                 "Сообщение",

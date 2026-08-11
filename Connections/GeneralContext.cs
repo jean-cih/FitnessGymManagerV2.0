@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GymApplicationV2._0.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -36,12 +37,12 @@ namespace GymApplicationV2._0.Connections
             }
             catch (SQLiteException ex)
             {
-                MessageBox.Show($"SQLite error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"SQLite error in {connectionString}: {ex.Message}", "Предупреждение");
                 return null;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"General error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"General error in {connectionString}: {ex.Message}", "Предупреждение");
                 return null;
             }
 
@@ -67,12 +68,12 @@ namespace GymApplicationV2._0.Connections
             }
             catch (SQLiteException ex)
             {
-                Console.Error.WriteLine($"SQLite error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"SQLite error in {connectionString}: {ex.Message}", "Предупреждение");
                 return null;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"General error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"General error in {connectionString}: {ex.Message}", "Предупреждение");
                 return null;
             }
         }
@@ -96,11 +97,11 @@ namespace GymApplicationV2._0.Connections
             }
             catch (SQLiteException ex)
             {
-                Console.Error.WriteLine($"SQLite error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"SQLite error in {connectionString}: {ex.Message}", "Предупреждение");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"General error in {connectionString}: {ex.Message}");
+                MessageHelper.MessageWindowOk($"General error in {connectionString}: {ex.Message}", "Предупреждение");
             }
         }
 

@@ -81,7 +81,7 @@ namespace GymApplicationV2._0
                 $"DELETE FROM Descriptions WHERE Абонемент = '{_labelMembership}'",
                 ServicesContext.ConnectionStringServices());
 
-            MessageHelper.MessageWindowOk("Услуга удалена");
+            MessageHelper.MessageWindowOk("Услуга удалена", "Сообщение");
             RefreshServicesData();
         }
 
@@ -89,19 +89,17 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                MessageHelper.MessageWindowOk("Нужно сначала выбрать услугу");
+                MessageHelper.MessageWindowOk("Нужно сначала выбрать услугу", "Предупреждение");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(NumberCard))
             {
-                MessageHelper.MessageWindowOk("Клиент не выбран");
+                MessageHelper.MessageWindowOk("Клиент не выбран", "Предупреждение");
                 return;
             }
 
-            object _existInIssued = GeneralContext.GetElementFromDatabase($@"SELECT Клиент
-                    FROM Issued 
-                    WHERE №Карты LIKE '%{NumberCard}%'",
+            object _existInIssued = GeneralContext.GetElementFromDatabase($"SELECT Клиент FROM Issued WHERE №Карты LIKE '%{NumberCard}%'",
                 IssuedMembershipContext.ConnectionStringIssued());
 
             if (_existInIssued != null)
@@ -118,8 +116,7 @@ namespace GymApplicationV2._0
         {
             string[] names = labelName.Text.Split(' ');
 
-            var updateQuery = $@"UPDATE Contacts SET 
-              №Карты = @CardNumber,
+            var updateQuery = $@"UPDATE Contacts SET №Карты = @CardNumber 
               WHERE Имя LIKE '%{names[0]}%' 
                 AND Фамилия LIKE '%{names[1]}%'";
 
@@ -145,7 +142,7 @@ namespace GymApplicationV2._0
             AddIssuedMembership();
             AddPaymentHistory();
 
-            MessageHelper.MessageWindowOk("Данные клиента обновлены");
+            MessageHelper.MessageWindowOk("Данные клиента обновлены", "Сообщение");
         }
 
         private int? GetServiceQuantityLeft()
@@ -307,7 +304,7 @@ namespace GymApplicationV2._0
         {
             if (string.IsNullOrWhiteSpace(_labelMembership))
             {
-                MessageHelper.MessageWindowOk("Выберите услугу из таблицы");
+                MessageHelper.MessageWindowOk("Выберите услугу из таблицы", "Сообщение");
                 return;
             }
 

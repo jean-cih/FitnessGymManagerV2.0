@@ -152,12 +152,11 @@ namespace GymApplicationV2._0.FormsServices
 
             var updateQuery = $@"UPDATE Issued SET 
                         Клиент = '{jeanTextBoxClient.Text}',
-                        Дата_окончания = '{jeanTextBoxTerm.Text}',
                         Абонемент = '{jeanTextBoxMembership.Text}',
                         Оплата = '{jeanTextBoxCost.Text}',
                         Статус = '{jeanTextBoxStatus.Text}',
                         Посещений_осталось = '{jeanTextBoxVisits.Text}'
-                        WHERE №Карты = '{_numberCard}';";
+                        WHERE №Карты = '{_numberCard}' AND Дата_окончания = '{jeanTextBoxTerm.Text}';";
 
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 IssuedMembershipContext.ConnectionStringIssued());
@@ -167,7 +166,7 @@ namespace GymApplicationV2._0.FormsServices
             timer.Tick += (s, args) =>
             {
                 timer.Stop();
-                MessageHelper.MessageWindowOk("Данные в базе обновлены");
+                MessageHelper.MessageWindowOk("Данные в базе обновлены", "Сообщение");
                 _fadeAnimation.CloseWithAnimation();
             };
             timer.Start();

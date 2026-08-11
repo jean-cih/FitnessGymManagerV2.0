@@ -555,7 +555,7 @@ namespace GymApplicationV2._0.FormsSettings
                 Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12: DataConfig.sizeFontButtons, FontStyle.Bold),
                 BorderRadius = 10
             };
-            emergencyButton.Click += (s, e) => MessageBox.Show("Экстренная служба поддержки будет доступна в ближайшее время!");
+            emergencyButton.Click += (s, e) => MessageHelper.MessageWindowOk("Экстренная служба поддержки будет доступна в ближайшее время!", "Сообщение");
 
             supportCard.Controls.Add(titleLabel);
             supportCard.Controls.Add(contactInfo);
