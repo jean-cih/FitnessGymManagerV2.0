@@ -188,7 +188,7 @@ namespace GymApplicationV2._0
                  Посетил
           FROM Issued 
           WHERE №Карты = @cardNumber 
-                ORDER BY date(Дата_окончания) ASC
+                ORDER BY Id ASC
                 LIMIT 1";
 
             DataTable table = GeneralContext.GetDataFromDatabase(query,

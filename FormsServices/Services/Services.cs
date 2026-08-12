@@ -240,7 +240,7 @@ namespace GymApplicationV2._0
                 using (var checkCmd = new SQLiteCommand(
                     @"SELECT Дата_окончания FROM Issued 
               WHERE №Карты = @№Карты 
-              ORDER BY Дата_окончания DESC LIMIT 1", conn))
+              ORDER BY Id DESC LIMIT 1", conn))
                 {
                     checkCmd.Parameters.AddWithValue("@№Карты", NumberCard);
 
