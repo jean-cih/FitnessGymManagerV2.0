@@ -202,6 +202,12 @@
     <Compile Include="AnimationTools\FadeAnimation.cs" />
     <Compile Include="AnimationTools\ScreenAnimation.cs" />
     <Compile Include="AppColors\AppColor.cs" />
+    <Compile Include="DuplicateResolution.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DuplicateResolution.Designer.cs">
+      <DependentUpon>DuplicateResolution.cs</DependentUpon>
+    </Compile>
     <Compile Include="Components\Drawer.cs" />
     <Compile Include="Components\JeanFormStyle.cs">
       <SubType>Component</SubType>
@@ -413,6 +419,9 @@
     <Compile Include="FormsSplashScreens\SplashScreen.Designer.cs">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DuplicateResolution.resx">
+      <DependentUpon>DuplicateResolution.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormsClients\Person.resx">
       <DependentUpon>Person.cs</DependentUpon>
     </EmbeddedResource>
