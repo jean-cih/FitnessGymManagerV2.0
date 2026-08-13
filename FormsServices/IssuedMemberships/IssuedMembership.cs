@@ -228,10 +228,11 @@ namespace GymApplicationV2._0
 
             using (var freezeDialog = new FreezeMembership())
             {
-                freezeDialog.txtClientName.Text = _client;
-                freezeDialog.txtFreezeDate.Text = DateTime.Now.ToString("dd.MM.yy");
                 freezeDialog._id = _id;
+                freezeDialog._client = _client;
                 freezeDialog._numberCard = _numberCard;
+
+                freezeDialog.UpdateData();
 
                 freezeDialog.ShowDialog();
             }
@@ -257,6 +258,8 @@ namespace GymApplicationV2._0
                 changeDialog.jeanTextBoxVisits.Text = _visits;
                 changeDialog.jeanTextBoxFreezeDate.Text = _freezeDate;
                 changeDialog._id = _id;
+
+                changeDialog.UpdateData();
 
                 changeDialog.ShowDialog();
             }

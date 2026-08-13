@@ -14,16 +14,18 @@ namespace GymApplicationV2._0.FormsServices
 {
     public partial class FreezeMembership : ShadowedForm
     {
-        public Label txtClientName;
-        public Label txtFreezeDate;
         private ComboBox cmbFreezeReason;
         private NumericUpDown numFreezeDays;
-        private JeanModernButton btnSave;
-        private JeanModernButton btnCancel;
         private Label lblTitle;
+
+        private Label txtClientName;
+        private Label lblCard;
+        private Label lblFreezeReason;
+        private Label lblFreezeDays;
 
         public string _id = string.Empty;
         public string _numberCard = string.Empty;
+        public string _client = string.Empty;
 
         private FadeAnimation _fadeAnimation;
 
@@ -54,9 +56,7 @@ namespace GymApplicationV2._0.FormsServices
         {
             // Основные настройки формы
             this.BackColor = Color.FromArgb(255, 255, 255);
-            this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Padding = new Padding(10);
             this.DoubleBuffered = true;
 
             titlePanel = new Panel
@@ -76,70 +76,25 @@ namespace GymApplicationV2._0.FormsServices
                 TextAlign = ContentAlignment.MiddleCenter,
                 BackColor = Color.Transparent
             };
-
-            lblTitle.Location = new Point((this.Width - lblTitle.Width) / 2, (titlePanel.Height - lblTitle.Height) / 2);
             titlePanel.Controls.Add(lblTitle);
 
             // Информация о клиенте
-            Label lblClientInfo = new Label
-            {
-                Text = "Информация о клиенте:",
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = Color.MediumSlateBlue,
-                Location = new Point(20, 60),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            var lblClientInfo = UIStyler.CreateStyledTextBox("Информация о клиенте:", new Point(20, 60), Color.MediumSlateBlue);
 
-            txtClientName = CreateStyledTextBox(new Point(30, 90), 400);
+            txtClientName = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 90));
 
-            Label lblCard = new Label
-            {
-                Text = "Номер карты:",
-                Font = new Font("Segoe UI", 11, FontStyle.Regular),
-                ForeColor = Color.Black,
-                Location = new Point(30, 130),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            lblCard = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 125));
 
             // Детали заморозки
-            Label lblFreezeDetails = new Label
-            {
-                Text = "Детали заморозки:",
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
-                ForeColor = Color.MediumSlateBlue,
-                Location = new Point(20, 170),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            var lblFreezeDetails = UIStyler.CreateStyledTextBox("Детали заморозки:", new Point(20, 170), Color.MediumSlateBlue);
 
             // Поля для заморозки
-            Label lblFreezeDate = new Label
-            {
-                Text = "Дата заморозки:",
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                ForeColor = Color.Black,
-                Location = new Point(30, 200),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            var lblFreezeDate = UIStyler.CreateStyledTextBox("Дата заморозки: " + DateTime.Now.ToShortDateString(), new Point(30, 200));
 
-            txtFreezeDate = CreateStyledTextBox(new Point(180, 202), 180);
-
-            Label lblFreezeReason = new Label
-            {
-                Text = "Причина заморозки:",
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                ForeColor = Color.Black,
-                Location = new Point(30, 235),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            lblFreezeReason = UIStyler.CreateStyledTextBox("Причина заморозки:", new Point(30, 235));
 
             cmbFreezeReason = new ComboBox
             {
-                Location = new Point(180, 235),
                 Size = new Size(200, 30),
                 Font = new Font("Segoe UI", 10, FontStyle.Regular),
                 DropDownStyle = ComboBoxStyle.DropDownList,
@@ -158,19 +113,10 @@ namespace GymApplicationV2._0.FormsServices
             });
             cmbFreezeReason.SelectedIndex = 0;
 
-            Label lblFreezeDays = new Label
-            {
-                Text = "Срок заморозки (дней):",
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                ForeColor = Color.Black,
-                Location = new Point(30, 270),
-                AutoSize = true,
-                BackColor = Color.Transparent
-            };
+            lblFreezeDays = UIStyler.CreateStyledTextBox("Срок заморозки (дней):", new Point(30, 270));
 
             numFreezeDays = new NumericUpDown
             {
-                Location = new Point(190, 270),
                 Size = new Size(60, 30),
                 Font = new Font("Segoe UI", 9),
                 Minimum = 1,
@@ -182,11 +128,13 @@ namespace GymApplicationV2._0.FormsServices
             };
 
             // Кнопки
-            btnCancel = CreateStyledButton("Отмена", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(120, 320), new Size(120, 40));
-            btnSave = CreateStyledButton("Заморозить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
+            var btnCancel = UIStyler.CreateStyledButton("Отмена", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(120, 320), new Size(120, 40));
+            var btnSave = UIStyler.CreateStyledButton("Заморозить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
+            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
 
             btnCancel.Click += BtnCancel_Click;
             btnSave.Click += BtnFreeze_Click;
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             // Добавляем все элементы на главную панель
             this.Controls.AddRange(new Control[]
@@ -196,134 +144,40 @@ namespace GymApplicationV2._0.FormsServices
                 lblCard,
                 lblFreezeDetails,
                 lblFreezeDate,
-                txtFreezeDate,
                 lblFreezeReason,
                 cmbFreezeReason,
                 lblFreezeDays,
                 numFreezeDays,
                 btnCancel,
-                btnSave
+                btnSave,
+                btnClose,
+                titlePanel
             });
-
-            var btnClose = new JeanModernButton
-            {
-                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand
-            };
-
-            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(460, 10), new Size(30, 28));
-            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
-
-            // Добавление подсказки внизу формы
-            hintLabel.Font = new Font("Montserrat", 7, FontStyle.Italic);
-            hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
-            hintLabel.BackColor = Color.Transparent;
-            hintLabel.Size = new Size(250, 25);
-            hintLabel.Location = new Point((this.Width - 250) / 2, this.Height - hintLabel.Height - 10);
-
-            titlePanel.Controls.Add(btnClose);
-
-            this.Controls.Add(titlePanel);
         }
 
-        private Label CreateStyledTextBox(Point location, int width)
+        public void UpdateData()
         {
-            return new Label
-            {
-                Location = location,
-                Size = new Size(width, 16),
-                BorderStyle = BorderStyle.None,
-                BackColor = Color.Transparent,
-                ForeColor = Color.Black,
-                Font = new Font("Segoe UI", 11, FontStyle.Regular),
-            };
-        }
+            if (txtClientName != null)
+                txtClientName.Text = "Клиент: " + _client;
 
-        private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = baseColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
+            if (lblCard != null)
+                lblCard.Text = "Номер карты: " + _numberCard;
 
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.Text = text;
-            button.Font = new Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            return button;
+            lblTitle.Location = new Point((this.Width - lblTitle.Width) / 2, (titlePanel.Height - lblTitle.Height) / 2);
+            cmbFreezeReason.Location = new Point(lblFreezeReason.Location.X + lblFreezeReason.Width, 235);
+            numFreezeDays.Location = new Point(lblFreezeDays.Location.X + lblFreezeDays.Width, 270);
+            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
         }
 
         private void BtnFreeze_Click(object sender, EventArgs e)
         {
-            if (!ValidateForm()) return;
-
             try
             {
-                // Парсим дату окончания заморозки
-                if (!DateTime.TryParseExact(txtFreezeDate.Text, "dd.MM.yy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime freezeDate))
-                {
-                    MessageHelper.MessageWindowOk("❌ Неверный формат даты! Используйте ДД.ММ.ГГ", "Ошибка");
-                    return;
-                }
-
                 string reason = cmbFreezeReason.SelectedItem.ToString().Substring(2);
                 int days = (int)numFreezeDays.Value;
 
-                // Рассчитываем новую дату окончания
-                DateTime newFreezeEndDate = freezeDate.AddDays(days);
+                DateTime newFreezeEndDate = DateTime.Now.AddDays(days);
 
-                // Используем параметризованный запрос
                 using (var conn = new SQLiteConnection(IssuedMembershipContext.ConnectionStringIssued()))
                 {
                     conn.Open();
@@ -352,16 +206,13 @@ namespace GymApplicationV2._0.FormsServices
                     }
                 }
 
-                // Показываем сообщение об успехе
-                MessageHelper.MessageWindowOk($"✅ Абонемент успешно заморожен!\n\n" +
-                                   $"👤 Клиент: {txtClientName.Text}\n" +
-                                   $"📅 Дата заморозки: {freezeDate:dd.MM.yyyy}\n" +
+                MessageHelper.ShowNotification(this, $"✅ Абонемент успешно заморожен!\n\n" +
+                                   $"👤 Клиент: {_client}\n" +
+                                   $"📅 Дата заморозки: {DateTime.Now.ToShortDateString()}\n" +
                                    $"⏰ Срок: {days} дней\n" +
-                                   $"📋 Причина: {reason}",
-                                   "Успешно");
+                                   $"📋 Причина: {reason}", 1500);
 
-                    this.DialogResult = DialogResult.OK;
-                    this.Close();
+                _fadeAnimation.CloseWithAnimation();
             }
             catch (Exception ex)
             {
@@ -373,23 +224,6 @@ namespace GymApplicationV2._0.FormsServices
         {
             this.DialogResult = DialogResult.Cancel;
             _fadeAnimation.CloseWithAnimation();
-        }
-
-        private bool ValidateForm()
-        {
-            if (string.IsNullOrEmpty(txtFreezeDate.Text))
-            {
-                MessageHelper.MessageWindowOk("❌ Укажите дату заморозки", "Ошибка");
-                return false;
-            }
-
-            if (cmbFreezeReason.SelectedItem == null)
-            {
-                MessageHelper.MessageWindowOk("❌ Выберите причину заморозки", "Ошибка");
-                return false;
-            }
-
-            return true;
         }
     }
 }

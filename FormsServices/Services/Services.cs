@@ -73,6 +73,8 @@ namespace GymApplicationV2._0
         {
             using (var serviceForm = new FieldForService())
             {
+                serviceForm.UpdateData();
+
                 serviceForm.ShowDialog();
                 RefreshServicesData();
             }
@@ -301,6 +303,8 @@ namespace GymApplicationV2._0
                 f.jeanTextBoxVisited.Text = _servicesQuantity;
                 f.jeanTextBoxName.Text = _labelMembership;
                 f._id = _id;
+
+                f.UpdateData();
             });
 
             RefreshServicesData();

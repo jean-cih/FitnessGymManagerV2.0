@@ -1,4 +1,6 @@
-﻿namespace GymApplicationV2._0.FormsServices
+﻿using System.Drawing;
+
+namespace GymApplicationV2._0.FormsServices
 {
     partial class FreezeMembership
     {
@@ -38,15 +40,14 @@
             this.hintLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.hintLabel.AutoSize = true;
-            this.hintLabel.BackColor = System.Drawing.Color.Transparent;
-            this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.hintLabel.Location = new System.Drawing.Point(83, 402);
             this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.hintLabel.Name = "hintLabel";
-            this.hintLabel.Size = new System.Drawing.Size(195, 13);
             this.hintLabel.TabIndex = 36;
             this.hintLabel.Text = "Выберите причину и срок заморозки";
             this.hintLabel.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.hintLabel.Font = new Font("Montserrat", 7, FontStyle.Italic);
+            this.hintLabel.ForeColor = Color.FromArgb(140, 140, 180);
+            this.hintLabel.BackColor = Color.Transparent;
             // 
             // jeanFormStyle1
             // 
@@ -86,5 +87,6 @@
 
         protected internal System.Windows.Forms.Label hintLabel;
         private Components.JeanFormStyle jeanFormStyle1;
+
     }
 }

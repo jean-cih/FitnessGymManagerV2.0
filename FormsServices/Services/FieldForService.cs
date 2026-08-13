@@ -1,8 +1,8 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.Helpers;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Data.SQLite;
@@ -42,9 +42,7 @@ namespace GymApplicationV2._0
         {
             // Настройка стиля формы
             this.BackColor = Color.FromArgb(255, 255, 255);
-            this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Padding = new Padding(1);
             this.DoubleBuffered = true;
 
             titlePanel = new Panel
@@ -53,109 +51,32 @@ namespace GymApplicationV2._0
                 BackColor = Color.MediumSlateBlue,
                 Location = new Point(0, 0),
             };
-
-            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
             titlePanel.Controls.Add(titleLabel);
 
-            label1.ForeColor = Color.MediumSlateBlue;
-
             // Стилизация текстовых полей
-            StyleTextBox(jeanTextBoxName, "Введите название услуги");
-            StyleTextBox(jeanTextBoxPrice, "Цена (руб)");
-            StyleTextBox(jeanTextBoxTerm, "Срок действия (месяцев)");
-            StyleTextBox(jeanTextBoxVisited, "Количество посещений (опционально)");
+            UIStyler.StyleTextBox(this, jeanTextBoxName);
+            UIStyler.StyleTextBox(this, jeanTextBoxPrice);
+            UIStyler.StyleTextBox(this, jeanTextBoxTerm);
+            UIStyler.StyleTextBox(this, jeanTextBoxVisited);
 
             // Стилизация кнопок
-            StyleButton(jeanModernButtonAdd, "Добавить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonAdd.Width) / 2, this.Height - jeanModernButtonAdd.Height - 60));
+            var jeanModernButtonAdd = UIStyler.CreateStyledButton("Добавить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(this.Width / 2 - 60, this.Height - 80), new Size(120, 40));
+            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
 
-            // Добавление подсказки
-            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
-
-            var btnClose = new JeanModernButton
-            {
-                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand
-            };
-
-            StyleButton(btnClose, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, (titlePanel.Height - btnClose.Height) / 2));
-
+            jeanModernButtonAdd.Click += buttonSave_Click;
             btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.Add(titlePanel);
+            this.Controls.Add(jeanModernButtonAdd);
         }
 
-        private void StyleTextBox(JeanTextBox textBox, string placeholder)
+        public void UpdateData()
         {
-            textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            textBox.BackColor = Color.White;
-            textBox.ForeColor = Color.Black;
-            textBox.Font = new Font("Montserrat", 9);
-
-            // События для подсветки
-            textBox.Enter += (s, e) =>
-            {
-                textBox.BorderColor = Color.FromArgb(113, 96, 232);
-            };
-
-            textBox.Leave += (s, e) =>
-            {
-                textBox.BorderColor = Color.FromArgb(113, 96, 232);
-            };
-        }
-
-        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
-        {
-            button.Text = text;
-            button.Font = new Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-            button.Location = location;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-        }
-
-        private void FieldForService_Load(object sender, EventArgs e)
-        {
-            jeanModernButtonAdd.Font = new Font("Montserrat", DataConfig.sizeFontButtons, FontStyle.Bold);
+            labelService.Location = new Point((this.Width - labelService.Width) / 2, labelService.Location.Y);
+            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
+            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -168,19 +89,8 @@ namespace GymApplicationV2._0
 
             InsertService();
 
-            // Анимация успешного добавления
-            jeanModernButtonAdd.BackColor = Color.FromArgb(50, 200, 100);
-            jeanModernButtonAdd.Text = "✓ Готово";
-
-            var timer = new Timer();
-            timer.Interval = 500;
-            timer.Tick += (s, args) =>
-            {
-                timer.Stop();
-                MessageHelper.MessageWindowOk("Услуга успешно добавлена", "Сообщение");
-                _fadeAnimation.CloseWithAnimation();
-            };
-            timer.Start();
+            MessageHelper.ShowNotification(this, "✅ Услуга успешно добавлена", 1500);
+            _fadeAnimation.CloseWithAnimation();
         }
 
         private bool ValidateInput()
@@ -245,44 +155,6 @@ namespace GymApplicationV2._0
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
-            }
-        }
-
-        private void jeanModernButton1_Click(object sender, EventArgs e)
-        {
-            _fadeAnimation.CloseWithAnimation();
-        }
-
-        private void jeanTextBoxPrice_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void jeanTextBoxTerm_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void jeanTextBoxVisited_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        // Сброс цвета при вводе
-        private void jeanTextBox_TextChanged(object sender, EventArgs e)
-        {
-            if (sender is JeanTextBox textBox)
-            {
-                textBox.BorderColor = Color.FromArgb(80, 80, 120);
             }
         }
     }
