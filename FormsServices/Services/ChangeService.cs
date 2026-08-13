@@ -44,9 +44,7 @@ namespace GymApplicationV2._0
         {
             // Настройка стиля формы
             this.BackColor = Color.FromArgb(255, 255, 255);
-            this.ForeColor = Color.White;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.Padding = new Padding(1);
             this.DoubleBuffered = true;
 
             titlePanel = new Panel
@@ -55,92 +53,32 @@ namespace GymApplicationV2._0
                 BackColor = Color.MediumSlateBlue,
                 Location = new Point(0, 0),
             };
-
-            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
             titlePanel.Controls.Add(titleLabel);
 
-            label1.ForeColor = Color.MediumSlateBlue;
-
             // Стилизация текстовых полей
-            StyleTextBox(jeanTextBoxName, "Название услуги");
-            StyleTextBox(jeanTextBoxPrice, "Цена");
-            StyleTextBox(jeanTextBoxTerm, "Срок действия (мес)");
-            StyleTextBox(jeanTextBoxVisited, "Количество посещений");
+            UIStyler.StyleTextBox(this, jeanTextBoxName);
+            UIStyler.StyleTextBox(this, jeanTextBoxPrice);
+            UIStyler.StyleTextBox(this, jeanTextBoxTerm);
+            UIStyler.StyleTextBox(this, jeanTextBoxVisited);
 
             // Стилизация кнопок
-            StyleButton(jeanModernButtonSave, "Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonSave.Width) / 2, this.Height - jeanModernButtonSave.Height - 50));
+            var jeanModernButtonSave = UIStyler.CreateStyledButton("Сохранить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(this.Width / 2 - 60, this.Height - 80), new Size(120, 40));
+            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
 
-            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
-
-            var btnClose = new JeanModernButton
-            {
-                Font = new Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand
-            };
-
-            StyleButton(btnClose, "X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, (titlePanel.Height - btnClose.Height) / 2));
-
+            jeanModernButtonSave.Click += jeanModernButtonSave_Click;
             btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.Add(titlePanel);
+            this.Controls.Add(jeanModernButtonSave);
         }
 
-        private void StyleTextBox(JeanTextBox textBox, string placeholder)
+        public void UpdateData()
         {
-            textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            textBox.BackColor = Color.White;
-            textBox.ForeColor = Color.Black;
-            textBox.Font = new Font("Montserrat", 9);
-        }
-
-        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location)
-        {
-            button.Text = text;
-            button.Font = new Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-            button.Location = location;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
+            labelService.Location = new Point((this.Width - labelService.Width) / 2, labelService.Location.Y);
+            titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
+            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
         }
 
         private void jeanModernButtonSave_Click(object sender, EventArgs e)
@@ -167,65 +105,8 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase(updateQuery,
                 ServicesContext.ConnectionStringServices());
 
-            // Анимация успешного сохранения
-            jeanModernButtonSave.BackColor = Color.FromArgb(50, 200, 100);
-            jeanModernButtonSave.Text = "✓ Готово";
-
-            var timer = new Timer();
-            timer.Interval = 500;
-            timer.Tick += (s, args) =>
-            {
-                timer.Stop();
-                MessageHelper.MessageWindowOk("Услуга изменена", "Сообщение");
-                _fadeAnimation.CloseWithAnimation();
-            };
-            timer.Start();
-        }
-
-        private void jeanModernButton1_Click(object sender, EventArgs e)
-        {
+            MessageHelper.ShowNotification(this, "✅ Услуга изменена", 1500);
             _fadeAnimation.CloseWithAnimation();
-        }
-
-        private void JeanSoftTextBox_Enter(object sender, EventArgs e)
-        {
-            if (sender is jeanSoftTextBox textBox)
-            {
-                textBox.BorderColor = Color.FromArgb(100, 180, 255);
-            }
-        }
-
-        private void JeanSoftTextBox_Leave(object sender, EventArgs e)
-        {
-            if (sender is jeanSoftTextBox textBox)
-            {
-                textBox.BorderColor = Color.FromArgb(80, 80, 120);
-            }
-        }
-
-        // Валидация числовых полей
-        private void jeanSoftTextBoxPrice_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && e.KeyChar != '.')
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void jeanSoftTextBoxTerm_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
-        }
-
-        private void jeanSoftTextBoxQuantity_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
-            {
-                e.Handled = true;
-            }
         }
     }
 }

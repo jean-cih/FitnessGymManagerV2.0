@@ -31,7 +31,6 @@ namespace GymApplicationV2._0.FormsServices
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.jeanModernButtonChange = new GymApplicationV2._0.Controls.JeanModernButton();
             this.titleLabel = new System.Windows.Forms.Label();
             this.hintLabel = new System.Windows.Forms.Label();
             this.jeanFormStyle1 = new GymApplicationV2._0.Components.JeanFormStyle(this.components);
@@ -43,28 +42,6 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxCost = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxFreezeDate = new GymApplicationV2._0.JeanTextBox();
             this.SuspendLayout();
-            // 
-            // jeanModernButtonChange
-            // 
-            this.jeanModernButtonChange.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.jeanModernButtonChange.BackColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanModernButtonChange.BackgroundColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanModernButtonChange.BorderColor = System.Drawing.Color.DarkOrange;
-            this.jeanModernButtonChange.BorderRadius = 20;
-            this.jeanModernButtonChange.BorderSize = 2;
-            this.jeanModernButtonChange.FlatAppearance.BorderSize = 0;
-            this.jeanModernButtonChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.jeanModernButtonChange.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanModernButtonChange.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonChange.Location = new System.Drawing.Point(140, 380);
-            this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(2);
-            this.jeanModernButtonChange.Name = "jeanModernButtonChange";
-            this.jeanModernButtonChange.Size = new System.Drawing.Size(112, 37);
-            this.jeanModernButtonChange.TabIndex = 29;
-            this.jeanModernButtonChange.Text = "Изменить";
-            this.jeanModernButtonChange.TextColor = System.Drawing.Color.White;
-            this.jeanModernButtonChange.UseVisualStyleBackColor = false;
-            this.jeanModernButtonChange.Click += new System.EventHandler(this.jeanModernButtonChange_Click);
             // 
             // titleLabel
             // 
@@ -125,11 +102,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxTerm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxTerm.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxTerm.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxTerm.Location = new System.Drawing.Point(66, 210);
+            this.jeanTextBoxTerm.Location = new System.Drawing.Point(66, 195);
             this.jeanTextBoxTerm.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxTerm.Name = "jeanTextBoxTerm";
             this.jeanTextBoxTerm.SelectionStart = 0;
-            this.jeanTextBoxTerm.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxTerm.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxTerm.TabIndex = 46;
             this.jeanTextBoxTerm.TextInput = "";
             this.jeanTextBoxTerm.TextPreview = "Срок абонемента";
@@ -145,11 +122,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxMembership.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxMembership.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxMembership.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxMembership.Location = new System.Drawing.Point(66, 173);
+            this.jeanTextBoxMembership.Location = new System.Drawing.Point(66, 153);
             this.jeanTextBoxMembership.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxMembership.Name = "jeanTextBoxMembership";
             this.jeanTextBoxMembership.SelectionStart = 0;
-            this.jeanTextBoxMembership.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxMembership.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxMembership.TabIndex = 45;
             this.jeanTextBoxMembership.TextInput = "";
             this.jeanTextBoxMembership.TextPreview = "Абонемент";
@@ -165,11 +142,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxStatus.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxStatus.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxStatus.Location = new System.Drawing.Point(66, 136);
+            this.jeanTextBoxStatus.Location = new System.Drawing.Point(66, 111);
             this.jeanTextBoxStatus.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxStatus.Name = "jeanTextBoxStatus";
             this.jeanTextBoxStatus.SelectionStart = 0;
-            this.jeanTextBoxStatus.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxStatus.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxStatus.TabIndex = 44;
             this.jeanTextBoxStatus.TextInput = "";
             this.jeanTextBoxStatus.TextPreview = "Статус";
@@ -185,11 +162,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxClient.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxClient.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxClient.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxClient.Location = new System.Drawing.Point(66, 98);
+            this.jeanTextBoxClient.Location = new System.Drawing.Point(66, 69);
             this.jeanTextBoxClient.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxClient.Name = "jeanTextBoxClient";
             this.jeanTextBoxClient.SelectionStart = 0;
-            this.jeanTextBoxClient.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxClient.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxClient.TabIndex = 43;
             this.jeanTextBoxClient.TextInput = "";
             this.jeanTextBoxClient.TextPreview = "Наименование";
@@ -205,11 +182,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxVisits.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxVisits.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxVisits.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxVisits.Location = new System.Drawing.Point(66, 247);
+            this.jeanTextBoxVisits.Location = new System.Drawing.Point(66, 237);
             this.jeanTextBoxVisits.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxVisits.Name = "jeanTextBoxVisits";
             this.jeanTextBoxVisits.SelectionStart = 0;
-            this.jeanTextBoxVisits.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxVisits.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxVisits.TabIndex = 47;
             this.jeanTextBoxVisits.TextInput = "";
             this.jeanTextBoxVisits.TextPreview = "Посещений";
@@ -225,11 +202,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxCost.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxCost.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxCost.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxCost.Location = new System.Drawing.Point(66, 284);
+            this.jeanTextBoxCost.Location = new System.Drawing.Point(66, 279);
             this.jeanTextBoxCost.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxCost.Name = "jeanTextBoxCost";
             this.jeanTextBoxCost.SelectionStart = 0;
-            this.jeanTextBoxCost.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxCost.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxCost.TabIndex = 48;
             this.jeanTextBoxCost.TextInput = "";
             this.jeanTextBoxCost.TextPreview = "Цена";
@@ -249,7 +226,7 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxFreezeDate.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxFreezeDate.Name = "jeanTextBoxFreezeDate";
             this.jeanTextBoxFreezeDate.SelectionStart = 0;
-            this.jeanTextBoxFreezeDate.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxFreezeDate.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxFreezeDate.TabIndex = 49;
             this.jeanTextBoxFreezeDate.TextInput = "";
             this.jeanTextBoxFreezeDate.TextPreview = "Окончание заморозки";
@@ -270,7 +247,6 @@ namespace GymApplicationV2._0.FormsServices
             this.Controls.Add(this.jeanTextBoxClient);
             this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.titleLabel);
-            this.Controls.Add(this.jeanModernButtonChange);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "ChangeIssuedMembership";
@@ -281,8 +257,6 @@ namespace GymApplicationV2._0.FormsServices
         }
 
         #endregion
-
-        private Controls.JeanModernButton jeanModernButtonChange;
         protected internal System.Windows.Forms.Label titleLabel;
         protected internal System.Windows.Forms.Label hintLabel;
         private Components.JeanFormStyle jeanFormStyle1;

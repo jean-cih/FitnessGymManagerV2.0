@@ -31,35 +31,12 @@ namespace GymApplicationV2._0.FormsServices
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BackToLife));
-            this.jeanModernButtonBackToLife = new GymApplicationV2._0.Controls.JeanModernButton();
             this.titleLabel = new System.Windows.Forms.Label();
             this.hintLabel = new System.Windows.Forms.Label();
             this.jeanTextBoxVisits = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxTerm = new GymApplicationV2._0.JeanTextBox();
             this.jeanTextBoxMembership = new GymApplicationV2._0.JeanTextBox();
             this.SuspendLayout();
-            // 
-            // jeanModernButtonBackToLife
-            // 
-            this.jeanModernButtonBackToLife.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.jeanModernButtonBackToLife.BackColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanModernButtonBackToLife.BackgroundColor = System.Drawing.Color.MediumSlateBlue;
-            this.jeanModernButtonBackToLife.BorderColor = System.Drawing.Color.DarkOrange;
-            this.jeanModernButtonBackToLife.BorderRadius = 20;
-            this.jeanModernButtonBackToLife.BorderSize = 2;
-            this.jeanModernButtonBackToLife.FlatAppearance.BorderSize = 0;
-            this.jeanModernButtonBackToLife.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.jeanModernButtonBackToLife.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanModernButtonBackToLife.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonBackToLife.Location = new System.Drawing.Point(126, 320);
-            this.jeanModernButtonBackToLife.Margin = new System.Windows.Forms.Padding(2);
-            this.jeanModernButtonBackToLife.Name = "jeanModernButtonBackToLife";
-            this.jeanModernButtonBackToLife.Size = new System.Drawing.Size(112, 37);
-            this.jeanModernButtonBackToLife.TabIndex = 23;
-            this.jeanModernButtonBackToLife.Text = "Вернуть";
-            this.jeanModernButtonBackToLife.TextColor = System.Drawing.Color.White;
-            this.jeanModernButtonBackToLife.UseVisualStyleBackColor = false;
-            this.jeanModernButtonBackToLife.Click += new System.EventHandler(this.jeanModernButtonBackToLife_Click);
             // 
             // titleLabel
             // 
@@ -101,11 +78,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxVisits.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxVisits.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxVisits.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxVisits.Location = new System.Drawing.Point(52, 208);
+            this.jeanTextBoxVisits.Location = new System.Drawing.Point(52, 215);
             this.jeanTextBoxVisits.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxVisits.Name = "jeanTextBoxVisits";
             this.jeanTextBoxVisits.SelectionStart = 0;
-            this.jeanTextBoxVisits.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxVisits.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxVisits.TabIndex = 48;
             this.jeanTextBoxVisits.TextInput = "";
             this.jeanTextBoxVisits.TextPreview = "Посещения";
@@ -121,11 +98,11 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxTerm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxTerm.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxTerm.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxTerm.Location = new System.Drawing.Point(52, 170);
+            this.jeanTextBoxTerm.Location = new System.Drawing.Point(52, 173);
             this.jeanTextBoxTerm.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxTerm.Name = "jeanTextBoxTerm";
             this.jeanTextBoxTerm.SelectionStart = 0;
-            this.jeanTextBoxTerm.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxTerm.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxTerm.TabIndex = 47;
             this.jeanTextBoxTerm.TextInput = "";
             this.jeanTextBoxTerm.TextPreview = "Срок";
@@ -145,7 +122,7 @@ namespace GymApplicationV2._0.FormsServices
             this.jeanTextBoxMembership.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxMembership.Name = "jeanTextBoxMembership";
             this.jeanTextBoxMembership.SelectionStart = 0;
-            this.jeanTextBoxMembership.Size = new System.Drawing.Size(264, 32);
+            this.jeanTextBoxMembership.Size = new System.Drawing.Size(264, 40);
             this.jeanTextBoxMembership.TabIndex = 46;
             this.jeanTextBoxMembership.TextInput = "";
             this.jeanTextBoxMembership.TextPreview = "Абонемент";
@@ -162,7 +139,6 @@ namespace GymApplicationV2._0.FormsServices
             this.Controls.Add(this.jeanTextBoxMembership);
             this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.titleLabel);
-            this.Controls.Add(this.jeanModernButtonBackToLife);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(2);
@@ -174,7 +150,6 @@ namespace GymApplicationV2._0.FormsServices
         }
 
         #endregion
-        private Controls.JeanModernButton jeanModernButtonBackToLife;
         protected internal System.Windows.Forms.Label titleLabel;
         protected internal System.Windows.Forms.Label hintLabel;
         public JeanTextBox jeanTextBoxVisits;

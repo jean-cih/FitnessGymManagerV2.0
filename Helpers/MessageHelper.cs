@@ -41,5 +41,11 @@ namespace GymApplicationV2._0.Helpers
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Information);
         }
+
+        public static void ShowNotification(Form form, string message, int duration = 1000)
+        {
+            ToolTip toolTip = new ToolTip();
+            toolTip.Show(message, form, form.Width / 2 - 100, form.Height / 2 - 20, duration);
+        }
     }
 }

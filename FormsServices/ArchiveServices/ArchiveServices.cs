@@ -220,6 +220,8 @@ namespace GymApplicationV2._0
                 f.jeanTextBoxTerm.Text = _term;
                 f.jeanTextBoxVisits.Text = _visits;
                 f._id = _id;
+
+                f.UpdateData();
             });
         }
 
@@ -234,6 +236,8 @@ namespace GymApplicationV2._0
                 f.jeanTextBoxCost.Text = _cost;
                 f.jeanTextBoxVisits.Text = _visits;
                 f._id = _id;
+
+                f.UpdateData();
             });
         }
     }
