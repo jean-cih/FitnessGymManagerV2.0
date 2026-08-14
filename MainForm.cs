@@ -613,8 +613,6 @@ namespace GymApplicationV2._0
         {
             if (!ValidateIssuedExists(card)) return;
 
-            if (!ValidateMembershipStatus(card)) return;
-
             string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
                 WHERE №Карты = @cardNumber
                 ORDER BY date(Дата_окончания) ASC
@@ -627,6 +625,8 @@ namespace GymApplicationV2._0
 
             string membership = data.Rows[0]["Абонемент"].ToString();
             string date = data.Rows[0]["Дата_окончания"].ToString();
+
+            if (!ValidateMembershipStatus(card, membership)) return;
 
             TryHandleFrozenMembership(card, date);
 
@@ -746,7 +746,7 @@ namespace GymApplicationV2._0
         }
 
         // Валидация статуса абонемента
-        private bool ValidateMembershipStatus(string cardNumber)
+        private bool ValidateMembershipStatus(string cardNumber, string membership)
         {
             object timeLeft = GeneralContext.GetElementFromDatabase(@"SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber
                 ORDER BY date(Дата_окончания) ASC
@@ -760,6 +760,38 @@ namespace GymApplicationV2._0
 
                 ProcessMembership(numberCard);
                 return false;
+            }
+
+            var term_membership = GeneralContext.GetElementFromDatabase(@"SELECT Срок_действия 
+                        FROM Descriptions 
+                        WHERE Абонемент = @membership",
+                ServicesContext.ConnectionStringServices(),
+                new SQLiteParameter("@membership", membership));
+
+
+            DateTime endDate = Convert.ToDateTime(timeLeft);
+            int termMonths = Convert.ToInt32(term_membership);
+
+            DateTime startDate = endDate.AddMonths(-termMonths);
+
+            if (DateTime.Compare(startDate.Date, DateTime.Now.Date) > 0)
+            {
+                int daysDifference = (startDate - DateTime.Now).Days;
+
+                DateTime newEndDate = endDate.AddDays(-daysDifference-1);
+
+                string newEndDateStr = newEndDate.ToString("yyyy-MM-dd");
+                string oldEndDateStr = endDate.ToString("yyyy-MM-dd");
+
+                GeneralContext.CommandDataFromDatabase(
+                    @"UPDATE Issued SET 
+                        Дата_окончания = @newEndDate 
+                      WHERE №Карты = @cardNumber 
+                        AND Дата_окончания = @oldEndDate",
+                    IssuedMembershipContext.ConnectionStringIssued(),
+                    new SQLiteParameter("@newEndDate", newEndDateStr),
+                    new SQLiteParameter("@cardNumber", cardNumber),
+                    new SQLiteParameter("@oldEndDate", oldEndDateStr));
             }
 
             return true;
@@ -1054,6 +1086,7 @@ namespace GymApplicationV2._0
             services.labelName.Text = nameClient;
             services.NumberCard = numberCard;
             services.checkBoxVisited.Visible = true;
+            services.dateActivation.Visible = true;
 
             services.Show();
         }

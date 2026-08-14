@@ -170,7 +170,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             titlePanel.Controls.Add(titleLabel);
 
-            var btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(893, 10), new Size(30, 28));
+            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
             btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
@@ -361,7 +361,7 @@ namespace GymApplicationV2._0.FormsSettings
                 ForeColor = Color.FromArgb(255, 140, 0),
             };
 
-            var choose = CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
+            var choose = UIStyler.CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
             choose.Click += (s, e) => SelectSoundFile(s, e, false);
 
             var tooltip = new ToolTip();
@@ -401,7 +401,7 @@ namespace GymApplicationV2._0.FormsSettings
                 ForeColor = Color.FromArgb(255, 140, 0),
             };
 
-            var choose = CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
+            var choose = UIStyler.CreateStyledButton("Выбрать", Color.FromArgb(70, 130, 220), 10, 0, Color.FromArgb(255, 140, 0), new Point(380, 40), new Size(100, 40));
             choose.Click += (s, e) => SelectSoundFile(s, e);
 
             var tooltip = new ToolTip();
@@ -527,61 +527,6 @@ namespace GymApplicationV2._0.FormsSettings
             settingCard.Controls.Add(label);
             settingCard.Controls.Add(backgroundStyleComboBox);
             flowLayout.Controls.Add(settingCard);
-        }
-
-        private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                BackColor = baseColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand,
-                BorderColor = radiusColor,
-                BackgroundColor = baseColor,
-                TextColor = Color.White,
-                BorderRadius = radius,
-                BorderSize = radiusSize
-            };
-
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            return button;
         }
 
         private Color GetStylePreviewColor(string style)

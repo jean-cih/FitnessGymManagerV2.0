@@ -147,12 +147,12 @@ namespace GymApplicationV2._0
                 Location = new System.Drawing.Point((card.Width - 150) / 2, 20),
             };
 
-            checkBoxClientsForPeriod = CreateStyledCheckBox("Посещаемость", new System.Drawing.Point((card.Width - 130) / 2, 95));
+            checkBoxClientsForPeriod = UIStyler.CreateStyledCheckBox("Посещаемость", new System.Drawing.Point((card.Width - 130) / 2, 95));
             checkBoxClientsForPeriod.Checked = true;
             checkBoxClientsForPeriod.CheckedChanged += checkBoxClientsForPeriod_CheckedChanged;
 
 
-            checkBoxSellServices = CreateStyledCheckBox("Количество проданных\nабонементов", new System.Drawing.Point((card.Width - 130) / 2, 175));
+            checkBoxSellServices = UIStyler.CreateStyledCheckBox("Количество проданных\nабонементов", new System.Drawing.Point((card.Width - 130) / 2, 175));
             checkBoxSellServices.CheckedChanged += checkBoxSellServices_CheckedChanged;
 
             card.Controls.AddRange(new Control[] { title, checkBoxClientsForPeriod, checkBoxSellServices });
@@ -182,32 +182,16 @@ namespace GymApplicationV2._0
                 Location = new System.Drawing.Point((card.Width - 120) / 2 , 20),
             };
 
-            radioForMonth = CreateStyledRadioButton("За месяц", new System.Drawing.Point(card.Width / 3 + 5, 55));
-            radioForWeek = CreateStyledRadioButton("За неделю", new System.Drawing.Point(card.Width / 3 + 5, 85));
-            radioForDay = CreateStyledRadioButton("За день", new System.Drawing.Point(card.Width / 3 + 5,115), true);
-            radioOtherPeriod = CreateStyledRadioButton("Другой период", new System.Drawing.Point(card.Width / 3 + 5, 145));
+            radioForMonth = UIStyler.CreateStyledRadioButton("За месяц", new System.Drawing.Point(card.Width / 3 + 5, 55));
+            radioForWeek = UIStyler.CreateStyledRadioButton("За неделю", new System.Drawing.Point(card.Width / 3 + 5, 85));
+            radioForDay = UIStyler.CreateStyledRadioButton("За день", new System.Drawing.Point(card.Width / 3 + 5,115), true);
+            radioOtherPeriod = UIStyler.CreateStyledRadioButton("Другой период", new System.Drawing.Point(card.Width / 3 + 5, 145));
 
-            jeanDateTimePickerBegin = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
-            jeanDateTimePickerEnd = CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
+            jeanDateTimePickerBegin = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
+            jeanDateTimePickerEnd = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
 
             card.Controls.AddRange(new Control[] { title, radioForMonth, radioForWeek, radioForDay, radioOtherPeriod, jeanDateTimePickerBegin, jeanDateTimePickerEnd });
             this.Controls.Add(card);
-        }
-
-        private JeanDateTimePicker CreateStyledDateTimePicker(Size size, System.Drawing.Point location)
-        {
-            var dateTime = new JeanDateTimePicker
-            {
-                Size = size,
-                Location = location,
-                TextColor = Color.Black,
-                BorderColor = Color.MediumSlateBlue,
-                SkinColor = Color.Transparent,
-                BorderSize = 2,
-                AutoSize = true,
-            };
-
-            return dateTime;
         }
 
         private void CreateExportCard()
@@ -232,18 +216,18 @@ namespace GymApplicationV2._0
                 Location = new System.Drawing.Point((card.Width - 130) / 2, 20),
             };
 
-            checkBoxXLS = CreateStyledCheckBox("Excel (.xls)", new System.Drawing.Point(card.Width / 3 + 5, 55), true);
-            checkBoxCSV = CreateStyledCheckBox("CSV (.csv)", new System.Drawing.Point(card.Width / 3 + 5, 85));
-            checkBoxTXT = CreateStyledCheckBox("Text (.txt)", new System.Drawing.Point(card.Width / 3 + 5, 115));
-            checkBoxJSON = CreateStyledCheckBox("JSON (.json)", new System.Drawing.Point(card.Width / 3 + 5, 145));
-            checkBoxTSV = CreateStyledCheckBox("TSV (.tsv)", new System.Drawing.Point(card.Width / 3 + 5, 175));
+            checkBoxXLS = UIStyler.CreateStyledCheckBox("Excel (.xls)", new System.Drawing.Point(card.Width / 3 + 5, 55), true);
+            checkBoxCSV = UIStyler.CreateStyledCheckBox("CSV (.csv)", new System.Drawing.Point(card.Width / 3 + 5, 85));
+            checkBoxTXT = UIStyler.CreateStyledCheckBox("Text (.txt)", new System.Drawing.Point(card.Width / 3 + 5, 115));
+            checkBoxJSON = UIStyler.CreateStyledCheckBox("JSON (.json)", new System.Drawing.Point(card.Width / 3 + 5, 145));
+            checkBoxTSV = UIStyler.CreateStyledCheckBox("TSV (.tsv)", new System.Drawing.Point(card.Width / 3 + 5, 175));
 
             // Кнопка выбора файла
-            jeanModernButtonChooseFile = CreateStyledButton("📁 Выбрать файл", PrimaryColor, new System.Drawing.Point((card.Width - 150) / 2, 205), new Size(150, 45));
+            jeanModernButtonChooseFile = UIStyler.CreateStyledButton("📁 Выбрать файл", PrimaryColor, 20, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point((card.Width - 150) / 2, 205), new Size(150, 45));
             jeanModernButtonChooseFile.Click += jeanModernButtonChooseFile_Click;
 
             // Кнопка экспорта
-            jeanModernButtonExport = CreateStyledButton("🚀 Экспорт", AccentColor, new System.Drawing.Point((card.Width - 180) / 2, 260), new Size(180, 50));
+            jeanModernButtonExport = UIStyler.CreateStyledButton("🚀 Экспорт", AccentColor, 20, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point((card.Width - 180) / 2, 260), new Size(180, 50));
             jeanModernButtonExport.Click += jeanModernButtonExport_Click;
 
             card.Controls.AddRange(new Control[] { title, checkBoxXLS, checkBoxCSV, checkBoxTXT, checkBoxJSON, checkBoxTSV, jeanModernButtonChooseFile, jeanModernButtonExport });
@@ -253,90 +237,14 @@ namespace GymApplicationV2._0
         private void CreateButtons()
         {
             // Кнопка показа
-            jeanModernButtonShow = CreateStyledButton("👁️ Показать", SecondaryColor, new System.Drawing.Point((this.Width - 200) / 2, 335), new Size(200, 60));
+            jeanModernButtonShow = UIStyler.CreateStyledButton("👁️ Показать", SecondaryColor, 20, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point((this.Width - 200) / 2, 335), new Size(200, 60));
             jeanModernButtonShow.Click += buttonShow_Click;
 
-            var btnClose = new JeanModernButton
-            {
-                Text = "X",
-                ForeColor = Color.White,
-                BackColor = Color.FromArgb(180, 70, 70),
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand,
-                BorderRadius = 0,
-                BorderSize = 0,
-                Location = new System.Drawing.Point(958, 10),
-            };
-
+            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point(this.Width - 40, 10), new Size(30, 28));
             btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.AddRange(new Control[] { jeanModernButtonShow });
-        }
-        private System.Windows.Forms.CheckBox CreateStyledCheckBox(string text, System.Drawing.Point location, bool flag = false)
-        {
-            var checkBox = new System.Windows.Forms.CheckBox
-            {
-                Text = text,
-                Location = location,
-                ForeColor = TextColor,
-                BackColor = Color.Transparent,
-                Checked = flag,
-                AutoSize = true
-            };
-
-            checkBox.CheckedChanged += (s, e) =>
-            {
-                checkBox.ForeColor = checkBox.Checked ? PrimaryColor : TextColor;
-            };
-
-            return checkBox;
-        }
-
-        private RadioButton CreateStyledRadioButton(string text, System.Drawing.Point location, bool flag = false)
-        {
-            var radio = new RadioButton
-
-            {
-                Text = text,
-                Location = location,
-                ForeColor = TextColor,
-                AutoSize = true,
-                BackColor = Color.Transparent,
-                Checked = flag
-            };
-
-            radio.CheckedChanged += (s, e) =>
-            {
-                radio.ForeColor = radio.Checked ? PrimaryColor : TextColor;
-            };
-
-            return radio;
-        }
-
-        private JeanModernButton CreateStyledButton(string text, Color backColor, System.Drawing.Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                BackColor = Color.Transparent,
-                BackgroundColor = backColor,
-                TextColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand,
-                BorderRadius = 20,
-                BorderSize = 0,
-                BorderColor = Color.FromArgb(255, 140, 0)
-            };
-
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(backColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(backColor, 0.2f);
-
-            return button;
         }
 
         private GraphicsPath GetRoundedRectangle(System.Drawing.Rectangle bounds, int radius)

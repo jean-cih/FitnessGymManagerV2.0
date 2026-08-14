@@ -67,7 +67,7 @@ namespace GymApplicationV2._0
                 startDate = new DateTime(today.Year, today.Month, 1);
                 DateTime endDate = today.AddDays(1).AddSeconds(-1);
 
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForWeek)
@@ -79,14 +79,14 @@ namespace GymApplicationV2._0
                 startDate = today.AddDays(-daysOffset);
                 DateTime endDate = today.AddDays(1).AddSeconds(-1);
 
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
             }
             else if (periodForDay)
             {
                 startDate = DateTime.Now.Date;
                 DateTime endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения за {startDate.ToShortDateString()}";
             }
             else if (otherPeriod)
@@ -94,79 +94,79 @@ namespace GymApplicationV2._0
                 // Для произвольного периода
                 DateTime beginDate = dateBegin.Date;
                 DateTime endDate = dateEnd.Date.AddDays(1).AddSeconds(-1); // Конец дня
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{beginDate:yyyy-MM-dd HH:mm:ss}' AND '{endDate:yyyy-MM-dd HH:mm:ss}' ORDER BY Посетил";
+                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{beginDate}' AND '{endDate}' ORDER BY Посетил";
                 labelShowPeriod.Text = $"Посещения с {dateBegin.ToShortDateString()} по {dateEnd.ToShortDateString()}";
             }
 
             DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
 
-            if (dataTable == null || dataTable.Rows.Count <= 0)
-            {
-                return;
-            }
+            //if (dataTable == null || dataTable.Rows.Count <= 0)
+            //{
+            //    return;
+            //}
 
-            dataTable.Columns.Add("Статус", typeof(string));
+            //dataTable.Columns.Add("Статус", typeof(string));
 
-            foreach (DataRow row in dataTable.Rows)
-            {
-                string cardNumber = row["№Карты"].ToString();
+            //foreach (DataRow row in dataTable.Rows)
+            //{
+            //    string cardNumber = row["№Карты"].ToString();
 
-                if (userStatus.TryGetValue(cardNumber, out string status))
-                {
-                    row["Статус"] = status;
-                }
-                else
-                {
-                    row["Статус"] = "Неизвестно";
-                }
-            }
+            //    if (userStatus.TryGetValue(cardNumber, out string status))
+            //    {
+            //        row["Статус"] = status;
+            //    }
+            //    else
+            //    {
+            //        row["Статус"] = "Неизвестно";
+            //    }
+            //}
 
-            foreach (var kvp in userStatus)
-            {
-                string cardNumber = kvp.Key;
-                string status = kvp.Value;
+            //foreach (var kvp in userStatus)
+            //{
+            //    string cardNumber = kvp.Key;
+            //    string status = kvp.Value;
 
-                bool cardExists = dataTable.AsEnumerable().Any(row => row["№Карты"].ToString() == cardNumber);
+            //    bool cardExists = dataTable.AsEnumerable().Any(row => row["№Карты"].ToString() == cardNumber);
 
-                if (!cardExists)
-                {
-                    DataRow newRow = dataTable.NewRow();
-                    newRow["№Карты"] = cardNumber;
-                    newRow["Статус"] = status;
-                    newRow["Клиент"] = "***";
+            //    if (!cardExists)
+            //    {
+            //        DataRow newRow = dataTable.NewRow();
+            //        newRow["№Карты"] = cardNumber;
+            //        newRow["Статус"] = status;
+            //        newRow["Клиент"] = "***";
                                                    
-                    dataTable.Rows.Add(newRow);
-                }
-            }
+            //        dataTable.Rows.Add(newRow);
+            //    }
+            //}
 
             dataGridViewShowReport.DataSource = dataTable;
 
-            dataGridViewShowReport.Columns["Статус"].DefaultCellStyle.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+            //dataGridViewShowReport.Columns["Статус"].DefaultCellStyle.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
 
-            foreach (DataGridViewRow row in dataGridViewShowReport.Rows)
-            {
-                if (row.Cells["Статус"].Value != null)
-                {
-                    string status = row.Cells["Статус"].Value.ToString();
+            //foreach (DataGridViewRow row in dataGridViewShowReport.Rows)
+            //{
+            //    if (row.Cells["Статус"].Value != null)
+            //    {
+            //        string status = row.Cells["Статус"].Value.ToString();
 
-                    switch (status)
-                    {
-                        case "Активен":
-                            row.Cells["Статус"].Style.ForeColor = Color.Green;
-                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-                            break;
-                        case "Неизвестно":
-                            row.Cells["Статус"].Style.ForeColor = Color.Black;
-                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-                            break;
-                        default:
-                            row.Cells["Статус"].Style.ForeColor = Color.Red;
-                            row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-                            break;
-                    }
-                }
-            }
+            //        switch (status)
+            //        {
+            //            case "Активен":
+            //                row.Cells["Статус"].Style.ForeColor = Color.Green;
+            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+            //                break;
+            //            case "Неизвестно":
+            //                row.Cells["Статус"].Style.ForeColor = Color.Black;
+            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+            //                break;
+            //            default:
+            //                row.Cells["Статус"].Style.ForeColor = Color.Red;
+            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
+            //                break;
+            //        }
+            //    }
+            //}
 
             labelQuantity.Text = dataGridViewShowReport.Rows.Count.ToString();
         }

@@ -197,7 +197,8 @@ namespace GymApplicationV2._0
                 labelName = { Text = $"{_name} {_surname}", Visible = true },
                 jeanSoftTextBoxPurchase = { Visible = true },
                 NumberCard = _numberCard,
-                checkBoxVisited = { Visible = true }
+                checkBoxVisited = { Visible = true },
+                dateActivation = { Visible = true }
             };
 
             services.Show();
