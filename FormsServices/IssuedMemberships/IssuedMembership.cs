@@ -110,7 +110,7 @@ namespace GymApplicationV2._0
             Статус,
             Посещений_осталось AS 'Посещений осталось',
             Окончание_заморозки AS 'Окончание заморозки'
-        FROM Issued";
+        FROM Issued ORDER BY Id DESC";
 
             _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
@@ -126,8 +126,6 @@ namespace GymApplicationV2._0
                 dataGridViewIssued.Columns["Id"].Visible = false;
             }
         }
-        private void jeanModernButtonRefresh_Click(object sender, EventArgs e) =>
-            RefreshDataGrid();
 
         private void jeanModernButtonErase_Click(object sender, EventArgs e) =>
             jeanSoftTextBoxSearch.Texts = string.Empty;

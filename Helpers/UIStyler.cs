@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static GymApplicationV2._0.AppColors.AppColors;
 
 namespace GymApplicationV2._0.Helpers
 {
@@ -48,6 +49,63 @@ namespace GymApplicationV2._0.Helpers
                 ForeColor = color == default ? Color.Black : color,
                 AutoSize = true,
             };
+        }
+
+        public static JeanDateTimePicker CreateStyledDateTimePicker(Size size, Point location)
+        {
+            var dateTime = new JeanDateTimePicker
+            {
+                Size = size,
+                Location = location,
+                TextColor = Color.Black,
+                BorderColor = Color.MediumSlateBlue,
+                SkinColor = Color.Transparent,
+                BorderSize = 2,
+                AutoSize = true,
+            };
+
+            return dateTime;
+        }
+
+        public static CheckBox CreateStyledCheckBox(string text, Point location, bool flag = false)
+        {
+            var checkBox = new CheckBox
+            {
+                Text = text,
+                Location = location,
+                ForeColor = TextColor,
+                BackColor = Color.Transparent,
+                Checked = flag,
+                AutoSize = true
+            };
+
+            checkBox.CheckedChanged += (s, e) =>
+            {
+                checkBox.ForeColor = checkBox.Checked ? PrimaryColor : TextColor;
+            };
+
+            return checkBox;
+        }
+
+        public static RadioButton CreateStyledRadioButton(string text, System.Drawing.Point location, bool flag = false)
+        {
+            var radio = new RadioButton
+
+            {
+                Text = text,
+                Location = location,
+                ForeColor = TextColor,
+                AutoSize = true,
+                BackColor = Color.Transparent,
+                Checked = flag
+            };
+
+            radio.CheckedChanged += (s, e) =>
+            {
+                radio.ForeColor = radio.Checked ? PrimaryColor : TextColor;
+            };
+
+            return radio;
         }
     }
 }

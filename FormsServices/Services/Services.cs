@@ -1,7 +1,8 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
-using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using System;
 using System.Data.SQLite;
 using System.Drawing;
@@ -25,6 +26,7 @@ namespace GymApplicationV2._0
         public Services()
         {
             InitializeComponent();
+            InitializeCustomDesign();
 
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Opacity = 0;
@@ -38,6 +40,13 @@ namespace GymApplicationV2._0
         private void Services_Load(object sender, EventArgs e)
         {
             RefreshServicesData();
+        }
+
+        private void InitializeCustomDesign()
+        {
+            dateActivation = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new Point(checkBoxVisited.Location.X, checkBoxVisited.Location.Y + 30));
+            
+            this.Controls.Add(dateActivation);
         }
 
         private void RefreshServicesData()
@@ -194,14 +203,15 @@ namespace GymApplicationV2._0
                 ServicesContext.ConnectionStringServices());
         }
 
+
+        // В платежах нету коррекции на несколько абонементов, ниже в выданных она есть
         private void AddPaymentHistory()
         {
             var fatherName = GeneralContext.GetElementFromDatabase(
                 $"SELECT Отчество FROM Contacts WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients())?.ToString() ?? string.Empty;
 
-            var now = DateTime.Now;
-            var endDate = now.AddMonths(Convert.ToInt32(_termMembership));
+            var endDate = dateActivation.Value.AddMonths(Convert.ToInt32(_termMembership));
             var clientName = $"{labelName.Text} {fatherName}";
 
             using (var conn = new SQLiteConnection(HistoryPaymentContext.ConnectionStringPayment()))
@@ -214,10 +224,10 @@ namespace GymApplicationV2._0
             {
                 cmd.Parameters.AddWithValue("@Клиент", clientName);
                 cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
-                cmd.Parameters.AddWithValue("@Дата_начала", now.ToString("yyyy-MM-dd"));
+                cmd.Parameters.AddWithValue("@Дата_начала", dateActivation.Value.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Цена", _servicesCost);
-                cmd.Parameters.AddWithValue("@Дата_платежа", now.ToString("yyyy-MM-dd HH:mm:ss"));
+                cmd.Parameters.AddWithValue("@Дата_платежа", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -230,7 +240,6 @@ namespace GymApplicationV2._0
                 $"SELECT Отчество FROM Contacts WHERE №Карты = '{NumberCard}'",
                 ClientsContext.ConnectionStringClients())?.ToString() ?? string.Empty;
 
-            var now = DateTime.Now;
             var clientName = $"{labelName.Text} {fatherName}";
             var quantityLeft = GetServiceQuantityLeft();
             var termMonths = Convert.ToInt32(_termMembership);
@@ -253,18 +262,18 @@ namespace GymApplicationV2._0
 
                     if (!string.IsNullOrEmpty(lastEndDateStr) && DateTime.TryParse(lastEndDateStr, out DateTime lastEndDate))
                     {
-                        if (lastEndDate.Date >= now.Date)
+                        if (lastEndDate.Date >= dateActivation.Value.Date)
                         {
                             endDate = lastEndDate.Date.AddDays(1).AddMonths(termMonths);
                         }
                         else
                         {
-                            endDate = now.Date.AddMonths(termMonths);
+                            endDate = dateActivation.Value.Date.AddMonths(termMonths);
                         }
                     }
                     else
                     {
-                        endDate = now.Date.AddMonths(termMonths);
+                        endDate = dateActivation.Value.Date.AddMonths(termMonths);
                     }
                 }
 
@@ -283,7 +292,7 @@ namespace GymApplicationV2._0
                     cmd.Parameters.AddWithValue("@Клиент", clientName);
                     cmd.Parameters.AddWithValue("@№Карты", NumberCard);
                     cmd.Parameters.AddWithValue("@Дата_окончания", endDate.ToString("yyyy-MM-dd"));
-                    cmd.Parameters.AddWithValue("@Дата_оформления", now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    cmd.Parameters.AddWithValue("@Дата_оформления", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                     cmd.Parameters.AddWithValue("@Абонемент", _labelMembership);
                     cmd.Parameters.AddWithValue("@Посетил", visitDate);
                     cmd.Parameters.AddWithValue("@Оплата", _servicesCost);

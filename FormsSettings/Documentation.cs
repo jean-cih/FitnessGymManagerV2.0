@@ -133,73 +133,12 @@ namespace GymApplicationV2._0.FormsSettings
                 Cursor = Cursors.Hand
             };
 
-            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(1008, 10), new Size(30, 28));
+            btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
             btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
 
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.Add(titlePanel);
-        }
-
-        private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                BackColor = baseColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand
-            };
-
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            button.Text = text;
-            button.Font = new Font("Montserrat", 10, FontStyle.Bold);
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            return button;
         }
 
         private void InitializeNavigation()
