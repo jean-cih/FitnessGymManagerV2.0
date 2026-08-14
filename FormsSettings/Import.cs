@@ -1,8 +1,8 @@
 ﻿using GymApplicationV2._0.AnimationTools;
 using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
-using GymApplicationV2._0.Helpers;
 using GymApplicationV2._0.Data;
+using GymApplicationV2._0.Helpers;
 using Microsoft.Office.Interop.Excel;
 using Shadow;
 using System;
@@ -11,8 +11,10 @@ using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Globalization;
 using System.IO;
-using System.Reflection.Emit;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -28,13 +30,11 @@ namespace GymApplicationV2._0.FormsSettings
         private JeanModernButton documentationButton;
         private Panel dropZonePanel;
         private System.Windows.Forms.Label dropZoneLabel;
-
-        private System.Windows.Forms.Timer _fadeTimer;
-        private float _opacity = 0;
-
-        Panel titlePanel;
-
+        private Panel titlePanel;
         private FadeAnimation _fadeAnimation;
+
+        private readonly string[] _notChangeableTexts = new[] { "📤 Импорт данных" };
+        private readonly object _dbLock = new object();
 
         public Import()
         {
@@ -47,20 +47,10 @@ namespace GymApplicationV2._0.FormsSettings
             _fadeAnimation = new FadeAnimation(this);
             _fadeAnimation.FadeIn();
 
-            ApplySettings();
+            FontHelper.ApplyFontSettings(this, _notChangeableTexts);
 
             titlePanel.EnableDrag(this);
         }
-
-        private void ApplySettings()
-        {
-            string[] notChangeableTexts = new string[]
-            {
-                "📤 Импорт данных"
-            };
-
-            FontHelper.ApplyFontSettings(this, notChangeableTexts);
-        }  
 
         private void InitializeComponents()
         {
@@ -68,6 +58,14 @@ namespace GymApplicationV2._0.FormsSettings
             this.StartPosition = FormStartPosition.CenterScreen;
             this.DoubleBuffered = true;
 
+            SetupFormPaint();
+            CreateTitlePanel();
+            CreateImportCard();
+            SetupDragDropEvents();
+        }
+
+        private void SetupFormPaint()
+        {
             this.Paint += (s, e) =>
             {
                 using (var brush = new LinearGradientBrush(
@@ -79,13 +77,15 @@ namespace GymApplicationV2._0.FormsSettings
                     e.Graphics.FillRectangle(brush, this.ClientRectangle);
                 }
 
-                // Рамка с свечением
                 using (var pen = new Pen(Color.FromArgb(80, 120, 200), 1))
                 {
                     e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(0, 0, Width - 1, Height - 1));
                 }
             };
+        }
 
+        private void CreateTitlePanel()
+        {
             titlePanel = new Panel
             {
                 Size = new Size(874, 50),
@@ -93,18 +93,33 @@ namespace GymApplicationV2._0.FormsSettings
                 Location = new System.Drawing.Point(0, 0),
             };
 
-            // Заголовок
             var titleLabel = new System.Windows.Forms.Label
             {
                 Text = "📤 Импорт данных",
                 Font = new System.Drawing.Font("Montserrat", 18, FontStyle.Bold),
-                ForeColor = ForeColor = Color.FromArgb(220, 220, 255),
+                ForeColor = Color.FromArgb(220, 220, 255),
                 BackColor = Color.Transparent,
                 Location = new System.Drawing.Point(320, 10),
                 AutoSize = true,
             };
 
-            // Карточка импорта
+            var btnClose = UIStyler.CreateStyledButton(
+                "X",
+                Color.FromArgb(180, 70, 70),
+                0, 0,
+                Color.FromArgb(255, 140, 0),
+                new System.Drawing.Point(this.Width - 40, 10),
+                new Size(30, 28));
+
+            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
+
+            titlePanel.Controls.Add(titleLabel);
+            titlePanel.Controls.Add(btnClose);
+            this.Controls.Add(titlePanel);
+        }
+
+        private void CreateImportCard()
+        {
             var importCard = new Panel
             {
                 BackColor = Color.White,
@@ -115,100 +130,22 @@ namespace GymApplicationV2._0.FormsSettings
 
             importCard.Paint += (s, e) =>
             {
-                // Рамка с свечением
                 using (var pen = new Pen(Color.FromArgb(255, 140, 0), 5))
                 {
                     e.Graphics.DrawRectangle(pen, new System.Drawing.Rectangle(0, 0, importCard.Width - 1, importCard.Height - 1));
                 }
             };
 
-            // Зона перетаскивания
             InitializeDropZone(importCard);
-
-            // Кнопки действий
             InitializeActionButtons(importCard);
-
             this.Controls.Add(importCard);
-            titlePanel.Controls.Add(titleLabel);
+        }
 
-            var btnClose = new JeanModernButton
-            {
-                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
-                ForeColor = Color.FromArgb(120, 120, 120),
-                BackColor = Color.Transparent,
-                FlatStyle = FlatStyle.Flat,
-                Size = new Size(30, 28),
-                Cursor = Cursors.Hand
-            };
-
-            btnClose = CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new System.Drawing.Point(834, 10), new Size(30, 28));
-            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
-
-            titlePanel.Controls.Add(btnClose);
-
-            this.Controls.Add(titlePanel);
-
-            // Разрешаем перетаскивание файлов
+        private void SetupDragDropEvents()
+        {
             this.AllowDrop = true;
             this.DragEnter += Import_DragEnter;
             this.DragDrop += Import_DragDrop;
-        }
-
-        private JeanModernButton CreateStyledButton(string text, Color baseColor, int radius, int radiusSize, Color radiusColor, System.Drawing.Point location, Size size)
-        {
-            var button = new JeanModernButton
-            {
-                Text = text,
-                Location = location,
-                Size = size,
-                Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
-                BackColor = baseColor,
-                ForeColor = Color.White,
-                FlatStyle = FlatStyle.Flat,
-                Cursor = Cursors.Hand,
-                BorderColor = radiusColor,
-                BackgroundColor = baseColor,
-                TextColor = Color.White,
-                BorderRadius = radius,
-                BorderSize = radiusSize,
-            };
-
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = ControlPaint.Light(baseColor, 0.2f);
-            button.FlatAppearance.MouseDownBackColor = ControlPaint.Dark(baseColor, 0.2f);
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            return button;
         }
 
         private void InitializeDropZone(Panel parent)
@@ -235,13 +172,12 @@ namespace GymApplicationV2._0.FormsSettings
             };
 
             var tooltip = new System.Windows.Forms.ToolTip();
-            var line = "📋 Поддерживаемые таблицы:\n    • Clients • Services • Archive \n    • Payments • IssuedMembership";
-            tooltip.SetToolTip(dropZonePanel, line);
-            tooltip.SetToolTip(dropZoneLabel, line);
+            var tooltipText = "📋 Поддерживаемые таблицы:\n    • Clients • Services • Archive \n    • Payments • IssuedMembership";
+            tooltip.SetToolTip(dropZonePanel, tooltipText);
+            tooltip.SetToolTip(dropZoneLabel, tooltipText);
 
             dropZonePanel.Click += (s, e) => ChooseFile_Click(s, e);
             dropZonePanel.Controls.Add(dropZoneLabel);
-
             parent.Controls.Add(dropZonePanel);
         }
 
@@ -276,6 +212,7 @@ namespace GymApplicationV2._0.FormsSettings
                 BorderRadius = 8,
             };
             importButton.Click += ImportButton_Click;
+            importButton.Enabled = false;
 
             documentationButton = new JeanModernButton
             {
@@ -297,16 +234,13 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void DocumentationButton_Click(object sender, EventArgs e)
         {
-            Documentation documentation = new Documentation();
-            documentation.ShowDialog();
+            using (var documentation = new Documentation())
+            {
+                documentation.ShowDialog();
+            }
         }
 
         private void ChooseFile_Click(object sender, EventArgs e)
-        {
-            ChooseFile();
-        }
-
-        private void ChooseFile()
         {
             using (var openFileDialog = new OpenFileDialog())
             {
@@ -369,7 +303,7 @@ namespace GymApplicationV2._0.FormsSettings
 
             if (!await CheckDatabaseExistsAsync())
             {
-                return; 
+                return;
             }
 
             await ImportDataAsync();
@@ -390,7 +324,10 @@ namespace GymApplicationV2._0.FormsSettings
                 {
                     try
                     {
-                        // Асинхронное удаление файла
+                        await CloseAllDatabaseConnectionsAsync(fileName);
+
+                        await Task.Delay(500);
+
                         await Task.Run(() => File.Delete(dbPath));
                         dropZoneLabel.Text = $"🗑️ Удалена существующая база: {fileName}.db\n\nЗагружается новая база";
                         return true;
@@ -411,24 +348,29 @@ namespace GymApplicationV2._0.FormsSettings
             return true;
         }
 
+        private async Task CloseAllDatabaseConnectionsAsync(string fileName)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            await Task.CompletedTask;
+        }
+
         private async Task ImportDataAsync()
         {
-            using (var _splashScreen = new SplashScreen())
+            using (var splashScreen = new SplashScreen())
             {
-                _splashScreen.Show();
+                splashScreen.Show();
                 importButton.Enabled = false;
                 chooseButton.Enabled = false;
+
                 try
                 {
-                    var progress = new Progress<string>(message =>
-                    {
-                        _splashScreen.UpdateProgress(message);
-                    });
+                    var progress = new Progress<string>(splashScreen.UpdateProgress);
 
                     await Task.Run(() => ImportExcelData(progress));
 
                     MessageHelper.MessageWindowOk("✅ Импорт завершен\nДанные успешно импортированы в базу данных!", "Успех");
-
                     ResetForm();
                 }
                 catch (Exception ex)
@@ -445,9 +387,8 @@ namespace GymApplicationV2._0.FormsSettings
 
         private void ImportExcelData(IProgress<string> progress)
         {
-       
             progress.Report("🔍 Анализ файла...");
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
             Microsoft.Office.Interop.Excel.Application excelApp = null;
             Workbook workbook = null;
@@ -456,7 +397,7 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 excelApp = new Microsoft.Office.Interop.Excel.Application();
                 progress.Report("📖 Открытие Excel файла...");
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
 
                 workbook = excelApp.Workbooks.Open(_selectedFilePath);
                 var worksheet = (Worksheet)workbook.Worksheets[1];
@@ -469,23 +410,26 @@ namespace GymApplicationV2._0.FormsSettings
 
                 if (contextInfo.ConnectionString == null)
                 {
-                    throw new Exception("Неподдерживаемый формат файла. Ожидаются: Clients, Services, Archive, Payments, IssuedMembership");
+                    throw new Exception("Неподдерживаемый формат файла. Ожидаются: Clients, Services, Archive, Payments, IssuedMembership, Products");
                 }
 
                 progress.Report("💾 Создание базы данных...");
-                Thread.Sleep(1000);
-                using (var connection = new SQLiteConnection(contextInfo.ConnectionString))
+                Thread.Sleep(500);
+
+                lock (_dbLock)
                 {
-                    connection.Open();
-                    CreateDatabaseTable(connection, dataTable, contextInfo.TableName);
+                    SQLiteConnection.ClearAllPools();
+
+                    CreateDatabaseTable(contextInfo.TableName, dataTable, contextInfo.ConnectionString);
 
                     progress.Report("📥 Импорт данных...");
-                    Thread.Sleep(1000);
-                    InsertDataIntoTable(connection, dataTable, contextInfo.TableName, progress);
+                    Thread.Sleep(500);
+
+                    InsertDataIntoTable(contextInfo.TableName, dataTable, contextInfo.ConnectionString, progress);
                 }
 
                 progress.Report("✅ Завершение...");
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
             finally
             {
@@ -499,6 +443,10 @@ namespace GymApplicationV2._0.FormsSettings
                     excelApp.Quit();
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(excelApp);
                 }
+
+                // Принудительная очистка COM объектов
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 
@@ -557,17 +505,6 @@ namespace GymApplicationV2._0.FormsSettings
             importButton.Enabled = false;
         }
 
-        private GraphicsPath GetRoundRectPath(System.Drawing.Rectangle rect, int radius)
-        {
-            var path = new GraphicsPath();
-            path.AddArc(rect.X, rect.Y, radius, radius, 180, 90);
-            path.AddArc(rect.X + rect.Width - radius, rect.Y, radius, radius, 270, 90);
-            path.AddArc(rect.X + rect.Width - radius, rect.Y + rect.Height - radius, radius, radius, 0, 90);
-            path.AddArc(rect.X, rect.Y + rect.Height - radius, radius, radius, 90, 90);
-            path.CloseFigure();
-            return path;
-        }
-
         private System.Data.DataTable ReadExcelData(Worksheet worksheet, IProgress<string> progress)
         {
             var dataTable = new System.Data.DataTable();
@@ -598,31 +535,40 @@ namespace GymApplicationV2._0.FormsSettings
             return dataTable;
         }
 
-        private void CreateDatabaseTable(SQLiteConnection connection, System.Data.DataTable dataTable, string tableName)
+        private void CreateDatabaseTable(string tableName, System.Data.DataTable dataTable, string connectionString)
         {
             switch (tableName)
             {
                 case "Contacts":
-                    CreateContactsTableWithFixedStructure(connection);
+                    ClientsContext.CreatingDatabase();
                     break;
                 case "Archive":
-                    CreateArchiveTableWithFixedStructure(connection);
+                    ArchiveServicesContext.CreatingDatabase();
                     break;
                 case "History":
-                    CreateHistoryTableWithFixedStructure(connection);
+                    HistoryPaymentContext.CreatingDatabase();
                     break;
                 case "Issued":
-                    CreateIssuedTableWithFixedStructure(connection);
+                    IssuedMembershipContext.CreatingDatabase();
                     break;
                 case "Descriptions":
-                    CreateDescriptionsTableWithFixedStructure(connection);
+                    ServicesContext.CreatingDatabase();
                     break;
                 case "Items":
-                    CreateProductsTableWithFixedStructure(connection);
+                    ProductsContext.CreatingDatabase();
                     break;
                 default:
-                    CreateDynamicTable(connection, dataTable, tableName);
+                    CreateDynamicTable(tableName, dataTable, connectionString);
                     break;
+            }
+        }
+
+        private void InsertDataIntoTable(string tableName, System.Data.DataTable dataTable, string connectionString, IProgress<string> progress)
+        {
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                InsertDataIntoTable(connection, dataTable, tableName, progress);
             }
         }
 
@@ -631,7 +577,6 @@ namespace GymApplicationV2._0.FormsSettings
             using (var transaction = connection.BeginTransaction())
             {
                 var targetColumns = GetTableColumns(connection, tableName);
-
                 var insertQuery = GenerateDynamicInsertQueryBasedOnTarget(tableName, targetColumns, dataTable.Columns);
 
                 using (var command = new SQLiteCommand(insertQuery, connection))
@@ -650,37 +595,9 @@ namespace GymApplicationV2._0.FormsSettings
                             {
                                 object value = dataTable.Rows[i][targetColumn.Key];
 
-                                if ((targetColumn.Key == "Сохранено" || targetColumn.Key == "Дата оформления" || targetColumn.Key == "Дата окончания" || targetColumn.Key == "Посетил") && value != DBNull.Value && value != null)
+                                if (IsDateColumn(targetColumn.Key) && value != DBNull.Value && value != null)
                                 {
-                                    try
-                                    {
-                                        // Пытаемся преобразовать в DateTime
-                                        DateTime dateValue;
-                                        if (value is DateTime dt)
-                                        {
-                                            dateValue = dt;
-                                        }
-                                        else if (value is string str)
-                                        {
-                                            // Пробуем распарсить строку
-                                            if (!DateTime.TryParse(str, out dateValue))
-                                            {
-                                                dateValue = DateTime.MinValue;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            dateValue = Convert.ToDateTime(value);
-                                        }
-
-                                        // Форматируем в нужный формат
-                                        value = dateValue.ToString("dd.MM.yyyy HH:mm:ss");
-                                    }
-                                    catch
-                                    {
-                                        // Если не удалось преобразовать, оставляем как есть
-                                        value = value ?? DBNull.Value;
-                                    }
+                                    value = ParseDateValue(value);
                                 }
 
                                 command.Parameters.AddWithValue($"@{targetColumn.Key}", value ?? DBNull.Value);
@@ -698,12 +615,155 @@ namespace GymApplicationV2._0.FormsSettings
             }
         }
 
+        private bool IsDateColumn(string columnName)
+        {
+            string[] dateColumns = new[]
+            {
+        "Дата рождения", "Дата начала", "Дата платежа", "Время продажи",
+        "Окончание заморозки", "Сохранено", "Дата оформления",
+        "Дата окончания", "Посетил", "Дата_рождения", "Дата_начала",
+        "Дата_платежа", "Время_продажи", "Окончание_заморозки",
+        "Сохранено", "Дата_оформления", "Дата_окончания"
+    };
+
+            return dateColumns.Contains(columnName) || dateColumns.Contains(columnName.Replace("_", " "));
+        }
+
+        private object ParseDateValue(object value)
+        {
+            try
+            {
+                DateTime dateValue = DateTime.MinValue;
+                bool parsed = false;
+
+                // 1. Если это уже DateTime
+                if (value is DateTime dt)
+                {
+                    dateValue = dt;
+                    parsed = true;
+                }
+                // 2. Если это число (OLE Automation date или Unix timestamp)
+                else if (value is double doubleValue && doubleValue > 0)
+                {
+                    // OLE Automation date (Excel даты)
+                    try
+                    {
+                        dateValue = DateTime.FromOADate(doubleValue);
+                        parsed = true;
+                    }
+                    catch
+                    {
+                        // Если не получилось, пробуем как Unix timestamp (секунды)
+                        try
+                        {
+                            dateValue = DateTimeOffset.FromUnixTimeSeconds((long)doubleValue).DateTime;
+                            parsed = true;
+                        }
+                        catch
+                        {
+                            // Пробуем как миллисекунды
+                            try
+                            {
+                                dateValue = DateTimeOffset.FromUnixTimeMilliseconds((long)doubleValue).DateTime;
+                                parsed = true;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                // 3. Если это строка
+                else if (value is string str && !string.IsNullOrWhiteSpace(str))
+                {
+                    // Убираем лишние пробелы
+                    str = str.Trim();
+
+                    // Пробуем различные форматы
+                    string[] formats = new[]
+                    {
+                "dd.MM.yyyy HH:mm:ss",
+                "dd.MM.yyyy",
+                "yyyy-MM-dd",
+                "yyyy-MM-dd HH:mm:ss",
+                "dd.MM.yy",
+                "dd.MM.yy HH:mm:ss",
+                "MM/dd/yyyy",
+                "MM/dd/yyyy HH:mm:ss",
+                "dd/MM/yyyy",
+                "dd/MM/yyyy HH:mm:ss",
+                "yyyy/MM/dd",
+                "yyyy/MM/dd HH:mm:ss",
+                "dd-MM-yyyy",
+                "dd-MM-yyyy HH:mm:ss",
+                "MM-dd-yyyy",
+                "MM-dd-yyyy HH:mm:ss",
+                "dd.MM.yyyy HH:mm",
+                "dd.MM.yy HH:mm",
+                "dd.MM.yyyy H:mm:ss",
+                "d.M.yyyy",
+                "d.M.yy",
+                "d.MM.yyyy",
+                "dd.M.yyyy"
+            };
+
+                    // Пробуем парсить с учетом культуры
+                    var cultures = new[]
+                    {
+                CultureInfo.InvariantCulture,
+                new CultureInfo("ru-RU"),
+                new CultureInfo("en-US")
+            };
+
+                    foreach (var culture in cultures)
+                    {
+                        if (DateTime.TryParseExact(str, formats, culture, DateTimeStyles.None, out dateValue))
+                        {
+                            parsed = true;
+                            break;
+                        }
+                    }
+
+                    // Если не получилось, пробуем обычный Parse
+                    if (!parsed)
+                    {
+                        foreach (var culture in cultures)
+                        {
+                            if (DateTime.TryParse(str, culture, DateTimeStyles.None, out dateValue))
+                            {
+                                parsed = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                // 4. Если это DateTimeOffset
+                else if (value is DateTimeOffset dto)
+                {
+                    dateValue = dto.DateTime;
+                    parsed = true;
+                }
+
+                // Если удалось распарсить и дата не минимальная - возвращаем в ISO формате
+                if (parsed && dateValue != DateTime.MinValue && dateValue.Year > 1900)
+                {
+                    return dateValue.ToString("yyyy-MM-dd");
+                }
+
+                // Если не удалось распарсить - возвращаем DBNull
+                return DBNull.Value;
+            }
+            catch
+            {
+                // Если произошла ошибка - возвращаем DBNull
+                return DBNull.Value;
+            }
+        }
+
         private string GenerateDynamicInsertQueryBasedOnTarget(string tableName, Dictionary<string, string> targetColumns, DataColumnCollection sourceColumns)
         {
             string escapedTableName = EscapeSqlIdentifier(tableName);
 
-            var columnsBuilder = new System.Text.StringBuilder();
-            var parametersBuilder = new System.Text.StringBuilder();
+            var columnsBuilder = new StringBuilder();
+            var parametersBuilder = new StringBuilder();
 
             bool first = true;
             foreach (var column in targetColumns)
@@ -746,26 +806,31 @@ namespace GymApplicationV2._0.FormsSettings
             return columns;
         }
 
-        private void CreateDynamicTable(SQLiteConnection connection, System.Data.DataTable dataTable, string tableName)
+        private void CreateDynamicTable(string tableName, System.Data.DataTable dataTable, string connectionString)
         {
-            var columns = new System.Text.StringBuilder();
-            for (int i = 0; i < dataTable.Columns.Count; i++)
+            using (var connection = new SQLiteConnection(connectionString))
             {
-                string columnName = EscapeSqlIdentifier(dataTable.Columns[i].ColumnName);
-                columns.Append($"{columnName} TEXT");
+                connection.Open();
 
-                if (i < dataTable.Columns.Count - 1)
+                var columns = new StringBuilder();
+                for (int i = 0; i < dataTable.Columns.Count; i++)
                 {
-                    columns.Append(", ");
+                    string columnName = EscapeSqlIdentifier(dataTable.Columns[i].ColumnName);
+                    columns.Append($"{columnName} TEXT");
+
+                    if (i < dataTable.Columns.Count - 1)
+                    {
+                        columns.Append(", ");
+                    }
                 }
-            }
 
-            string escapedTableName = EscapeSqlIdentifier(tableName);
-            var createTableQuery = $"CREATE TABLE {escapedTableName} ({columns})";
+                string escapedTableName = EscapeSqlIdentifier(tableName);
+                var createTableQuery = $"CREATE TABLE {escapedTableName} ({columns})";
 
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
+                using (var command = new SQLiteCommand(createTableQuery, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
             }
         }
 
@@ -776,286 +841,5 @@ namespace GymApplicationV2._0.FormsSettings
 
             return $"[{identifier}]";
         }
-
-        private string GenerateInsertQuery(System.Data.DataTable dataTable, string tableName)
-        {
-            string escapedTableName = EscapeSqlIdentifier(tableName);
-
-            switch (tableName)
-            {
-                case "Contacts":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Фамилия", "Имя", "Пол", "Телефон", "№Карты",
-                        "Покупки", "Посетил", "Абонемент", "Срок_абонемента", "Посещений_осталось",
-                        "Отчество", "Email", "Дата_рождения", "Скидка", "Сохранено"
-                    });
-
-                case "Archive":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Клиент", "№Карты", "Дата_окончания",
-                        "Абонемент", "Оплата", "Посещений_осталось"
-                    });
-
-                case "History":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Клиент", "Абонемент", "Дата_начала",
-                        "Дата_окончания", "Цена", "Дата_платежа"
-                    });
-
-                case "Issued":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Клиент", "№Карты", "Дата_окончания", "Дата_оформления",
-                        "Абонемент", "Оплата", "Статус", "Посещений_осталось", "Окончание_заморозки"
-                    });
-
-                case "Descriptions":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Наименование", "Цена", "Срок_действия",
-                        "Количество", "Проданных_за_месяц"
-                    });
-
-                case "Items":
-                    return GenerateFixedInsertQuery(escapedTableName, new[] {
-                        "Id", "Товары", "Цена", "Количество"
-                    });
-
-                default:
-                    return GenerateDynamicInsertQuery(escapedTableName, dataTable);
-            }
-        }
-
-        private string GenerateDynamicInsertQuery(string tableName, System.Data.DataTable dataTable)
-        {
-            var columns = new System.Text.StringBuilder();
-            var parameters = new System.Text.StringBuilder();
-
-            for (int i = 0; i < dataTable.Columns.Count; i++)
-            {
-                string escapedColumnName = EscapeSqlIdentifier(dataTable.Columns[i].ColumnName);
-                columns.Append(escapedColumnName);
-                parameters.Append($"@p{i}");
-
-                if (i < dataTable.Columns.Count - 1)
-                {
-                    columns.Append(", ");
-                    parameters.Append(", ");
-                }
-            }
-
-            return $"INSERT INTO {tableName} ({columns}) VALUES ({parameters})";
-        }
-
-
-        private string GenerateFixedInsertQuery(string tableName, string[] columns)
-        {
-            var columnsBuilder = new System.Text.StringBuilder();
-            var parametersBuilder = new System.Text.StringBuilder();
-
-            for (int i = 0; i < columns.Length; i++)
-            {
-                string escapedColumnName = EscapeSqlIdentifier(columns[i]);
-                columnsBuilder.Append(escapedColumnName);
-                parametersBuilder.Append($"@p{i}");
-
-                if (i < columns.Length - 1)
-                {
-                    columnsBuilder.Append(", ");
-                    parametersBuilder.Append(", ");
-                }
-            }
-
-            return $"INSERT INTO {tableName} ({columnsBuilder}) VALUES ({parametersBuilder})";
-        }
-
-        private void CreateContactsTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                    CREATE TABLE Contacts(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Фамилия TEXT(20) NOT NULL,
-                        Имя TEXT(20) NOT NULL,
-                        Пол TEXT(20) DEFAULT NULL,
-                        Телефон TEXT(20) DEFAULT NULL,
-                        №Карты TEXT(20) DEFAULT NULL,
-                        Покупки INTEGER DEFAULT NULL,
-                        Отчество TEXT(20) DEFAULT NULL,
-                        Email TEXT(100) DEFAULT NULL,
-                        Дата_рождения TEXT(20) DEFAULT NULL,
-                        Скидка INTEGER DEFAULT 0,
-                        Сохранено TEXT(20) NOT NULL
-                    )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private void CreateArchiveTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                    CREATE TABLE Archive(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Клиент TEXT(100),
-                        №Карты TEXT(20),
-                        Дата_окончания TEXT(20),
-                        Абонемент TEXT(100),
-                        Оплата INTEGER,
-                        Посещений_осталось INTEGER DEFAULT NULL
-                )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private void CreateHistoryTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                    CREATE TABLE History(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Клиент TEXT(100),
-                        Абонемент TEXT(100),
-                        Дата_начала TEXT(20),
-                        Дата_окончаний TEXT(20),
-                        Цена INTEGER,
-                        Дата_платежа TEXT(20)
-                )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private void CreateIssuedTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                    CREATE TABLE Issued(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Клиент TEXT(100),
-                        №Карты TEXT(20),
-                        Дата_окончания TEXT(20),
-                        Дата_оформления TEXT(20),
-                        Абонемент TEXT(100),
-                        Посетил TEXT(20),
-                        Оплата INTEGER,
-                        Статус TEXT(20),
-                        Посещений_осталось TEXT(5),
-                        Окончание_заморозки TEXT(20)
-                )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private void CreateDescriptionsTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                    CREATE TABLE Descriptions(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Абонемент TEXT(100),
-                        Цена INTEGER,
-                        Срок_действия TEXT(20),
-                        Посещений TEXT(5),
-                        Проданных_за_месяц INTEGER
-                )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        private void CreateProductsTableWithFixedStructure(SQLiteConnection connection)
-        {
-            string createTableQuery = @"
-                CREATE TABLE Items(
-                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Товары TEXT(100),
-                    Цена TEXT(20),
-                    Количество INTEGER,
-                    Время_продажи TEXT(20)
-            )";
-
-            using (var command = new SQLiteCommand(createTableQuery, connection))
-            {
-                command.ExecuteNonQuery();
-            }
-        }
-
-        //private void FillContactsParameters(SQLiteCommand command, DataRow dataRow)
-        //{
-        //    string[] contactColumns = {
-        //        "Id", "Фамилия", "Имя", "Пол", "Телефон", "№Карты",
-        //        "Покупки", "Посетил", "Абонемент", "Срок_абонемента", "Посещений_осталось",
-        //        "Отчество", "Email", "Дата_рождения", "Скидка", "Сохранено"
-        //    };
-
-        //    for (int j = 0; j < contactColumns.Length; j++)
-        //    {
-        //        object value = j < dataRow.Table.Columns.Count ? dataRow[j] : DBNull.Value;
-        //        command.Parameters.AddWithValue($"@p{j}", value ?? DBNull.Value);
-        //    }
-        //}
-
-        //private void FillArchiveParameters(SQLiteCommand command, DataRow dataRow)
-        //{
-        //    string[] archiveColumns = {
-        //        "Id", "Клиент", "№Карты", "Дата_окончания",
-        //        "Абонемент", "Оплата", "Посещений_осталось"
-        //    };
-
-        //    for (int j = 0; j < archiveColumns.Length; j++)
-        //    {
-        //        object value = j < dataRow.Table.Columns.Count ? dataRow[j] : DBNull.Value;
-        //        command.Parameters.AddWithValue($"@p{j}", value ?? DBNull.Value);
-        //    }
-        //}
-
-        //private void FillHistoryParameters(SQLiteCommand command, DataRow dataRow)
-        //{
-        //    string[] historyColumns = {
-        //        "Id", "Клиент", "Абонемент", "Дата_начала",
-        //        "Дата_окончания", "Цена", "Дата_платежа"
-        //    };
-
-        //    for (int j = 0; j < historyColumns.Length; j++)
-        //    {
-        //        object value = j < dataRow.Table.Columns.Count ? dataRow[j] : DBNull.Value;
-        //        command.Parameters.AddWithValue($"@p{j}", value ?? DBNull.Value);
-        //    }
-        //}
-
-        //private void FillIssuedParameters(SQLiteCommand command, DataRow dataRow)
-        //{
-        //    string[] issuedColumns = {
-        //        "Id", "Клиент", "№Карты", "Дата_окончания", "Дата_оформления",
-        //        "Абонемент", "Оплата", "Статус", "Посещений_осталось", "Окончание_заморозки"
-        //    };
-
-        //    for (int j = 0; j < issuedColumns.Length; j++)
-        //    {
-        //        object value = j < dataRow.Table.Columns.Count ? dataRow[j] : DBNull.Value;
-        //        command.Parameters.AddWithValue($"@p{j}", value ?? DBNull.Value);
-        //    }
-        //}
-
-        //private void FillDescriptionsParameters(SQLiteCommand command, DataRow dataRow)
-        //{
-        //    string[] descriptionsColumns = {
-        //        "Id", "Наименование", "Цена", "Срок_действия",
-        //        "Количество", "Проданных_за_месяц"
-        //    };
-
-        //    for (int j = 0; j < descriptionsColumns.Length; j++)
-        //    {
-        //        object value = j < dataRow.Table.Columns.Count ? dataRow[j] : DBNull.Value;
-        //        command.Parameters.AddWithValue($"@p{j}", value ?? DBNull.Value);
-        //    }
-        //}
     }
 }

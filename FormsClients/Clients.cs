@@ -117,7 +117,7 @@ namespace GymApplicationV2._0
         {
             if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
 
-            if (e.ColumnIndex == 0)
+            if (e.ColumnIndex == 1)
             {
                 OpenClient(e.RowIndex);
             }
@@ -171,36 +171,37 @@ namespace GymApplicationV2._0
         {
             var clientData = new DataClient
             {
-                Surname = row.Cells[0].Value.ToString() ?? "",
-                Name = row.Cells[1].Value.ToString() ?? "",
-                Gender = row.Cells[2].Value?.ToString() ?? "",
-                Phone = row.Cells[3].Value?.ToString() ?? "",
-                CardNumber = row.Cells[4].Value?.ToString() ?? "",
-                Discount = Convert.ToInt32(row.Cells[8].Value),
-                Email = row.Cells[7].Value?.ToString() ?? "",
-                Birthday = row.Cells[10].Value?.ToString() ?? "",
+                Id = row.Cells[0].Value.ToString() ?? "",
+                Surname = row.Cells[1].Value.ToString() ?? "",
+                Name = row.Cells[2].Value.ToString() ?? "",
+                Gender = row.Cells[3].Value?.ToString() ?? "",
+                Phone = row.Cells[4].Value?.ToString() ?? "",
+                CardNumber = row.Cells[5].Value?.ToString() ?? "",
+                Purchase = row.Cells[6].Value?.ToString() ?? "",
+                Email = row.Cells[8].Value?.ToString() ?? "",
+                Birthday = row.Cells[9].Value?.ToString() ?? "",
+                Discount = row.Cells[10].Value?.ToString() ?? "",
+                Saved = row.Cells[11].Value?.ToString() ?? "",
             };
 
-            string query = @"
-          SELECT Абонемент, 
-                 Дата_окончания AS 'Дата окончания', 
-                 Посещений_осталось AS 'Посещений осталось',
-                 Посетил
-          FROM Issued 
-          WHERE №Карты = @cardNumber 
-                ORDER BY Id ASC
-                LIMIT 1";
-
-            DataTable table = GeneralContext.GetDataFromDatabase(query,
+            DataTable table = GeneralContext.GetDataFromDatabase(@"
+                  SELECT Абонемент, 
+                         Дата_окончания AS 'Дата окончания', 
+                         Посещений_осталось AS 'Посещений осталось',
+                         Посетил
+                  FROM Issued 
+                  WHERE №Карты = @cardNumber 
+                        ORDER BY Id ASC
+                        LIMIT 1",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", clientData.CardNumber));
 
             if (table != null && table.Rows.Count > 0)
             {
-                clientData.VisitDate = table.Rows[0]["Посетил"] != DBNull.Value ? table.Rows[0]["Посетил"].ToString() : "";
-                clientData.VisitsLeft = table.Rows[0]["Посещений осталось"] != DBNull.Value ? table.Rows[0]["Посещений осталось"].ToString() : "";
                 clientData.Service = table.Rows[0]["Абонемент"] != DBNull.Value ? table.Rows[0]["Абонемент"].ToString() : "";
+                clientData.VisitDate = table.Rows[0]["Посетил"] != DBNull.Value ? table.Rows[0]["Посетил"].ToString() : "";
                 clientData.TermDate = table.Rows[0]["Дата окончания"] != DBNull.Value ? table.Rows[0]["Дата окончания"].ToString() : "";
+                clientData.VisitsLeft = table.Rows[0]["Посещений осталось"] != DBNull.Value ? table.Rows[0]["Посещений осталось"].ToString() : "";
             }
 
             return clientData;
@@ -305,6 +306,11 @@ namespace GymApplicationV2._0
             var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
             dataGridViewClients.DataSource = GeneralContext.GetDataFromDatabase(searchQuery,
                 ClientsContext.ConnectionStringClients());
+
+            if (dataGridViewClients.Columns["Id"] != null)
+            {
+                dataGridViewClients.Columns["Id"].Visible = false;
+            }
         }
 
         private string BuildSearchQuery(string searchText)
@@ -326,6 +332,7 @@ namespace GymApplicationV2._0
         private string BuildFullNameSearchQuery(string[] names)
         {
             return $@"SELECT 
+                Id,
                 Фамилия,
                 Имя,
                 Пол,
@@ -348,6 +355,7 @@ namespace GymApplicationV2._0
         private string BuildSimpleSearchQuery(string term)
         {
             return $@"SELECT 
+                Id,
                 Фамилия,
                 Имя,
                 Пол,
@@ -424,7 +432,6 @@ namespace GymApplicationV2._0
 
             MessageHelper.MessageWindowOk("Данные клиента обновлены", "Сообщение");
             RefreshDataAndClearFields();
-            jeanTextBoxClient.Text = "";
         }
 
         private void jeanModernButtonDelete_Click(object sender, EventArgs e)
@@ -455,6 +462,7 @@ namespace GymApplicationV2._0
 
         private void ClearAllFields()
         {
+            jeanSoftTextBoxSearch.Texts = "";
             jeanTextBoxClient.Text = string.Empty;
             jeanTextBoxGender.Text = string.Empty;
             jeanTextBoxPhone.Text = string.Empty;

@@ -145,6 +145,11 @@ namespace GymApplicationV2._0
             var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
             dataGridViewIssued.DataSource = GeneralContext.GetDataFromDatabase(searchQuery,
                 IssuedMembershipContext.ConnectionStringIssued());
+
+            if (dataGridViewIssued.Columns["Id"] != null)
+            {
+                dataGridViewIssued.Columns["Id"].Visible = false;
+            }
         }
 
         private string BuildSearchQuery(string searchText)
@@ -166,6 +171,7 @@ namespace GymApplicationV2._0
         private string BuildFullNameSearchQuery(string[] names)
         {
             return $@"SELECT
+                    Id,
                     Клиент,
                     №Карты,
                     Дата_окончания AS 'Дата окончания',
@@ -184,7 +190,8 @@ namespace GymApplicationV2._0
 
         private string BuildSimpleSearchQuery(string name)
         {
-            return $@"SELECT
+            return $@"SELECT 
+                    Id,
                     Клиент,
                     №Карты,
                     Дата_окончания AS 'Дата окончания',

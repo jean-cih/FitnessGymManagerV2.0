@@ -119,6 +119,11 @@ namespace GymApplicationV2._0
             var searchQuery = BuildSearchQuery(jeanSoftTextBoxSearch.Texts);
             dataGridViewArchive.DataSource = GeneralContext.GetDataFromDatabase(searchQuery,
                 ArchiveServicesContext.ConnectionStringArchive());
+
+            if (dataGridViewArchive.Columns["Id"] != null)
+            {
+                dataGridViewArchive.Columns["Id"].Visible = false;
+            }
         }
 
         private string BuildSearchQuery(string searchText)
@@ -140,6 +145,7 @@ namespace GymApplicationV2._0
         private string BuildFullNameSearchQuery(string[] names)
         {
             return $@"SELECT 
+                    Id,
                     Клиент,
                     №Карты AS 'Карта',
                     Дата_окончания AS 'Дата окончания',
@@ -155,6 +161,7 @@ namespace GymApplicationV2._0
         private string BuildSimpleSearchQuery(string name)
         {
             return $@"SELECT 
+                Id,
                 Клиент,
                 №Карты AS 'Карта',
                 Дата_окончания AS 'Дата окончания',
@@ -199,7 +206,7 @@ namespace GymApplicationV2._0
 
         private void ShowFormWithData(Form form, Action<Form> setData)
         {
-            if (!new Regex(@"^\d{13}$").IsMatch(_numberCard))
+            if (_id == string.Empty)
             {
                 MessageHelper.MessageWindowOk("Выберите номер клиента из таблицы", "Предупреждение");
                 return;

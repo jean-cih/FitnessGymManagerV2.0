@@ -50,7 +50,7 @@ namespace GymApplicationV2._0
             this.jeanTextBoxVisited.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxVisited.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxVisited.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxVisited.Location = new System.Drawing.Point(44, 219);
+            this.jeanTextBoxVisited.Location = new System.Drawing.Point(44, 239);
             this.jeanTextBoxVisited.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxVisited.Name = "jeanTextBoxVisited";
             this.jeanTextBoxVisited.SelectionStart = 0;
@@ -70,7 +70,7 @@ namespace GymApplicationV2._0
             this.jeanTextBoxTerm.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxTerm.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxTerm.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxTerm.Location = new System.Drawing.Point(44, 177);
+            this.jeanTextBoxTerm.Location = new System.Drawing.Point(44, 197);
             this.jeanTextBoxTerm.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxTerm.Name = "jeanTextBoxTerm";
             this.jeanTextBoxTerm.SelectionStart = 0;
@@ -90,7 +90,7 @@ namespace GymApplicationV2._0
             this.jeanTextBoxPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxPrice.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxPrice.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxPrice.Location = new System.Drawing.Point(44, 135);
+            this.jeanTextBoxPrice.Location = new System.Drawing.Point(44, 155);
             this.jeanTextBoxPrice.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxPrice.Name = "jeanTextBoxPrice";
             this.jeanTextBoxPrice.SelectionStart = 0;
@@ -110,7 +110,7 @@ namespace GymApplicationV2._0
             this.jeanTextBoxName.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanTextBoxName.FontTextPreview = new System.Drawing.Font("Arial", 8F, System.Drawing.FontStyle.Bold);
             this.jeanTextBoxName.ForeColor = System.Drawing.Color.Black;
-            this.jeanTextBoxName.Location = new System.Drawing.Point(44, 93);
+            this.jeanTextBoxName.Location = new System.Drawing.Point(44, 113);
             this.jeanTextBoxName.Margin = new System.Windows.Forms.Padding(2);
             this.jeanTextBoxName.Name = "jeanTextBoxName";
             this.jeanTextBoxName.SelectionStart = 0;
@@ -139,7 +139,7 @@ namespace GymApplicationV2._0
             this.hintLabel.BackColor = System.Drawing.Color.Transparent;
             this.hintLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Italic);
             this.hintLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(140)))), ((int)(((byte)(140)))), ((int)(((byte)(180)))));
-            this.hintLabel.Location = new System.Drawing.Point(79, 335);
+            this.hintLabel.Location = new System.Drawing.Point(79, 375);
             this.hintLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.hintLabel.Name = "hintLabel";
             this.hintLabel.Size = new System.Drawing.Size(250, 25);
@@ -167,7 +167,7 @@ namespace GymApplicationV2._0
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(400, 360);
+            this.ClientSize = new System.Drawing.Size(400, 400);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.hintLabel);
             this.Controls.Add(this.labelService);

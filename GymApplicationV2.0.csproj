@@ -216,7 +216,6 @@
       <DependentUpon>JeanFormStyle.cs</DependentUpon>
     </Compile>
     <Compile Include="Components\JeanStyle.cs" />
-    <Compile Include="DatabaseMigration.cs" />
     <Compile Include="Helpers\AppLogger.cs" />
     <Compile Include="Helpers\ConfigManager.cs" />
     <Compile Include="Connections\GeneralContext.cs" />
