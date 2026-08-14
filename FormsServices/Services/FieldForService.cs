@@ -15,7 +15,8 @@ namespace GymApplicationV2._0
     {
         private FadeAnimation _fadeAnimation;
 
-        Panel titlePanel;
+        private ComboBox typeMembership;
+        private Panel titlePanel;
 
         string[] notChangeableTexts = new string[]
             {
@@ -59,6 +60,22 @@ namespace GymApplicationV2._0
             UIStyler.StyleTextBox(this, jeanTextBoxTerm);
             UIStyler.StyleTextBox(this, jeanTextBoxVisited);
 
+            typeMembership = new ComboBox
+            {
+                Size = new Size(250, 30),
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(250, 250, 250)
+            };
+
+            // Заполняем причины заморозки
+            typeMembership.Items.AddRange(new object[]
+            {
+                "обычный",
+                "безлимитный"
+            });
+            typeMembership.SelectedIndex = 0;
+
             // Стилизация кнопок
             var jeanModernButtonAdd = UIStyler.CreateStyledButton("Добавить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(this.Width / 2 - 60, this.Height - 80), new Size(120, 40));
             var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
@@ -69,12 +86,14 @@ namespace GymApplicationV2._0
             titlePanel.Controls.Add(btnClose);
 
             this.Controls.Add(titlePanel);
+            this.Controls.Add(typeMembership);
             this.Controls.Add(jeanModernButtonAdd);
         }
 
         public void UpdateData()
         {
             labelService.Location = new Point((this.Width - labelService.Width) / 2, labelService.Location.Y);
+            typeMembership.Location = new Point((this.Width - typeMembership.Width) / 2, jeanTextBoxVisited.Location.Y + 50);
             titleLabel.Location = new Point((this.Width - titleLabel.Width) / 2, (titlePanel.Height - titleLabel.Height) / 2);
             hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
         }
@@ -116,13 +135,6 @@ namespace GymApplicationV2._0
                 isValid = false;
             }
 
-            if (jeanTextBoxVisited.Text != "inf" &&
-                (!int.TryParse(jeanTextBoxVisited.Text, out int quantity) || quantity < 0))
-            {
-                jeanTextBoxVisited.BorderColor = Color.FromArgb(255, 100, 100);
-                isValid = false;
-            }
-
             if (!isValid)
             {
                 MessageHelper.MessageWindowOk("Проверьте правильность заполнения полей", "Предупреждение");
@@ -144,13 +156,16 @@ namespace GymApplicationV2._0
         {
             using (var conn = new SQLiteConnection(ServicesContext.ConnectionStringServices()))
             using (var cmd = new SQLiteCommand(
-                "INSERT INTO Descriptions ([Абонемент],[Цена],[Срок_действия],[Посещений],[Проданных_за_месяц]) " +
-                "VALUES (@Абонемент,@Цена,@Срок_действия,@Посещений,@Проданных_за_месяц)", conn))
+                "INSERT INTO Descriptions ([Абонемент],[Цена],[Срок_действия],[Посещений],[Тип],[Проданных_за_месяц]) " +
+                "VALUES (@Абонемент,@Цена,@Срок_действия,@Посещений,@Тип,@Проданных_за_месяц)", conn))
             {
                 cmd.Parameters.AddWithValue("@Абонемент", jeanTextBoxName.Text.Trim());
                 cmd.Parameters.AddWithValue("@Цена", jeanTextBoxPrice.Text.Trim());
                 cmd.Parameters.AddWithValue("@Срок_действия", jeanTextBoxTerm.Text.Trim());
-                cmd.Parameters.AddWithValue("@Посещений", string.IsNullOrEmpty(jeanTextBoxVisited.Text) ? DBNull.Value : (object)jeanTextBoxVisited.Text.Trim());
+                cmd.Parameters.AddWithValue("@Посещений", string.IsNullOrWhiteSpace(jeanTextBoxVisited.Text) || jeanTextBoxVisited.Text.Trim() == "0"
+                    ? DBNull.Value
+                    : (object)jeanTextBoxVisited.Text.Trim());
+                cmd.Parameters.AddWithValue("@Тип", typeMembership.Text);
                 cmd.Parameters.AddWithValue("@Проданных_за_месяц", 0);
 
                 conn.Open();

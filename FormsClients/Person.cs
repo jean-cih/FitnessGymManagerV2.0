@@ -25,7 +25,6 @@ namespace GymApplicationV2._0.FormsClients
         private JeanPanel infoPanel;
         private JeanPanel membershipPanel;
         private JeanPanel statsPanel;
-        private JeanModernButton closeButton;
 
         private FadeAnimation _fadeAnimation;
 
@@ -136,19 +135,6 @@ namespace GymApplicationV2._0.FormsClients
                 BorderRadius = 20,
             };
 
-            // Close Button
-            closeButton = new JeanModernButton
-            {
-                Size = new Size(50, 30),
-                Location = new Point(380, 680),
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Montserrat", 10, FontStyle.Bold),
-            };
-
-            closeButton.FlatAppearance.BorderSize = 0;
-            closeButton.FlatAppearance.MouseOverBackColor = Color.FromArgb(80, 80, 100);
-            closeButton.Click += (s, e) => CloseWithAnimation(personPanel);
-
             // Добавляем элементы на форму
             headerPanel.Controls.Add(profilePicture);
             headerPanel.Controls.Add(userName);
@@ -158,7 +144,6 @@ namespace GymApplicationV2._0.FormsClients
             this.Controls.Add(infoPanel);
             this.Controls.Add(membershipPanel);
             this.Controls.Add(statsPanel);
-            this.Controls.Add(closeButton);
         }
 
         private void InitializeCustomDesign(DataClient data, Panel personPanel)
@@ -195,53 +180,10 @@ namespace GymApplicationV2._0.FormsClients
             FillMembershipPanel(data);
             FillStatsPanel(data);
 
-            StyleButton(closeButton, "➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0));
+            var closeButton = UIStyler.CreateStyledButton("➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(380, 680), new Size(50, 30));
+            closeButton.Click += (s, e) => CloseWithAnimation(personPanel);
 
-            // Обработчики событий
-            this.KeyPreview = true;
-            this.KeyDown += (s, e) => { if (e.KeyCode == Keys.Escape) CloseWithAnimation(personPanel); };
-        }
-
-        private void StyleButton(JeanModernButton button, string text, Color baseColor, int radius, int radiusSize, Color radiusColor)
-        {
-            button.Text = text;
-            button.BackColor = baseColor;
-            button.BorderColor = radiusColor;
-            button.BackgroundColor = baseColor;
-            button.TextColor = Color.White;
-            button.BorderRadius = radius;
-            button.BorderSize = radiusSize;
-
-            // Эффекты при наведении
-            button.MouseEnter += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Min(baseColor.R + 30, 255),
-                    Math.Min(baseColor.G + 30, 255),
-                    Math.Min(baseColor.B + 30, 255));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseLeave += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
-
-            button.MouseDown += (s, e) =>
-            {
-                button.BackColor = Color.FromArgb(
-                    Math.Max(baseColor.R - 30, 0),
-                    Math.Max(baseColor.G - 30, 0),
-                    Math.Max(baseColor.B - 30, 0));
-                button.BackgroundColor = button.BackColor;
-            };
-
-            button.MouseUp += (s, e) =>
-            {
-                button.BackColor = baseColor;
-                button.BackgroundColor = baseColor;
-            };
+            personPanel.Controls.Add(closeButton);
         }
 
         private void FillInfoPanel(DataClient data)
@@ -261,7 +203,7 @@ namespace GymApplicationV2._0.FormsClients
             {
                 idClient = "None";
             }
-
+            
             var infoItems = new[]
             {
                 new { Icon = "🆔", Label = "ID:", Value = idClient.ToString(), Y = 40 },
@@ -430,47 +372,33 @@ namespace GymApplicationV2._0.FormsClients
         {
             if (pictureBox.Image == null)
             {
-                // Если изображения нет, можно очистить регион или просто выйти.
-                // Присваиваем регион по умолчанию, чтобы избежать проблем, если он был ранее установлен.
                 pictureBox.Region = new Region(new Rectangle(0, 0, pictureBox.Width, pictureBox.Height));
                 return;
             }
 
-            // Сохраняем исходное изображение
             Image originalImage = pictureBox.Image;
 
-            // Создаем новый Bitmap с размерами PictureBox
-            // (Предполагается, что PictureBox имеет квадратные размеры для идеального круга)
-            // Если PictureBox не квадратный, круг будет вписан в наименьшую сторону.
             int diameter = Math.Min(pictureBox.Width, pictureBox.Height);
             Bitmap roundedImage = new Bitmap(diameter, diameter);
 
             using (Graphics g = Graphics.FromImage(roundedImage))
             {
-                // Включаем сглаживание для качественного круга
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                // Создаем Path для круга
                 GraphicsPath path = new GraphicsPath();
                 path.AddEllipse(0, 0, diameter, diameter);
 
-                // Обрезаем Graphics контекст по кругу
                 g.SetClip(path);
 
-                // Вычисляем размеры и позицию для отрисовки исходного изображения
-                // так, чтобы оно было центрировано и максимально заполняло круг.
-                Rectangle sourceRect; // Часть исходного изображения, которую будем использовать
-                Rectangle destRect = new Rectangle(0, 0, diameter, diameter); // Куда отрисовывать на новом Bitmap
+                Rectangle sourceRect; 
+                Rectangle destRect = new Rectangle(0, 0, diameter, diameter);
 
-                // Рассчитываем, как масштабировать и обрезать исходное изображение,
-                // чтобы оно выглядело хорошо в круге.
-                // Аналогично PictureBox.SizeMode.Zoom или PictureBox.SizeMode.CenterImage
                 float imageAspectRatio = (float)originalImage.Width / originalImage.Height;
-                float pictureBoxAspectRatio = (float)diameter / diameter; // Всегда 1.0 для квадрата
+                float pictureBoxAspectRatio = (float)diameter / diameter;
 
-                if (imageAspectRatio > pictureBoxAspectRatio) // Изображение шире, чем "круг"
+                if (imageAspectRatio > pictureBoxAspectRatio)
                 {
                     int scaledHeight = diameter;
                     int scaledWidth = (int)(imageAspectRatio * scaledHeight);
@@ -478,7 +406,7 @@ namespace GymApplicationV2._0.FormsClients
                     sourceRect = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
                     g.DrawImage(originalImage, new Rectangle(-xOffset, 0, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
                 }
-                else // Изображение выше, чем "круг" (или равно)
+                else
                 {
                     int scaledWidth = diameter;
                     int scaledHeight = (int)(scaledWidth / imageAspectRatio);
@@ -487,10 +415,8 @@ namespace GymApplicationV2._0.FormsClients
                     g.DrawImage(originalImage, new Rectangle(0, -yOffset, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
                 }
 
-                // Сбрасываем Clip, чтобы рамка не обрезалась
                 g.ResetClip();
 
-                // Отрисовываем рамку вокруг круга
                 using (var pen = new Pen(borderColor, borderThickness))
                 {
                     g.DrawEllipse(pen, borderThickness / 2, borderThickness / 2,
@@ -498,27 +424,17 @@ namespace GymApplicationV2._0.FormsClients
                 }
             }
 
-            // Устанавливаем новое обрезанное изображение в PictureBox
             pictureBox.Image = roundedImage;
 
-            // Удаляем старый регион (если был), чтобы не было конфликтов
             if (pictureBox.Region != null)
             {
                 pictureBox.Region.Dispose();
-                pictureBox.Region = null; // Сбрасываем регион, так как теперь само изображение круглое
+                pictureBox.Region = null;
             }
 
-            // Если вы хотите, чтобы PictureBox сам был кругом, но это не обязательно,
-            // так как изображение уже круглое. Но это может помочь с кликами и т.п.
             GraphicsPath pictureboxPath = new GraphicsPath();
             pictureboxPath.AddEllipse(0, 0, diameter, diameter);
             pictureBox.Region = new Region(pictureboxPath);
-
-            // Отписываемся от Paint события, так как мы уже отрисовали рамку на Bitmap
-            // Если вы хотите, чтобы рамка отрисовывалась всегда поверх,
-            // то событие Paint может быть полезным, но тогда убедитесь, что
-            // оно не конфликтует с отрисовкой на Bitmap.
-            // Обычно, когда само изображение круглое, Region и Paint для рамки не нужны.
         }
 
 

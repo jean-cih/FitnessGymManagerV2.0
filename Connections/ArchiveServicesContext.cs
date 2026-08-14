@@ -30,7 +30,7 @@ namespace GymApplicationV2._0.Connections
                         Дата_окончания TEXT(20),
                         Абонемент TEXT(100),
                         Оплата INTEGER,
-                        Посещений_осталось INTEGER CHECK(Посещений_осталось BETWEEN 0 AND 100)
+                        Посещений_осталось INTEGER
                 )";
 
                 using (SQLiteCommand cmd = new SQLiteCommand(commandString, conn))

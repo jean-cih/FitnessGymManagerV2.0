@@ -57,8 +57,6 @@ namespace GymApplicationV2._0
             CheckIfDataExistsIssued(splash);
             CheckIfDataExistsProducts(splash);
 
-            splash.UpdateProgress("Миграция данных...", "Обновление", 85);
-            DatabaseMigration.MigrateDatesToIsoFormat();
             Thread.Sleep(100);
 
             LoadSettings();

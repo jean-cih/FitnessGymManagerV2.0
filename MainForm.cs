@@ -491,28 +491,7 @@ namespace GymApplicationV2._0
                     numberCard = jeanTextBoxNumberCard.Text.Trim();
                     ClearCardNumber();
 
-                    if (!ValidateIssuedExists(numberCard))
-                        return;
-
-                    if (!ValidateMembershipStatus(numberCard))
-                        return;
-
-                    string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
-                        WHERE №Карты = @cardNumber
-                        ORDER BY Id ASC
-                        LIMIT 1";
-                    var data = GeneralContext.GetDataFromDatabase(query_help,
-                        IssuedMembershipContext.ConnectionStringIssued(),
-                        new SQLiteParameter("@cardNumber", numberCard));
-
-                    string membership = data.Rows[0]["Абонемент"].ToString();
-                    string date = data.Rows[0]["Дата_окончания"].ToString();
-
-                    TryHandleFrozenMembership(numberCard, date);
-
-                    ProcessClientVisit(numberCard, membership);
-
-                    DisplayClientData(numberCard);
+                    ProcessMembership(numberCard);
                 }
                 else
                 {
@@ -552,28 +531,7 @@ namespace GymApplicationV2._0
                     numberCard = card;
                     ClearCardNumber();
 
-                    if (!ValidateIssuedExists(numberCard))
-                        return;
-
-                    if (!ValidateMembershipStatus(numberCard))
-                        return;
-
-                    string query_help = @"SELECT Абонемент, Дата_окончания FROM Issued 
-                        WHERE №Карты = @cardNumber
-                        ORDER BY Id ASC
-                        LIMIT 1";
-                    var data = GeneralContext.GetDataFromDatabase(query_help,
-                        IssuedMembershipContext.ConnectionStringIssued(),
-                        new SQLiteParameter("@cardNumber", numberCard));
-
-                    string membership = data.Rows[0]["Абонемент"].ToString();
-                    string date = data.Rows[0]["Дата_окончания"].ToString();
-
-                    TryHandleFrozenMembership(numberCard, date);
-                    
-                    ProcessClientVisit(numberCard, membership);
-
-                    DisplayClientData(numberCard);
+                    ProcessMembership(numberCard);
                 }
             }
         }
@@ -651,6 +609,32 @@ namespace GymApplicationV2._0
             picture_status.Image = Properties.Resources.redError;
         }
 
+        private void ProcessMembership(string card)
+        {
+            if (!ValidateIssuedExists(card)) return;
+
+            if (!ValidateMembershipStatus(card)) return;
+
+            string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
+                WHERE №Карты = @cardNumber
+                ORDER BY date(Дата_окончания) ASC
+                LIMIT 1";
+            var data = GeneralContext.GetDataFromDatabase(query,
+                IssuedMembershipContext.ConnectionStringIssued(),
+                new SQLiteParameter("@cardNumber", card));
+
+            if (data == null || data.Rows.Count == 0) return;
+
+            string membership = data.Rows[0]["Абонемент"].ToString();
+            string date = data.Rows[0]["Дата_окончания"].ToString();
+
+            TryHandleFrozenMembership(card, date);
+
+            ProcessClientVisit(card, membership);
+
+            DisplayClientData(card);
+        }
+
         private void textNumberClient_TextChanged(object sender, EventArgs e)
         {
             if (isProgrammaticChange)
@@ -674,28 +658,7 @@ namespace GymApplicationV2._0
             numberCard = jeanTextBoxNumberCard.Text.Trim();
             ClearCardNumber();
 
-            if (!ValidateIssuedExists(numberCard))
-                return;
-
-            if (!ValidateMembershipStatus(numberCard))
-                return;
-
-            string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
-                WHERE №Карты = @cardNumber
-                ORDER BY Id ASC
-                LIMIT 1";
-            var data = GeneralContext.GetDataFromDatabase(query,
-                IssuedMembershipContext.ConnectionStringIssued(),
-                new SQLiteParameter("@cardNumber", numberCard));
-
-            string membership = data.Rows[0]["Абонемент"].ToString();
-            string date = data.Rows[0]["Дата_окончания"].ToString();
-
-            TryHandleFrozenMembership(numberCard, date);
-
-            ProcessClientVisit(numberCard, membership);
-
-            DisplayClientData(numberCard);
+            ProcessMembership(numberCard);
         }
 
         // Валидация существования клиента
@@ -786,14 +749,16 @@ namespace GymApplicationV2._0
         private bool ValidateMembershipStatus(string cardNumber)
         {
             object timeLeft = GeneralContext.GetElementFromDatabase(@"SELECT Дата_окончания FROM Issued WHERE №Карты = @cardNumber
-                ORDER BY Id ASC
+                ORDER BY date(Дата_окончания) ASC
                 LIMIT 1",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
-            if (DateTime.Compare(Convert.ToDateTime(timeLeft), DateTime.Now) < 0)
+            if (DateTime.Compare(Convert.ToDateTime(timeLeft).Date, DateTime.Now.Date) < 0)
             {
                 HandleExpiredMembership(cardNumber, timeLeft.ToString());
+
+                ProcessMembership(numberCard);
                 return false;
             }
 
@@ -812,9 +777,6 @@ namespace GymApplicationV2._0
             ArchiveExpiredMembership(cardNumber, issuedInfo);
 
             ResetClientMembership(cardNumber, date);
-
-            var errorSound = new PlaySoundHelper(false);
-            errorSound.PlaySound();
 
             if (!userStatus.ContainsKey(cardNumber))
             {
@@ -866,20 +828,25 @@ namespace GymApplicationV2._0
         // Обработка посещения клиента
         private void ProcessClientVisit(string cardNumber, string membership)
         {
-            string query = @"SELECT Дата_окончания 
+            var date = GeneralContext.GetElementFromDatabase(@"SELECT Дата_окончания 
                         FROM Issued 
                         WHERE №Карты = @cardNumber 
-                        ORDER BY Id ASC
-                        LIMIT 1";
-            var date = GeneralContext.GetElementFromDatabase(query,
+                        ORDER BY date(Дата_окончания) ASC
+                        LIMIT 1",
                 IssuedMembershipContext.ConnectionStringIssued(),
                 new SQLiteParameter("@cardNumber", cardNumber));
 
             string new_date_after_unfreeze = date.ToString();
 
-            if (membership.ToString() == "Безлимитный")
+            var type_membership = GeneralContext.GetElementFromDatabase(@"SELECT Тип 
+                        FROM Descriptions 
+                        WHERE Абонемент = @membership",
+                ServicesContext.ConnectionStringServices(),
+                new SQLiteParameter("@membership", membership));
+
+            if (type_membership.ToString() == "безлимитный")
             {
-                ProcessUnlimitedVisit(cardNumber, membership, new_date_after_unfreeze);
+                ProcessUnlimitedVisit(cardNumber, new_date_after_unfreeze);
                 return;
             }
 
@@ -889,31 +856,48 @@ namespace GymApplicationV2._0
                 new SQLiteParameter("@cardNumber", cardNumber),
                 new SQLiteParameter("@dateEnd", new_date_after_unfreeze));
 
-            numberLeft = Convert.ToInt32(visitsLeft);
+            numberLeft = SafeParseInt(visitsLeft);
             if (numberLeft <= 0)
             {
                 HandleNoVisitsLeft(cardNumber, new_date_after_unfreeze);
 
-                var dataNew = GeneralContext.GetDataFromDatabase(@"
-                    SELECT Посещений_осталось, Дата_окончания 
-                        FROM Issued 
-                        WHERE №Карты = @cardNumber
-                        ORDER BY Id ASC
-                        LIMIT 1",
-                    IssuedMembershipContext.ConnectionStringIssued(),
-                    new SQLiteParameter("@cardNumber", cardNumber));
-
-                if (dataNew == null || dataNew.Rows.Count == 0) return;
-
-                numberLeft = Convert.ToInt32(dataNew.Rows[0]["Посещений_осталось"]);
-                new_date_after_unfreeze = dataNew.Rows[0]["Дата_окончания"].ToString();
+                ProcessMembership(cardNumber);
+                return;
             }
 
             ProcessLimitedVisit(cardNumber, numberLeft, new_date_after_unfreeze);
         }
 
+        private int SafeParseInt(object value, int defaultValue = 0)
+        {
+            if (value == null || value == DBNull.Value)
+                return defaultValue;
+
+            try
+            {
+                string strValue = value.ToString().Trim();
+
+                if (string.IsNullOrEmpty(strValue))
+                    return defaultValue;
+
+                string cleanValue = new string(strValue.Where(c => char.IsDigit(c) || c == '-').ToArray());
+
+                if (string.IsNullOrEmpty(cleanValue))
+                    return defaultValue;
+
+                if (int.TryParse(cleanValue, out int result))
+                    return result;
+
+                return defaultValue;
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
         // Обработка безлимитного посещения
-        private void ProcessUnlimitedVisit(string cardNumber, string membership, string date)
+        private void ProcessUnlimitedVisit(string cardNumber, string date)
         {
             GeneralContext.CommandDataFromDatabase(@"UPDATE Issued SET " +
                 "Посетил = '" + DateTime.Now + "' " +
@@ -1006,7 +990,7 @@ namespace GymApplicationV2._0
                        Посещений_осталось AS 'Посещений осталось' 
                 FROM Issued 
                 WHERE №Карты = @cardNumber
-                ORDER BY Id ASC
+                ORDER BY date(Дата_окончания) ASC
                 LIMIT 1";
 
             dataGridViewClient.DataSource = GeneralContext.GetDataFromDatabase(query,
@@ -1053,14 +1037,13 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            if (nameClient == "")
+            if (numberCard == "")
             {
                 MessageHelper.MessageWindowOk("Клиент не выбран", "Сообщение");
                 return;
             }
 
             Services services = new Services();
-            services.Show();
             services.jeanModernButtonAdd.Visible = true;
             services.jeanModernButtonAdd.Visible = false;
             services.jeanModernButtonDelete.Visible = false;
@@ -1071,6 +1054,8 @@ namespace GymApplicationV2._0
             services.labelName.Text = nameClient;
             services.NumberCard = numberCard;
             services.checkBoxVisited.Visible = true;
+
+            services.Show();
         }
 
         private void ApplySettingsToAllControls()
@@ -1259,7 +1244,7 @@ namespace GymApplicationV2._0
             GeneralContext.CommandDataFromDatabase("UPDATE Issued SET " +
                         "Посещений_осталось = '" + numberLeft.ToString() + "' " +
                         "WHERE №Карты = '" + numberCard + "' " +
-                        "ORDER BY Id ASC " +
+                        "ORDER BY date(Дата_окончания) ASC " +
                         "LIMIT 1;",
                 IssuedMembershipContext.ConnectionStringIssued());
 

@@ -302,9 +302,25 @@ namespace GymApplicationV2._0
                 TermDate = termDate,
                 VisitsLeft = lefts,
                 Birthday = FormatBirthdayForDatabase(jeanTextBoxBirthday.Text), // Убедитесь, что этот метод тоже возвращает ISO
-                Discount = discountParts[0] != "Скидка" && !string.IsNullOrEmpty(discountParts[0]) ? Convert.ToInt32(discountParts[0]) : 0,
+                Discount = discountParts[0] != "Скидка" && !string.IsNullOrEmpty(discountParts[0]) ? TryParseInt(discountParts[0]).ToString() : "",
                 Saved = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") // ISO формат с временем
             };
+        }
+
+        private int TryParseInt(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return 0;
+
+            string cleanValue = new string(value.Where(c => char.IsDigit(c) || c == '-').ToArray());
+
+            if (string.IsNullOrEmpty(cleanValue))
+                return 0;
+
+            if (int.TryParse(cleanValue, out int result))
+                return result;
+
+            return 0;
         }
 
         private string FormatBirthdayForDatabase(string birthdayText)

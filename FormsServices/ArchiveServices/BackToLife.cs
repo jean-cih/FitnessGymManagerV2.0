@@ -89,6 +89,20 @@ namespace GymApplicationV2._0.FormsServices
             if (MessageHelper.MessageWindowYesNo("Вы уверены что хотите восстановить абонемент?") != DialogResult.Yes)
                 return;
 
+            var type_membership = GeneralContext.GetElementFromDatabase(@"SELECT Цена 
+                                    FROM Descriptions 
+                                    WHERE Абонемент = @membership",
+                ServicesContext.ConnectionStringServices(),
+                new SQLiteParameter("@membership", jeanTextBoxMembership.Text));
+
+            if (type_membership == null) return;
+
+            string visitsLeft = jeanTextBoxVisits.Text;
+            if (type_membership.ToString() == "обычный" && visitsLeft == string.Empty)
+            {
+                visitsLeft = "0";
+            }
+
             string insertQuery = @"
                 INSERT INTO Issued (
                     Клиент,
@@ -97,6 +111,7 @@ namespace GymApplicationV2._0.FormsServices
                     Дата_оформления,
                     Абонемент,
                     Посетил,
+                    Оплата,
                     Статус,
                     Посещений_осталось,
                     Окончание_заморозки
@@ -107,6 +122,7 @@ namespace GymApplicationV2._0.FormsServices
                     @registrationDate,
                     @membership,
                     @visited,
+                    @cost,
                     @status,
                     @visitsLeft,
                     @freezeEnd
@@ -120,8 +136,9 @@ namespace GymApplicationV2._0.FormsServices
                 new SQLiteParameter("@registrationDate", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")),
                 new SQLiteParameter("@membership", jeanTextBoxMembership.Text),
                 new SQLiteParameter("@visited", string.Empty),
+                new SQLiteParameter("@cost", type_membership.ToString()),
                 new SQLiteParameter("@status", "активирован"),
-                new SQLiteParameter("@visitsLeft", jeanTextBoxVisits.Text),
+                new SQLiteParameter("@visitsLeft", visitsLeft),
                 new SQLiteParameter("@freezeEnd", string.Empty));
 
             GeneralContext.CommandDataFromDatabase("DELETE FROM Archive WHERE Id = @id;",

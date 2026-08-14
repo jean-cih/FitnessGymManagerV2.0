@@ -17,6 +17,7 @@ namespace GymApplicationV2._0
         private string _servicesQuantity = string.Empty;
         private string _servicesCost = string.Empty;
         private string _labelMembership = string.Empty;
+        private string _typeMembership = string.Empty;
         public string NumberCard = string.Empty;
 
         private FadeAnimation _fadeAnimation;
@@ -46,7 +47,8 @@ namespace GymApplicationV2._0
                 " Абонемент," +
                 " Цена," +
                 " Срок_действия AS 'Срок действия'," +
-                " Посещений" +
+                " Посещений," +
+                " Тип" +
                 " FROM Descriptions",
                 ServicesContext.ConnectionStringServices()
             );
@@ -67,6 +69,7 @@ namespace GymApplicationV2._0
             _servicesCost = selectedRow.Cells[2].Value.ToString();
             _termMembership = selectedRow.Cells[3].Value?.ToString();
             _servicesQuantity = selectedRow.Cells[4].Value.ToString();
+            _typeMembership = selectedRow.Cells[5].Value.ToString();
         }
 
         private void buttonAddService_Click(object sender, EventArgs e)
@@ -302,6 +305,8 @@ namespace GymApplicationV2._0
                 f.jeanTextBoxTerm.Text = _termMembership;
                 f.jeanTextBoxVisited.Text = _servicesQuantity;
                 f.jeanTextBoxName.Text = _labelMembership;
+                f._typeMembership = _typeMembership;
+
                 f._id = _id;
 
                 f.UpdateData();

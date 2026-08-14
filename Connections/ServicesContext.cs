@@ -25,12 +25,13 @@ namespace GymApplicationV2._0.Connections
                 string commandString = @"
                     CREATE TABLE Descriptions(
                         Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Абонемент TEXT(100),
-                        Цена INTEGER,
-                        Срок_действия TEXT(20),
-                        Посещений TEXT(5),
-                        Проданных_за_месяц INTEGER
-                )";
+                        Абонемент TEXT(100) NOT NULL,
+                        Цена INTEGER NOT NULL,
+                        Срок_действия INTEGER NOT NULL,
+                        Посещений INTEGER NULL,
+                        Тип TEXT DEFAULT 'Обычный',
+                        Проданных_за_месяц INTEGER DEFAULT 0
+                    )";
 
                 using (SQLiteCommand cmd = new SQLiteCommand(commandString, conn))
                 {
