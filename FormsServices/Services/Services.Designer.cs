@@ -31,24 +31,24 @@ namespace GymApplicationV2._0
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Services));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle12 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.labelName = new System.Windows.Forms.Label();
             this.checkBoxVisited = new System.Windows.Forms.CheckBox();
             this.pictureBoxSearch = new System.Windows.Forms.PictureBox();
-            this.dataGridViewServices = new System.Windows.Forms.DataGridView();
+            this.dateActivation = new GymApplicationV2._0.Controls.JeanDateTimePicker();
             this.jeanPanel = new GymApplicationV2._0.Controls.JeanPanel();
+            this.dataGridViewServices = new System.Windows.Forms.DataGridView();
             this.jeanModernButtonErase = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanSoftTextBoxPurchase = new GymApplicationV2._0.Controls.jeanSoftTextBox();
             this.jeanModernButtonChange = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanModernButtonSell = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanModernButtonAdd = new GymApplicationV2._0.Controls.JeanModernButton();
             this.jeanModernButtonDelete = new GymApplicationV2._0.Controls.JeanModernButton();
-            this.dateActivation = new GymApplicationV2._0.Controls.JeanDateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewServices)).BeginInit();
             this.jeanPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewServices)).BeginInit();
             this.SuspendLayout();
             // 
             // labelName
@@ -67,7 +67,7 @@ namespace GymApplicationV2._0
             this.checkBoxVisited.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.checkBoxVisited.AutoSize = true;
             this.checkBoxVisited.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.checkBoxVisited.Location = new System.Drawing.Point(11, 417);
+            this.checkBoxVisited.Location = new System.Drawing.Point(27, 459);
             this.checkBoxVisited.Margin = new System.Windows.Forms.Padding(2);
             this.checkBoxVisited.Name = "checkBoxVisited";
             this.checkBoxVisited.Size = new System.Drawing.Size(167, 17);
@@ -80,7 +80,7 @@ namespace GymApplicationV2._0
             // 
             this.pictureBoxSearch.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.pictureBoxSearch.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSearch.Image")));
-            this.pictureBoxSearch.Location = new System.Drawing.Point(352, 46);
+            this.pictureBoxSearch.Location = new System.Drawing.Point(368, 46);
             this.pictureBoxSearch.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBoxSearch.Name = "pictureBoxSearch";
             this.pictureBoxSearch.Size = new System.Drawing.Size(26, 24);
@@ -88,52 +88,19 @@ namespace GymApplicationV2._0
             this.pictureBoxSearch.TabIndex = 57;
             this.pictureBoxSearch.TabStop = false;
             // 
-            // dataGridViewServices
+            // dateActivation
             // 
-            this.dataGridViewServices.AllowUserToAddRows = false;
-            this.dataGridViewServices.AllowUserToDeleteRows = false;
-            this.dataGridViewServices.AllowUserToResizeColumns = false;
-            this.dataGridViewServices.AllowUserToResizeRows = false;
-            this.dataGridViewServices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridViewServices.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dataGridViewServices.BackgroundColor = System.Drawing.Color.White;
-            this.dataGridViewServices.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.dataGridViewServices.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
-            this.dataGridViewServices.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
-            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle10.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            dataGridViewCellStyle10.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle10.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle10.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
-            dataGridViewCellStyle10.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
-            dataGridViewCellStyle10.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.dataGridViewServices.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
-            this.dataGridViewServices.ColumnHeadersHeight = 35;
-            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle11.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle11.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle11.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle11.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle11.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle11.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.dataGridViewServices.DefaultCellStyle = dataGridViewCellStyle11;
-            this.dataGridViewServices.EnableHeadersVisualStyles = false;
-            this.dataGridViewServices.GridColor = System.Drawing.Color.Black;
-            this.dataGridViewServices.Location = new System.Drawing.Point(13, 11);
-            this.dataGridViewServices.Margin = new System.Windows.Forms.Padding(2);
-            this.dataGridViewServices.Name = "dataGridViewServices";
-            this.dataGridViewServices.ReadOnly = true;
-            this.dataGridViewServices.RowHeadersVisible = false;
-            this.dataGridViewServices.RowHeadersWidth = 40;
-            dataGridViewCellStyle12.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
-            this.dataGridViewServices.RowsDefaultCellStyle = dataGridViewCellStyle12;
-            this.dataGridViewServices.RowTemplate.Height = 24;
-            this.dataGridViewServices.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridViewServices.Size = new System.Drawing.Size(842, 306);
-            this.dataGridViewServices.TabIndex = 58;
-            this.dataGridViewServices.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewServices_CellContentClick_1);
+            this.dateActivation.BorderColor = System.Drawing.Color.PaleVioletRed;
+            this.dateActivation.BorderSize = 0;
+            this.dateActivation.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
+            this.dateActivation.Location = new System.Drawing.Point(24, 482);
+            this.dateActivation.MinimumSize = new System.Drawing.Size(4, 35);
+            this.dateActivation.Name = "dateActivation";
+            this.dateActivation.Size = new System.Drawing.Size(200, 35);
+            this.dateActivation.SkinColor = System.Drawing.Color.MediumSlateBlue;
+            this.dateActivation.TabIndex = 60;
+            this.dateActivation.TextColor = System.Drawing.Color.White;
+            this.dateActivation.Visible = false;
             // 
             // jeanPanel
             // 
@@ -151,8 +118,55 @@ namespace GymApplicationV2._0
             this.jeanPanel.Location = new System.Drawing.Point(11, 89);
             this.jeanPanel.Margin = new System.Windows.Forms.Padding(2);
             this.jeanPanel.Name = "jeanPanel";
-            this.jeanPanel.Size = new System.Drawing.Size(868, 325);
+            this.jeanPanel.Size = new System.Drawing.Size(901, 362);
             this.jeanPanel.TabIndex = 54;
+            // 
+            // dataGridViewServices
+            // 
+            this.dataGridViewServices.AllowUserToAddRows = false;
+            this.dataGridViewServices.AllowUserToDeleteRows = false;
+            this.dataGridViewServices.AllowUserToResizeColumns = false;
+            this.dataGridViewServices.AllowUserToResizeRows = false;
+            this.dataGridViewServices.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataGridViewServices.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dataGridViewServices.BackgroundColor = System.Drawing.Color.White;
+            this.dataGridViewServices.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.dataGridViewServices.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
+            this.dataGridViewServices.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(113)))), ((int)(((byte)(96)))), ((int)(((byte)(232)))));
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(230)))), ((int)(((byte)(255)))));
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.dataGridViewServices.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this.dataGridViewServices.ColumnHeadersHeight = 35;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.dataGridViewServices.DefaultCellStyle = dataGridViewCellStyle2;
+            this.dataGridViewServices.EnableHeadersVisualStyles = false;
+            this.dataGridViewServices.GridColor = System.Drawing.Color.Black;
+            this.dataGridViewServices.Location = new System.Drawing.Point(13, 11);
+            this.dataGridViewServices.Margin = new System.Windows.Forms.Padding(2);
+            this.dataGridViewServices.Name = "dataGridViewServices";
+            this.dataGridViewServices.ReadOnly = true;
+            this.dataGridViewServices.RowHeadersVisible = false;
+            this.dataGridViewServices.RowHeadersWidth = 40;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.TopCenter;
+            this.dataGridViewServices.RowsDefaultCellStyle = dataGridViewCellStyle3;
+            this.dataGridViewServices.RowTemplate.Height = 24;
+            this.dataGridViewServices.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridViewServices.Size = new System.Drawing.Size(875, 343);
+            this.dataGridViewServices.TabIndex = 58;
+            this.dataGridViewServices.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridViewServices_CellContentClick_1);
             // 
             // jeanModernButtonErase
             // 
@@ -167,7 +181,7 @@ namespace GymApplicationV2._0
             this.jeanModernButtonErase.FlatAppearance.BorderSize = 0;
             this.jeanModernButtonErase.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonErase.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonErase.Location = new System.Drawing.Point(536, 46);
+            this.jeanModernButtonErase.Location = new System.Drawing.Point(552, 46);
             this.jeanModernButtonErase.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonErase.Name = "jeanModernButtonErase";
             this.jeanModernButtonErase.Size = new System.Drawing.Size(26, 24);
@@ -185,7 +199,7 @@ namespace GymApplicationV2._0
             this.jeanSoftTextBoxPurchase.BorderRadius = 15;
             this.jeanSoftTextBoxPurchase.BorderSize = 2;
             this.jeanSoftTextBoxPurchase.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.jeanSoftTextBoxPurchase.Location = new System.Drawing.Point(343, 41);
+            this.jeanSoftTextBoxPurchase.Location = new System.Drawing.Point(359, 41);
             this.jeanSoftTextBoxPurchase.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.jeanSoftTextBoxPurchase.Multiline = false;
             this.jeanSoftTextBoxPurchase.Name = "jeanSoftTextBoxPurchase";
@@ -211,7 +225,7 @@ namespace GymApplicationV2._0
             this.jeanModernButtonChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonChange.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonChange.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonChange.Location = new System.Drawing.Point(752, 29);
+            this.jeanModernButtonChange.Location = new System.Drawing.Point(785, 29);
             this.jeanModernButtonChange.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonChange.Name = "jeanModernButtonChange";
             this.jeanModernButtonChange.Size = new System.Drawing.Size(112, 45);
@@ -233,7 +247,7 @@ namespace GymApplicationV2._0
             this.jeanModernButtonSell.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonSell.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonSell.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonSell.Location = new System.Drawing.Point(403, 430);
+            this.jeanModernButtonSell.Location = new System.Drawing.Point(419, 467);
             this.jeanModernButtonSell.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonSell.Name = "jeanModernButtonSell";
             this.jeanModernButtonSell.Size = new System.Drawing.Size(112, 45);
@@ -256,7 +270,7 @@ namespace GymApplicationV2._0
             this.jeanModernButtonAdd.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonAdd.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonAdd.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonAdd.Location = new System.Drawing.Point(344, 430);
+            this.jeanModernButtonAdd.Location = new System.Drawing.Point(360, 467);
             this.jeanModernButtonAdd.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonAdd.Name = "jeanModernButtonAdd";
             this.jeanModernButtonAdd.Size = new System.Drawing.Size(112, 45);
@@ -278,7 +292,7 @@ namespace GymApplicationV2._0
             this.jeanModernButtonDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.jeanModernButtonDelete.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.jeanModernButtonDelete.ForeColor = System.Drawing.Color.White;
-            this.jeanModernButtonDelete.Location = new System.Drawing.Point(460, 430);
+            this.jeanModernButtonDelete.Location = new System.Drawing.Point(476, 467);
             this.jeanModernButtonDelete.Margin = new System.Windows.Forms.Padding(2);
             this.jeanModernButtonDelete.Name = "jeanModernButtonDelete";
             this.jeanModernButtonDelete.Size = new System.Drawing.Size(112, 45);
@@ -288,26 +302,12 @@ namespace GymApplicationV2._0
             this.jeanModernButtonDelete.UseVisualStyleBackColor = false;
             this.jeanModernButtonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
-            // dateActivation
-            // 
-            this.dateActivation.BorderColor = System.Drawing.Color.PaleVioletRed;
-            this.dateActivation.BorderSize = 0;
-            this.dateActivation.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F);
-            this.dateActivation.Location = new System.Drawing.Point(11, 450);
-            this.dateActivation.MinimumSize = new System.Drawing.Size(4, 35);
-            this.dateActivation.Name = "dateActivation";
-            this.dateActivation.Size = new System.Drawing.Size(200, 35);
-            this.dateActivation.SkinColor = System.Drawing.Color.MediumSlateBlue;
-            this.dateActivation.TabIndex = 60;
-            this.dateActivation.TextColor = System.Drawing.Color.White;
-            this.dateActivation.Visible = false;
-            // 
             // Services
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(886, 497);
+            this.ClientSize = new System.Drawing.Size(919, 534);
             this.Controls.Add(this.dateActivation);
             this.Controls.Add(this.jeanPanel);
             this.Controls.Add(this.jeanModernButtonErase);
@@ -328,8 +328,8 @@ namespace GymApplicationV2._0
             this.Text = "Абонементы";
             this.Load += new System.EventHandler(this.Services_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSearch)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewServices)).EndInit();
             this.jeanPanel.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewServices)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -347,6 +347,6 @@ namespace GymApplicationV2._0
         protected internal Controls.jeanSoftTextBox jeanSoftTextBoxPurchase;
         protected internal System.Windows.Forms.DataGridView dataGridViewServices;
         private Controls.JeanModernButton jeanModernButtonErase;
-        public Controls.JeanDateTimePicker dateActivation;
+        protected internal Controls.JeanDateTimePicker dateActivation;
     }
 }

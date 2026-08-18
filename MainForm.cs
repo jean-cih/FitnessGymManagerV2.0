@@ -626,6 +626,8 @@ namespace GymApplicationV2._0
             string membership = data.Rows[0]["Абонемент"].ToString();
             string date = data.Rows[0]["Дата_окончания"].ToString();
 
+            checkDelayStartDate(date, card);
+
             if (!ValidateMembershipStatus(card, membership)) return;
 
             TryHandleFrozenMembership(card, date);
@@ -633,6 +635,39 @@ namespace GymApplicationV2._0
             ProcessClientVisit(card, membership);
 
             DisplayClientData(card);
+        }
+
+        private void checkDelayStartDate(string date, string card)
+        {
+            DateTime endDate = DateTime.Parse(date);
+
+            var res = GeneralContext.GetDataFromDatabase(@"SELECT Дата_начала FROM History 
+                WHERE Дата_окончания = @dateEnd",
+                HistoryPaymentContext.ConnectionStringPayment(),
+                new SQLiteParameter("@dateEnd", endDate));
+
+            if (res == null || res.Rows.Count == 0) return;
+
+            DateTime startDate = DateTime.Parse(res.Rows[0]["Дата_начала"].ToString());
+            DateTime currentDate = DateTime.Now.Date;
+
+            if (startDate > currentDate)
+            {
+                int daysDifference = (startDate - currentDate).Days;
+
+                DateTime newEndDate = endDate.AddDays(-daysDifference + 1);
+
+                date = newEndDate.ToString("yyyy-MM-dd");
+
+                GeneralContext.CommandDataFromDatabase(@"UPDATE Issued 
+                    SET Дата_окончания = @newEndDate 
+                    WHERE №Карты = @cardNumber 
+                    AND Дата_окончания = @oldEndDate",
+                    IssuedMembershipContext.ConnectionStringIssued(),
+                    new SQLiteParameter("@newEndDate", newEndDate.ToString("yyyy-MM-dd")),
+                    new SQLiteParameter("@cardNumber", card),
+                    new SQLiteParameter("@oldEndDate", date));
+            }
         }
 
         private void textNumberClient_TextChanged(object sender, EventArgs e)

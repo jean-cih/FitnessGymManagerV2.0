@@ -44,9 +44,7 @@ namespace GymApplicationV2._0
 
         private void InitializeCustomDesign()
         {
-            dateActivation = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new Point(checkBoxVisited.Location.X, checkBoxVisited.Location.Y + 30));
-            
-            this.Controls.Add(dateActivation);
+            dateActivation.CreateStyledDateTimePicker(new Size(140, 15), new Point(checkBoxVisited.Location.X, checkBoxVisited.Location.Y + 30));
         }
 
         private void RefreshServicesData()

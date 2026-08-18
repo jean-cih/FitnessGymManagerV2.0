@@ -51,20 +51,15 @@ namespace GymApplicationV2._0.Helpers
             };
         }
 
-        public static JeanDateTimePicker CreateStyledDateTimePicker(Size size, Point location)
+        public static void CreateStyledDateTimePicker(this JeanDateTimePicker dateTime, Size size, Point location)
         {
-            var dateTime = new JeanDateTimePicker
-            {
-                Size = size,
-                Location = location,
-                TextColor = Color.Black,
-                BorderColor = Color.MediumSlateBlue,
-                SkinColor = Color.Transparent,
-                BorderSize = 2,
-                AutoSize = true,
-            };
-
-            return dateTime;
+            dateTime.Size = size;
+            dateTime.Location = location;
+            dateTime.TextColor = Color.Black;
+            dateTime.BorderColor = Color.MediumSlateBlue;
+            dateTime.SkinColor = Color.Transparent;
+            dateTime.BorderSize = 2;
+            dateTime.AutoSize = true;
         }
 
         public static CheckBox CreateStyledCheckBox(string text, Point location, bool flag = false)
