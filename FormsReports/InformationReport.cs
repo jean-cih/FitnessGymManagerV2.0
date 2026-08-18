@@ -26,10 +26,6 @@ namespace GymApplicationV2._0
 
         private FadeAnimation _fadeAnimation;
 
-        private DataTable _currentDataTable;
-
-        public Dictionary<string, string> userStatus = new Dictionary<string, string>();
-
         public InformationReport()
         {
             InitializeComponent();
@@ -101,72 +97,7 @@ namespace GymApplicationV2._0
             DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
                 IssuedMembershipContext.ConnectionStringIssued());
 
-            //if (dataTable == null || dataTable.Rows.Count <= 0)
-            //{
-            //    return;
-            //}
-
-            //dataTable.Columns.Add("Статус", typeof(string));
-
-            //foreach (DataRow row in dataTable.Rows)
-            //{
-            //    string cardNumber = row["№Карты"].ToString();
-
-            //    if (userStatus.TryGetValue(cardNumber, out string status))
-            //    {
-            //        row["Статус"] = status;
-            //    }
-            //    else
-            //    {
-            //        row["Статус"] = "Неизвестно";
-            //    }
-            //}
-
-            //foreach (var kvp in userStatus)
-            //{
-            //    string cardNumber = kvp.Key;
-            //    string status = kvp.Value;
-
-            //    bool cardExists = dataTable.AsEnumerable().Any(row => row["№Карты"].ToString() == cardNumber);
-
-            //    if (!cardExists)
-            //    {
-            //        DataRow newRow = dataTable.NewRow();
-            //        newRow["№Карты"] = cardNumber;
-            //        newRow["Статус"] = status;
-            //        newRow["Клиент"] = "***";
-                                                   
-            //        dataTable.Rows.Add(newRow);
-            //    }
-            //}
-
             dataGridViewShowReport.DataSource = dataTable;
-
-            //dataGridViewShowReport.Columns["Статус"].DefaultCellStyle.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-
-            //foreach (DataGridViewRow row in dataGridViewShowReport.Rows)
-            //{
-            //    if (row.Cells["Статус"].Value != null)
-            //    {
-            //        string status = row.Cells["Статус"].Value.ToString();
-
-            //        switch (status)
-            //        {
-            //            case "Активен":
-            //                row.Cells["Статус"].Style.ForeColor = Color.Green;
-            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-            //                break;
-            //            case "Неизвестно":
-            //                row.Cells["Статус"].Style.ForeColor = Color.Black;
-            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-            //                break;
-            //            default:
-            //                row.Cells["Статус"].Style.ForeColor = Color.Red;
-            //                row.Cells["Статус"].Style.Font = new Font(dataGridViewShowReport.Font, FontStyle.Bold);
-            //                break;
-            //        }
-            //    }
-            //}
 
             labelQuantity.Text = dataGridViewShowReport.Rows.Count.ToString();
         }
