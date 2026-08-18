@@ -79,6 +79,7 @@ namespace GymApplicationV2._0
             catch (Exception ex)
             {
                 MessageHelper.MessageWindowOk($"Ошибка загрузки настроек: {ex.Message}", "Ошибка");
+                Logger.Error($"Ошибка загрузки настроек: {ex.Message}");
             }
         }
 

@@ -17,7 +17,6 @@ namespace GymApplicationV2._0
         public bool periodForDay;
         public bool otherPeriod;
 
-
         public DateTime dateBegin;
         public DateTime dateEnd;
 
@@ -28,93 +27,144 @@ namespace GymApplicationV2._0
 
         public InformationReport()
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
+                this.StartPosition = FormStartPosition.CenterScreen;
+                this.Opacity = 0;
 
-            _fadeAnimation = new FadeAnimation(this);
-            _fadeAnimation.FadeIn();
+                _fadeAnimation = new FadeAnimation(this);
+                _fadeAnimation.FadeIn();
+
+                Logger.Info("Форма InformationReport инициализирована");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка при инициализации InformationReport", ex);
+                throw;
+            }
         }
 
         private void Attendance_Load(object sender, EventArgs e)
         {
-            dataGridViewShowReport.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-            if (forPeriod)
+            try
             {
-                LoadPeriodClientsReport();
-            }
-            else if (sellServices)
-            {
-                LoadServicesReport();
-            }
+                Logger.Info("Загрузка Attendance_Load");
+                dataGridViewShowReport.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-            FontHelper.ApplyFontSettings(this, null);
+                if (forPeriod)
+                {
+                    Logger.Info("Загрузка отчета по посещениям за период");
+                    LoadPeriodClientsReport();
+                }
+                else if (sellServices)
+                {
+                    Logger.Info("Загрузка отчета по проданным услугам");
+                    LoadServicesReport();
+                }
+
+                FontHelper.ApplyFontSettings(this, null);
+                Logger.Info("Attendance_Load завершена успешно");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка в Attendance_Load", ex);
+                MessageHelper.MessageWindowOk("Ошибка загрузки отчета", "Ошибка");
+            }
         }
+
         private void LoadPeriodClientsReport()
         {
-            DateTime startDate = DateTime.Now;
-            string query = string.Empty;
-
-            if (periodForMonth)
+            try
             {
-                DateTime today = DateTime.Now.Date;
-                startDate = new DateTime(today.Year, today.Month, 1);
-                DateTime endDate = today.AddDays(1).AddSeconds(-1);
+                DateTime startDate = DateTime.Now;
+                string query = string.Empty;
 
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
+                if (periodForMonth)
+                {
+                    DateTime today = DateTime.Now.Date;
+                    startDate = new DateTime(today.Year, today.Month, 1);
+                    DateTime endDate = today.AddDays(1).AddSeconds(-1);
+
+                    query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                    labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
+                    Logger.Info($"Загружен отчет за месяц: {startDate.ToShortDateString()} - {endDate.ToShortDateString()}");
+                }
+                else if (periodForWeek)
+                {
+                    DateTime today = DateTime.Now.Date;
+                    int daysOffset = (int)today.DayOfWeek - 1;
+                    if (daysOffset < 0) daysOffset = 6;
+
+                    startDate = today.AddDays(-daysOffset);
+                    DateTime endDate = today.AddDays(1).AddSeconds(-1);
+
+                    query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                    labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
+                    Logger.Info($"Загружен отчет за неделю: {startDate.ToShortDateString()} - {endDate.ToShortDateString()}");
+                }
+                else if (periodForDay)
+                {
+                    startDate = DateTime.Now.Date;
+                    DateTime endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+                    query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
+                    labelShowPeriod.Text = $"Посещения за {startDate.ToShortDateString()}";
+                    Logger.Info($"Загружен отчет за день: {startDate.ToShortDateString()}");
+                }
+                else if (otherPeriod)
+                {
+                    // Для произвольного периода
+                    DateTime beginDate = dateBegin.Date;
+                    DateTime endDate = dateEnd.Date.AddDays(1).AddSeconds(-1); // Конец дня
+                    query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{beginDate}' AND '{endDate}' ORDER BY Посетил";
+                    labelShowPeriod.Text = $"Посещения с {dateBegin.ToShortDateString()} по {dateEnd.ToShortDateString()}";
+                    Logger.Info($"Загружен отчет за произвольный период: {dateBegin.ToShortDateString()} - {dateEnd.ToShortDateString()}");
+                }
+
+                DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
+                    IssuedMembershipContext.ConnectionStringIssued());
+
+                dataGridViewShowReport.DataSource = dataTable;
+
+                labelQuantity.Text = dataGridViewShowReport.Rows.Count.ToString();
+
+                Logger.Info($"Загружено {dataGridViewShowReport.Rows.Count} записей посещений");
             }
-            else if (periodForWeek)
+            catch (Exception ex)
             {
-                DateTime today = DateTime.Now.Date;
-                int daysOffset = (int)today.DayOfWeek - 1;
-                if (daysOffset < 0) daysOffset = 6;
-
-                startDate = today.AddDays(-daysOffset);
-                DateTime endDate = today.AddDays(1).AddSeconds(-1);
-
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {startDate.ToShortDateString()} по {endDate.ToShortDateString()}";
+                Logger.Error("Ошибка при загрузке отчета по посещениям", ex);
+                MessageHelper.MessageWindowOk("Ошибка загрузки данных посещений", "Ошибка");
             }
-            else if (periodForDay)
-            {
-                startDate = DateTime.Now.Date;
-                DateTime endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{startDate}' AND '{endDate}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения за {startDate.ToShortDateString()}";
-            }
-            else if (otherPeriod)
-            {
-                // Для произвольного периода
-                DateTime beginDate = dateBegin.Date;
-                DateTime endDate = dateEnd.Date.AddDays(1).AddSeconds(-1); // Конец дня
-                query = $"SELECT Посетил, Клиент, №Карты, Абонемент FROM Issued WHERE Посетил BETWEEN '{beginDate}' AND '{endDate}' ORDER BY Посетил";
-                labelShowPeriod.Text = $"Посещения с {dateBegin.ToShortDateString()} по {dateEnd.ToShortDateString()}";
-            }
-
-            DataTable dataTable = GeneralContext.GetDataFromDatabase(query,
-                IssuedMembershipContext.ConnectionStringIssued());
-
-            dataGridViewShowReport.DataSource = dataTable;
-
-            labelQuantity.Text = dataGridViewShowReport.Rows.Count.ToString();
         }
 
         private void LoadServicesReport()
         {
-            DateTime startDate = DateTime.Now;
-            string query = "SELECT * FROM Descriptions";
+            try
+            {
+                DateTime startDate = DateTime.Now;
+                string query = "SELECT * FROM Descriptions";
 
-            labelShowPeriod.Text = $"Абонементы";
-            labelAllClients.Text = "Всего продано:";
+                labelShowPeriod.Text = $"Абонементы";
+                labelAllClients.Text = "Всего продано:";
 
-            labelQuantity.Text = GeneralContext.GetElementFromDatabase($"SELECT SUM(Проданных_за_месяц) FROM Descriptions",
-            ServicesContext.ConnectionStringServices()).ToString();
+                var totalSold = GeneralContext.GetElementFromDatabase($"SELECT SUM(Проданных_за_месяц) FROM Descriptions",
+                    ServicesContext.ConnectionStringServices());
 
-            dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase("SELECT Абонемент, Цена, Проданных_за_месяц AS 'Проданных за месяц'  FROM Descriptions WHERE Проданных_за_месяц != 0",
-            ServicesContext.ConnectionStringServices());
+                labelQuantity.Text = totalSold?.ToString() ?? "0";
+
+                dataGridViewShowReport.DataSource = GeneralContext.GetDataFromDatabase(
+                    "SELECT Абонемент, Цена, Проданных_за_месяц AS 'Проданных за месяц' FROM Descriptions WHERE Проданных_за_месяц != 0",
+                    ServicesContext.ConnectionStringServices());
+
+                Logger.Info($"Загружен отчет по услугам. Всего продано: {labelQuantity.Text}");
+                Logger.Info($"Загружено {dataGridViewShowReport.Rows.Count} видов услуг");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка при загрузке отчета по услугам", ex);
+                MessageHelper.MessageWindowOk("Ошибка загрузки данных услуг", "Ошибка");
+            }
         }
     }
 }

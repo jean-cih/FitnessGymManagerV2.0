@@ -38,135 +38,167 @@ namespace GymApplicationV2._0.FormsServices
 
         public FreezeMembership()
         {
-            InitializeComponent();
-            InitializeCustomDesign();
+            try
+            {
+                InitializeComponent();
+                InitializeCustomDesign();
 
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
+                this.StartPosition = FormStartPosition.CenterScreen;
+                this.Opacity = 0;
 
-            _fadeAnimation = new FadeAnimation(this);
-            _fadeAnimation.FadeIn();
+                _fadeAnimation = new FadeAnimation(this);
+                _fadeAnimation.FadeIn();
 
-            FontHelper.ApplyFontSettings(this, notChangeableTexts);
+                FontHelper.ApplyFontSettings(this, notChangeableTexts);
 
-            titlePanel.EnableDrag(this);
+                titlePanel.EnableDrag(this);
+
+                Logger.Info("Форма FreezeMembership инициализирована");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка при инициализации FreezeMembership", ex);
+                throw;
+            }
         }
 
         private void InitializeCustomDesign()
         {
-            // Основные настройки формы
-            this.BackColor = Color.FromArgb(255, 255, 255);
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.DoubleBuffered = true;
-
-            titlePanel = new Panel
+            try
             {
-                Size = new Size(this.Width, 50),
-                BackColor = Color.MediumSlateBlue,
-                Location = new Point(0, 0),
-            };
+                // Основные настройки формы
+                this.BackColor = Color.FromArgb(255, 255, 255);
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.DoubleBuffered = true;
 
-            // Заголовок
-            lblTitle = new Label
+                titlePanel = new Panel
+                {
+                    Size = new Size(this.Width, 50),
+                    BackColor = Color.MediumSlateBlue,
+                    Location = new Point(0, 0),
+                };
+
+                // Заголовок
+                lblTitle = new Label
+                {
+                    Text = "❄️ ЗАМОРОЗКА АБОНЕМЕНТА",
+                    Font = new Font("Montserrat", 13, FontStyle.Bold),
+                    ForeColor = Color.FromArgb(220, 220, 255),
+                    Size = new Size(400, 25),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    BackColor = Color.Transparent
+                };
+                titlePanel.Controls.Add(lblTitle);
+
+                // Информация о клиенте
+                var lblClientInfo = UIStyler.CreateStyledTextBox("Информация о клиенте:", new Point(20, 60), Color.MediumSlateBlue);
+
+                txtClientName = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 90));
+
+                lblCard = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 125));
+
+                // Детали заморозки
+                var lblFreezeDetails = UIStyler.CreateStyledTextBox("Детали заморозки:", new Point(20, 170), Color.MediumSlateBlue);
+
+                // Поля для заморозки
+                var lblFreezeDate = UIStyler.CreateStyledTextBox("Дата заморозки: " + DateTime.Now.ToShortDateString(), new Point(30, 200));
+
+                lblFreezeReason = UIStyler.CreateStyledTextBox("Причина заморозки:", new Point(30, 235));
+
+                cmbFreezeReason = new ComboBox
+                {
+                    Size = new Size(200, 30),
+                    Font = new Font("Segoe UI", 10, FontStyle.Regular),
+                    DropDownStyle = ComboBoxStyle.DropDownList,
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = Color.White
+                };
+
+                // Заполняем причины заморозки
+                cmbFreezeReason.Items.AddRange(new object[]
+                {
+                    "🏥 Болезнь",
+                    "✈️ Отпуск",
+                    "💼 Командировка",
+                    "👨‍👩‍👧‍👦 Семейные обстоятельства",
+                    "❓ Другая причина"
+                });
+                cmbFreezeReason.SelectedIndex = 0;
+
+                lblFreezeDays = UIStyler.CreateStyledTextBox("Срок заморозки (дней):", new Point(30, 270));
+
+                numFreezeDays = new NumericUpDown
+                {
+                    Size = new Size(60, 30),
+                    Font = new Font("Segoe UI", 9),
+                    Minimum = 1,
+                    Maximum = 90,
+                    Value = 30,
+                    BorderStyle = BorderStyle.FixedSingle,
+                    BackColor = Color.White,
+                    TextAlign = HorizontalAlignment.Center
+                };
+
+                // Кнопки
+                var btnCancel = UIStyler.CreateStyledButton("Отмена", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(120, 320), new Size(120, 40));
+                var btnSave = UIStyler.CreateStyledButton("Заморозить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
+                var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
+
+                btnCancel.Click += BtnCancel_Click;
+                btnSave.Click += BtnFreeze_Click;
+                btnClose.Click += (s, e) =>
+                {
+                    Logger.Info("Закрытие формы FreezeMembership");
+                    _fadeAnimation.CloseWithAnimation();
+                };
+
+                // Добавляем все элементы на главную панель
+                this.Controls.AddRange(new Control[]
+                {
+                    lblClientInfo,
+                    txtClientName,
+                    lblCard,
+                    lblFreezeDetails,
+                    lblFreezeDate,
+                    lblFreezeReason,
+                    cmbFreezeReason,
+                    lblFreezeDays,
+                    numFreezeDays,
+                    btnCancel,
+                    btnSave,
+                    btnClose,
+                    titlePanel
+                });
+
+                Logger.Info("Дизайн формы FreezeMembership инициализирован");
+            }
+            catch (Exception ex)
             {
-                Text = "❄️ ЗАМОРОЗКА АБОНЕМЕНТА",
-                Font = new Font("Montserrat", 13, FontStyle.Bold),
-                ForeColor = Color.FromArgb(220, 220, 255),
-                Size = new Size(400, 25),
-                TextAlign = ContentAlignment.MiddleCenter,
-                BackColor = Color.Transparent
-            };
-            titlePanel.Controls.Add(lblTitle);
-
-            // Информация о клиенте
-            var lblClientInfo = UIStyler.CreateStyledTextBox("Информация о клиенте:", new Point(20, 60), Color.MediumSlateBlue);
-
-            txtClientName = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 90));
-
-            lblCard = UIStyler.CreateStyledTextBox(string.Empty, new Point(30, 125));
-
-            // Детали заморозки
-            var lblFreezeDetails = UIStyler.CreateStyledTextBox("Детали заморозки:", new Point(20, 170), Color.MediumSlateBlue);
-
-            // Поля для заморозки
-            var lblFreezeDate = UIStyler.CreateStyledTextBox("Дата заморозки: " + DateTime.Now.ToShortDateString(), new Point(30, 200));
-
-            lblFreezeReason = UIStyler.CreateStyledTextBox("Причина заморозки:", new Point(30, 235));
-
-            cmbFreezeReason = new ComboBox
-            {
-                Size = new Size(200, 30),
-                Font = new Font("Segoe UI", 10, FontStyle.Regular),
-                DropDownStyle = ComboBoxStyle.DropDownList,
-                FlatStyle = FlatStyle.Flat,
-                BackColor = Color.White
-            };
-
-            // Заполняем причины заморозки
-            cmbFreezeReason.Items.AddRange(new object[]
-            {
-                "🏥 Болезнь",
-                "✈️ Отпуск",
-                "💼 Командировка",
-                "👨‍👩‍👧‍👦 Семейные обстоятельства",
-                "❓ Другая причина"
-            });
-            cmbFreezeReason.SelectedIndex = 0;
-
-            lblFreezeDays = UIStyler.CreateStyledTextBox("Срок заморозки (дней):", new Point(30, 270));
-
-            numFreezeDays = new NumericUpDown
-            {
-                Size = new Size(60, 30),
-                Font = new Font("Segoe UI", 9),
-                Minimum = 1,
-                Maximum = 90,
-                Value = 30,
-                BorderStyle = BorderStyle.FixedSingle,
-                BackColor = Color.White,
-                TextAlign = HorizontalAlignment.Center
-            };
-
-            // Кнопки
-            var btnCancel = UIStyler.CreateStyledButton("Отмена", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(120, 320), new Size(120, 40));
-            var btnSave = UIStyler.CreateStyledButton("Заморозить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point(250, 320), new Size(120, 40));
-            var btnClose = UIStyler.CreateStyledButton("X", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(this.Width - 40, 10), new Size(30, 28));
-
-            btnCancel.Click += BtnCancel_Click;
-            btnSave.Click += BtnFreeze_Click;
-            btnClose.Click += (s, e) => _fadeAnimation.CloseWithAnimation();
-
-            // Добавляем все элементы на главную панель
-            this.Controls.AddRange(new Control[]
-            {
-                lblClientInfo,
-                txtClientName,
-                lblCard,
-                lblFreezeDetails,
-                lblFreezeDate,
-                lblFreezeReason,
-                cmbFreezeReason,
-                lblFreezeDays,
-                numFreezeDays,
-                btnCancel,
-                btnSave,
-                btnClose,
-                titlePanel
-            });
+                Logger.Error("Ошибка в InitializeCustomDesign", ex);
+            }
         }
 
         public void UpdateData()
         {
-            if (txtClientName != null)
-                txtClientName.Text = "Клиент: " + _client;
+            try
+            {
+                if (txtClientName != null)
+                    txtClientName.Text = "Клиент: " + _client;
 
-            if (lblCard != null)
-                lblCard.Text = "Номер карты: " + _numberCard;
+                if (lblCard != null)
+                    lblCard.Text = "Номер карты: " + _numberCard;
 
-            lblTitle.Location = new Point((this.Width - lblTitle.Width) / 2, (titlePanel.Height - lblTitle.Height) / 2);
-            cmbFreezeReason.Location = new Point(lblFreezeReason.Location.X + lblFreezeReason.Width, 235);
-            numFreezeDays.Location = new Point(lblFreezeDays.Location.X + lblFreezeDays.Width, 270);
-            hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
+                lblTitle.Location = new Point((this.Width - lblTitle.Width) / 2, (titlePanel.Height - lblTitle.Height) / 2);
+                cmbFreezeReason.Location = new Point(lblFreezeReason.Location.X + lblFreezeReason.Width, 235);
+                numFreezeDays.Location = new Point(lblFreezeDays.Location.X + lblFreezeDays.Width, 270);
+                hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
+
+                Logger.Info($"Данные обновлены для клиента: {_client}, карта: {_numberCard}, ID: {_id}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка в UpdateData", ex);
+            }
         }
 
         private void BtnFreeze_Click(object sender, EventArgs e)
@@ -175,6 +207,9 @@ namespace GymApplicationV2._0.FormsServices
             {
                 string reason = cmbFreezeReason.SelectedItem.ToString().Substring(2);
                 int days = (int)numFreezeDays.Value;
+
+                Logger.Info($"Нажата кнопка 'Заморозить' для клиента: {_client}, карта: {_numberCard}");
+                Logger.Info($"Параметры заморозки: причина='{reason}', дней={days}");
 
                 DateTime newFreezeEndDate = DateTime.Now.AddDays(days);
 
@@ -200,9 +235,13 @@ namespace GymApplicationV2._0.FormsServices
 
                         if (rowsAffected == 0)
                         {
+                            Logger.Warning($"Абонемент не найден для карты: {_numberCard}");
                             MessageHelper.MessageWindowOk("❌ Абонемент не найден!", "Ошибка");
                             return;
                         }
+
+                        Logger.Info($"Абонемент заморожен. Обновлено строк: {rowsAffected}");
+                        Logger.Info($"Новая дата окончания заморозки: {newFreezeEndDate:yyyy-MM-dd}");
                     }
                 }
 
@@ -212,18 +251,28 @@ namespace GymApplicationV2._0.FormsServices
                                    $"⏰ Срок: {days} дней\n" +
                                    $"📋 Причина: {reason}", 1500);
 
+                Logger.Info($"Абонемент успешно заморожен для клиента: {_client}");
                 _fadeAnimation.CloseWithAnimation();
             }
             catch (Exception ex)
             {
+                Logger.Error($"Ошибка при заморозке абонемента для клиента {_client}, карта: {_numberCard}", ex);
                 MessageHelper.MessageWindowOk($"❌ Ошибка при заморозке абонемента:\n{ex.Message}", "Ошибка");
             }
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            _fadeAnimation.CloseWithAnimation();
+            try
+            {
+                Logger.Info($"Отмена заморозки для клиента: {_client}");
+                this.DialogResult = DialogResult.Cancel;
+                _fadeAnimation.CloseWithAnimation();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка в BtnCancel_Click", ex);
+            }
         }
     }
 }
