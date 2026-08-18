@@ -187,8 +187,8 @@ namespace GymApplicationV2._0
             radioForDay = UIStyler.CreateStyledRadioButton("За день", new System.Drawing.Point(card.Width / 3 + 5,115), true);
             radioOtherPeriod = UIStyler.CreateStyledRadioButton("Другой период", new System.Drawing.Point(card.Width / 3 + 5, 145));
 
-            jeanDateTimePickerBegin = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
-            jeanDateTimePickerEnd = UIStyler.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
+            jeanDateTimePickerBegin.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
+            jeanDateTimePickerEnd.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
 
             card.Controls.AddRange(new Control[] { title, radioForMonth, radioForWeek, radioForDay, radioOtherPeriod, jeanDateTimePickerBegin, jeanDateTimePickerEnd });
             this.Controls.Add(card);
