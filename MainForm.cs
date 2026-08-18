@@ -23,8 +23,8 @@ namespace GymApplicationV2._0
 {
     public partial class MainForm : ShadowedForm
     {
-        private string nameClient = "";
-        private string numberCard;
+        private string nameClient = string.Empty;
+        private string numberCard = string.Empty;
         private int numberLeft;
 
         private ToolStripDropDownMenu _menu_service;
@@ -1052,7 +1052,7 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            if (numberCard == "")
+            if (numberCard == string.Empty)
             {
                 MessageHelper.MessageWindowOk("Клиент не выбран", "Сообщение");
                 return;
