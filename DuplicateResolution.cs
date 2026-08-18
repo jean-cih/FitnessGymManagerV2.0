@@ -20,6 +20,7 @@ namespace GymApplicationV2._0
         private FadeAnimation _fadeAnimation;
 
         public string SelectedCardNumber { get; private set; }
+        public string SelectedClient { get; private set; }
 
         string[] notChangeableTexts = new string[]
             {
@@ -64,7 +65,6 @@ namespace GymApplicationV2._0
                     return new DataTable();
                 }
 
-                // Собираем все номера карт в список
                 List<string> cardNumbers = new List<string>();
                 foreach (DataRow row in cardNumbersTable.Rows)
                 {
@@ -83,7 +83,6 @@ namespace GymApplicationV2._0
 
                 Logger.Info($"Поиск клиентов по {cardNumbers.Count} номерам карт");
 
-                // Создаем IN-запрос с параметрами
                 string query = $"SELECT №Карты, Имя, Фамилия, Отчество FROM Contacts WHERE №Карты IN ({string.Join(",", cardNumbers.Select((_, i) => $"@Card{i}"))})";
 
                 DataTable result = new DataTable();
@@ -91,7 +90,6 @@ namespace GymApplicationV2._0
                 {
                     using (SQLiteCommand cmd = new SQLiteCommand(query, conn))
                     {
-                        // Добавляем параметры
                         for (int i = 0; i < cardNumbers.Count; i++)
                         {
                             cmd.Parameters.AddWithValue($"@Card{i}", cardNumbers[i]);
@@ -127,7 +125,7 @@ namespace GymApplicationV2._0
                 this.DoubleBuffered = true;
 
                 // Стилизация кнопок
-                StyleButton(jeanModernButtonSave, "Отметить", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonSave.Width) / 2, this.Height - jeanModernButtonSave.Height - 40));
+                StyleButton(jeanModernButtonSave, "Выбрать", Color.FromArgb(123, 104, 238), 20, 2, Color.FromArgb(255, 140, 0), new Point((this.Width - jeanModernButtonSave.Width) / 2, this.Height - jeanModernButtonSave.Height - 40));
 
                 hintLabel.Location = new Point((this.Width - hintLabel.Width) / 2, this.Height - hintLabel.Height - 10);
 
@@ -249,8 +247,13 @@ namespace GymApplicationV2._0
                 labelCard.Text = selectedRow.Cells[0].Value.ToString();
                 SelectedCardNumber = labelCard.Text;
 
+                SelectedClient = string.Join(" ",
+                    selectedRow.Cells[1].Value?.ToString() ?? "",
+                    selectedRow.Cells[2].Value?.ToString() ?? "",
+                    selectedRow.Cells[3].Value?.ToString() ?? "");
+
                 Logger.Info($"Выбран клиент в таблице: карта {SelectedCardNumber}, " +
-                    $"имя {selectedRow.Cells[1]?.Value}, фамилия {selectedRow.Cells[2]?.Value}");
+                    $"клиент {SelectedClient}");
             }
             catch (Exception ex)
             {
