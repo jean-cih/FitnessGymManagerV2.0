@@ -17,7 +17,6 @@ namespace GymApplicationV2._0.FormsClients
     {
         private string path = "\\Photos\\";
 
-        // Элементы управления
         private PictureBox profilePicture;
         private Label userName;
         private Label userStatus;
@@ -32,420 +31,503 @@ namespace GymApplicationV2._0.FormsClients
 
         public Person(DataClient data, Panel panelPerson)
         {
-            InitializeComponent();
+            try
+            {
+                InitializeComponent();
 
-            CardNumber = data.CardNumber;
+                CardNumber = data.CardNumber;
 
-            CreateControls(data, panelPerson);
-            InitializeCustomDesign(data, panelPerson);
+                CreateControls(data, panelPerson);
+                InitializeCustomDesign(data, panelPerson);
 
-            this.StartPosition = FormStartPosition.CenterScreen;
-            this.Opacity = 0;
+                this.StartPosition = FormStartPosition.CenterScreen;
+                this.Opacity = 0;
 
-            _fadeAnimation = new FadeAnimation(this);
-            _fadeAnimation.FadeIn();
+                _fadeAnimation = new FadeAnimation(this);
+                _fadeAnimation.FadeIn();
 
-            this.EnableDrag(this);
+                this.EnableDrag(this);
+
+                Logger.Info($"Форма Person инициализирована для клиента: {data.Surname} {data.Name}, карта: {data.CardNumber}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Ошибка при инициализации Person для карты: {data?.CardNumber ?? "unknown"}", ex);
+                throw;
+            }
         }
 
         private void CreateControls(DataClient data, Panel personPanel)
         {
-            // Header Panel
-            headerPanel = new JeanPanel
+            try
             {
-                Size = new Size(410, 140),
-                Location = new Point(20, 20),
-                BackColor = Color.White,
-                GradientBottomColor = Color.White,
-                GradientTapColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                Margin = new Padding(10),
-                BorderRadius = 20,
-            };
+                // Header Panel
+                headerPanel = new JeanPanel
+                {
+                    Size = new Size(410, 140),
+                    Location = new Point(20, 20),
+                    BackColor = Color.White,
+                    GradientBottomColor = Color.White,
+                    GradientTapColor = Color.White,
+                    BorderStyle = BorderStyle.None,
+                    Margin = new Padding(10),
+                    BorderRadius = 20,
+                };
 
-            // Profile Picture
-            profilePicture = new PictureBox
+                // Profile Picture
+                profilePicture = new PictureBox
+                {
+                    Size = new Size(100, 100),
+                    Location = new Point(20, 20),
+                    SizeMode = PictureBoxSizeMode.Zoom,
+                    BorderStyle = BorderStyle.None
+                };
+
+                // User Name
+                userName = new Label
+                {
+                    Text = data.Surname + " " + data.Name + " " + data.FatherName,
+                    AutoSize = false,
+                    Size = new Size(300, 30),
+                    Location = new Point(120, 25),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Font = new Font("Montserrat", 15, FontStyle.Bold),
+                    ForeColor = Color.Black
+                };
+
+                // User Status
+                userStatus = new Label
+                {
+                    Text = "● Активный клиент",
+                    AutoSize = false,
+                    Size = new Size(150, 20),
+                    Location = new Point(130, 60),
+                    TextAlign = ContentAlignment.MiddleLeft,
+                    Font = new Font("Montserrat", 9, FontStyle.Regular),
+                    ForeColor = Color.LimeGreen
+                };
+
+                // Info Panel
+                infoPanel = new JeanPanel
+                {
+                    Size = new Size(410, 200),
+                    Location = new Point(20, 170),
+                    BackColor = Color.White,
+                    GradientBottomColor = Color.White,
+                    GradientTapColor = Color.White,
+                    BorderStyle = BorderStyle.None,
+                    Margin = new Padding(10),
+                    BorderRadius = 20,
+                };
+
+                // Membership Panel
+                membershipPanel = new JeanPanel
+                {
+                    Size = new Size(410, 200),
+                    Location = new Point(20, 380),
+                    BackColor = Color.White,
+                    GradientBottomColor = Color.White,
+                    GradientTapColor = Color.White,
+                    BorderStyle = BorderStyle.None,
+                    Margin = new Padding(10),
+                    BorderRadius = 20,
+                };
+
+                // Stats Panel
+                statsPanel = new JeanPanel
+                {
+                    Size = new Size(410, 80),
+                    Location = new Point(20, 590),
+                    BackColor = Color.White,
+                    GradientBottomColor = Color.White,
+                    GradientTapColor = Color.White,
+                    BorderStyle = BorderStyle.None,
+                    Margin = new Padding(10),
+                    BorderRadius = 20,
+                };
+
+                // Добавляем элементы на форму
+                headerPanel.Controls.Add(profilePicture);
+                headerPanel.Controls.Add(userName);
+                headerPanel.Controls.Add(userStatus);
+
+                this.Controls.Add(headerPanel);
+                this.Controls.Add(infoPanel);
+                this.Controls.Add(membershipPanel);
+                this.Controls.Add(statsPanel);
+
+                Logger.Info($"Элементы управления созданы для клиента: {data.Surname} {data.Name}");
+            }
+            catch (Exception ex)
             {
-                Size = new Size(100, 100),
-                Location = new Point(20, 20),
-                SizeMode = PictureBoxSizeMode.Zoom,
-                BorderStyle = BorderStyle.None
-            };
-
-            // User Name
-            userName = new Label
-            {
-                Text = data.Surname + " " + data.Name + " " + data.FatherName,
-                AutoSize = false,
-                Size = new Size(300, 30),
-                Location = new Point(120, 25),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Montserrat", 15, FontStyle.Bold),
-                ForeColor = Color.Black
-            };
-
-            // User Status
-            userStatus = new Label
-            {
-                Text = "● Активный клиент",
-                AutoSize = false,
-                Size = new Size(150, 20),
-                Location = new Point(130, 60),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = new Font("Montserrat", 9, FontStyle.Regular),
-                ForeColor = Color.LimeGreen
-            };
-
-            // Info Panel
-            infoPanel = new JeanPanel
-            {
-                Size = new Size(410, 200),
-                Location = new Point(20, 170),
-                BackColor = Color.White,
-                GradientBottomColor = Color.White,
-                GradientTapColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                Margin = new Padding(10),
-                BorderRadius = 20,
-            };
-
-            // Membership Panel
-            membershipPanel = new JeanPanel
-            {
-                Size = new Size(410, 200),
-                Location = new Point(20, 380),
-                BackColor = Color.White,
-                GradientBottomColor = Color.White,
-                GradientTapColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                Margin = new Padding(10),
-                BorderRadius = 20,
-            };
-
-            // Stats Panel
-            statsPanel = new JeanPanel
-            {
-                Size = new Size(410, 80),
-                Location = new Point(20, 590),
-                BackColor = Color.White,
-                GradientBottomColor = Color.White,
-                GradientTapColor = Color.White,
-                BorderStyle = BorderStyle.None,
-                Margin = new Padding(10),
-                BorderRadius = 20,
-            };
-
-            // Добавляем элементы на форму
-            headerPanel.Controls.Add(profilePicture);
-            headerPanel.Controls.Add(userName);
-            headerPanel.Controls.Add(userStatus);
-
-            this.Controls.Add(headerPanel);
-            this.Controls.Add(infoPanel);
-            this.Controls.Add(membershipPanel);
-            this.Controls.Add(statsPanel);
+                Logger.Error($"Ошибка при создании элементов управления для клиента {data?.Surname} {data?.Name}", ex);
+                throw;
+            }
         }
 
         private void InitializeCustomDesign(DataClient data, Panel personPanel)
         {
-            // Настройка формы
-            this.Size = new Size(460, 840);
-            this.ForeColor = Color.White;
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.Padding = new Padding(20);
-            this.DoubleBuffered = true;
-
-            // Градиентный фон
-            this.Paint += (s, e) =>
+            try
             {
-                using (var brush = new LinearGradientBrush(
-                    this.ClientRectangle,
-                    Color.FromArgb(113, 96, 232),
-                    Color.DodgerBlue,
-                    LinearGradientMode.Vertical))
+                // Настройка формы
+                this.Size = new Size(460, 840);
+                this.ForeColor = Color.White;
+                this.FormBorderStyle = FormBorderStyle.None;
+                this.Padding = new Padding(20);
+                this.DoubleBuffered = true;
+
+                // Градиентный фон
+                this.Paint += (s, e) =>
                 {
-                    e.Graphics.FillRectangle(brush, this.ClientRectangle);
-                }
+                    using (var brush = new LinearGradientBrush(
+                        this.ClientRectangle,
+                        Color.FromArgb(113, 96, 232),
+                        Color.DodgerBlue,
+                        LinearGradientMode.Vertical))
+                    {
+                        e.Graphics.FillRectangle(brush, this.ClientRectangle);
+                    }
 
-                // Неоновая рамка
-                using (var pen = new Pen(Color.FromArgb(80, 120, 200), 2))
-                {
-                    pen.DashStyle = DashStyle.Solid;
-                    e.Graphics.DrawRectangle(pen, new Rectangle(1, 1, Width - 3, Height - 3));
-                }
-            };
+                    // Неоновая рамка
+                    using (var pen = new Pen(Color.FromArgb(80, 120, 200), 2))
+                    {
+                        pen.DashStyle = DashStyle.Solid;
+                        e.Graphics.DrawRectangle(pen, new Rectangle(1, 1, Width - 3, Height - 3));
+                    }
+                };
 
-            // Заполняем информационные панели
-            FillInfoPanel(data);
-            FillMembershipPanel(data);
-            FillStatsPanel(data);
+                // Заполняем информационные панели
+                FillInfoPanel(data);
+                FillMembershipPanel(data);
+                FillStatsPanel(data);
 
-            var closeButton = UIStyler.CreateStyledButton("➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(380, 680), new Size(50, 30));
-            closeButton.Click += (s, e) => CloseWithAnimation(personPanel);
+                var closeButton = UIStyler.CreateStyledButton("➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(380, 680), new Size(50, 30));
+                closeButton.Click += (s, e) => CloseWithAnimation(personPanel);
 
-            personPanel.Controls.Add(closeButton);
+                personPanel.Controls.Add(closeButton);
+
+                Logger.Info($"Дизайн формы Person инициализирован для {data.Surname} {data.Name}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Ошибка при инициализации дизайна Person для {data?.Surname} {data?.Name}", ex);
+                throw;
+            }
         }
 
         private void FillInfoPanel(DataClient data)
         {
-            var titleLabel = new Label
+            try
             {
-                Text = "Личные данные",
-                Font = new Font("Montserrat", 13, FontStyle.Bold),
-                Size = new Size(200, 25),
-                Location = new Point(15, 10),
-                ForeColor = Color.FromArgb(113, 96, 232)
-            };
+                var titleLabel = new Label
+                {
+                    Text = "Личные данные",
+                    Font = new Font("Montserrat", 13, FontStyle.Bold),
+                    Size = new Size(200, 25),
+                    Location = new Point(15, 10),
+                    ForeColor = Color.FromArgb(113, 96, 232)
+                };
 
-            object idClient = GeneralContext.GetElementFromDatabase("SELECT id FROM Contacts WHERE №Карты = '" + data.CardNumber + "';",
-                ClientsContext.ConnectionStringClients());
-            if (idClient == null)
-            {
-                idClient = "None";
+                object idClient = GeneralContext.GetElementFromDatabase("SELECT id FROM Contacts WHERE №Карты = '" + data.CardNumber + "';",
+                    ClientsContext.ConnectionStringClients());
+                if (idClient == null)
+                {
+                    idClient = "None";
+                }
+
+                var infoItems = new[]
+                {
+                    new { Icon = "🆔", Label = "ID:", Value = idClient.ToString(), Y = 40 },
+                    new { Icon = "📞", Label = "Телефон:", Value = data.Phone, Y = 70 },
+                    new { Icon = "📧", Label = "Почта:", Value = data.Email, Y = 100 },
+                    new { Icon = "🎂", Label = "День рождения:", Value = data.Birthday, Y = 130 },
+                    new { Icon = "⭐", Label = "Сохранен:", Value = data.Saved, Y = 160 }
+                };
+
+                infoPanel.Controls.Add(titleLabel);
+
+                foreach (var item in infoItems)
+                {
+                    var iconLabel = new Label
+                    {
+                        Text = item.Icon,
+                        Font = new Font("Segoe UI Emoji", 12),
+                        Size = new Size(30, 20),
+                        Location = new Point(15, item.Y),
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        ForeColor = Color.Black
+                    };
+
+                    var labelLabel = new Label
+                    {
+                        Text = item.Label,
+                        Font = new Font("Montserrat", 9, FontStyle.Bold),
+                        Size = new Size(120, 20),
+                        Location = new Point(50, item.Y),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.Black
+                    };
+
+                    var valueLabel = new Label
+                    {
+                        Text = item.Value,
+                        Font = new Font("Montserrat", 9, FontStyle.Regular),
+                        Size = new Size(200, 20),
+                        Location = new Point(180, item.Y),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.Black
+                    };
+
+                    infoPanel.Controls.Add(iconLabel);
+                    infoPanel.Controls.Add(labelLabel);
+                    infoPanel.Controls.Add(valueLabel);
+                }
+
+                Logger.Info($"Панель информации заполнена для клиента: {data.Surname} {data.Name}");
             }
-            
-            var infoItems = new[]
+            catch (Exception ex)
             {
-                new { Icon = "🆔", Label = "ID:", Value = idClient.ToString(), Y = 40 },
-                new { Icon = "📞", Label = "Телефон:", Value = data.Phone, Y = 70 },
-                new { Icon = "📧", Label = "Почта:", Value = data.Email, Y = 100 },
-                new { Icon = "🎂", Label = "День рождения:", Value = data.Birthday, Y = 130 },
-                new { Icon = "⭐", Label = "Сохранен:", Value = data.Saved, Y = 160 }
-            };
-
-            infoPanel.Controls.Add(titleLabel);
-
-            foreach (var item in infoItems)
-            {
-                var iconLabel = new Label
-                {
-                    Text = item.Icon,
-                    Font = new Font("Segoe UI Emoji", 12),
-                    Size = new Size(30, 20),
-                    Location = new Point(15, item.Y),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.Black
-                };
-
-                var labelLabel = new Label
-                {
-                    Text = item.Label,
-                    Font = new Font("Montserrat", 9, FontStyle.Bold),
-                    Size = new Size(120, 20),
-                    Location = new Point(50, item.Y),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.Black
-                };
-
-                var valueLabel = new Label
-                {
-                    Text = item.Value,
-                    Font = new Font("Montserrat", 9, FontStyle.Regular),
-                    Size = new Size(200, 20),
-                    Location = new Point(180, item.Y),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.Black
-                };
-
-                infoPanel.Controls.Add(iconLabel);
-                infoPanel.Controls.Add(labelLabel);
-                infoPanel.Controls.Add(valueLabel);
+                Logger.Error($"Ошибка при заполнении панели информации для {data?.Surname} {data?.Name}", ex);
             }
         }
 
         private void FillMembershipPanel(DataClient data)
         {
-            var titleLabel = new Label
+            try
             {
-                Text = "Абонемент",
-                Font = new Font("Montserrat", 13, FontStyle.Bold),
-                Size = new Size(200, 25),
-                Location = new Point(15, 10),
-                ForeColor = Color.FromArgb(113, 96, 232)
-            };
-
-            var membershipItems = new[]
-            {
-                new { Icon = "🎯", Label = "Тип:", Value = data.Service, Y = 40 },
-                new { Icon = "🔢", Label = "Номер:", Value = data.CardNumber, Y = 70 },
-                new { Icon = "📅", Label = "Окончание:", Value = data.TermDate, Y = 100 },
-                new { Icon = "👣", Label = "Осталось посещений:", Value = data.VisitsLeft, Y = 130 },
-                new { Icon = "🎫", Label = "Скидка:", Value = data.Discount.ToString(), Y = 160 }
-            };
-
-            membershipPanel.Controls.Add(titleLabel);
-
-            foreach (var item in membershipItems)
-            {
-                var iconLabel = new Label
+                var titleLabel = new Label
                 {
-                    Text = item.Icon,
-                    Font = new Font("Segoe UI Emoji", 12),
-                    Size = new Size(30, 20),
-                    Location = new Point(15, item.Y),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.Black
+                    Text = "Абонемент",
+                    Font = new Font("Montserrat", 13, FontStyle.Bold),
+                    Size = new Size(200, 25),
+                    Location = new Point(15, 10),
+                    ForeColor = Color.FromArgb(113, 96, 232)
                 };
 
-                var labelLabel = new Label
+                var membershipItems = new[]
                 {
-                    Text = item.Label,
-                    Font = new Font("Montserrat", 9, FontStyle.Bold),
-                    Size = new Size(120, 20),
-                    Location = new Point(50, item.Y),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.Black
+                    new { Icon = "🎯", Label = "Тип:", Value = data.Service, Y = 40 },
+                    new { Icon = "🔢", Label = "Номер:", Value = data.CardNumber, Y = 70 },
+                    new { Icon = "📅", Label = "Окончание:", Value = data.TermDate, Y = 100 },
+                    new { Icon = "👣", Label = "Осталось посещений:", Value = data.VisitsLeft, Y = 130 },
+                    new { Icon = "🎫", Label = "Скидка:", Value = data.Discount.ToString(), Y = 160 }
                 };
 
-                var valueLabel = new Label
-                {
-                    Text = item.Value,
-                    Font = new Font("Montserrat", 9, FontStyle.Regular),
-                    Size = new Size(200, 20),
-                    Location = new Point(180, item.Y),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.Black
-                };
+                membershipPanel.Controls.Add(titleLabel);
 
-                membershipPanel.Controls.Add(iconLabel);
-                membershipPanel.Controls.Add(labelLabel);
-                membershipPanel.Controls.Add(valueLabel);
+                foreach (var item in membershipItems)
+                {
+                    var iconLabel = new Label
+                    {
+                        Text = item.Icon,
+                        Font = new Font("Segoe UI Emoji", 12),
+                        Size = new Size(30, 20),
+                        Location = new Point(15, item.Y),
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        ForeColor = Color.Black
+                    };
+
+                    var labelLabel = new Label
+                    {
+                        Text = item.Label,
+                        Font = new Font("Montserrat", 9, FontStyle.Bold),
+                        Size = new Size(120, 20),
+                        Location = new Point(50, item.Y),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.Black
+                    };
+
+                    var valueLabel = new Label
+                    {
+                        Text = item.Value,
+                        Font = new Font("Montserrat", 9, FontStyle.Regular),
+                        Size = new Size(200, 20),
+                        Location = new Point(180, item.Y),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.Black
+                    };
+
+                    membershipPanel.Controls.Add(iconLabel);
+                    membershipPanel.Controls.Add(labelLabel);
+                    membershipPanel.Controls.Add(valueLabel);
+                }
+
+                Logger.Info($"Панель абонемента заполнена для клиента: {data.Surname} {data.Name}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Ошибка при заполнении панели абонемента для {data?.Surname} {data?.Name}", ex);
             }
         }
 
         private void FillStatsPanel(DataClient data)
         {
-            var statsItems = new[]
+            try
             {
-                new { Icon = "🔄", Label = "Последнее посещение:", Value = data.VisitDate, X = 15 },
-                new { Icon = "📊", Label = "Статус:", Value = "● Активен", X = 200 }
-            };
+                var statsItems = new[]
+                {
+                    new { Icon = "🔄", Label = "Последнее посещение:", Value = data.VisitDate, X = 15 },
+                    new { Icon = "📊", Label = "Статус:", Value = "● Активен", X = 200 }
+                };
 
-            foreach (var item in statsItems)
+                foreach (var item in statsItems)
+                {
+                    var iconLabel = new Label
+                    {
+                        Text = item.Icon,
+                        Font = new Font("Segoe UI Emoji", 12),
+                        Size = new Size(30, 20),
+                        Location = new Point(item.X, 15),
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        ForeColor = Color.Black
+                    };
+
+                    var labelLabel = new Label
+                    {
+                        Text = item.Label,
+                        Font = new Font("Montserrat", 8, FontStyle.Bold),
+                        Size = new Size(120, 15),
+                        Location = new Point(item.X + 35, 10),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.Black
+                    };
+
+                    var valueLabel = new Label
+                    {
+                        Text = item.Value,
+                        Font = new Font("Montserrat", 10, FontStyle.Bold),
+                        Size = new Size(100, 20),
+                        Location = new Point(item.X + 35, 30),
+                        TextAlign = ContentAlignment.MiddleLeft,
+                        ForeColor = Color.LimeGreen
+                    };
+
+                    statsPanel.Controls.Add(iconLabel);
+                    statsPanel.Controls.Add(labelLabel);
+                    statsPanel.Controls.Add(valueLabel);
+                }
+
+                Logger.Info($"Панель статистики заполнена для клиента: {data.Surname} {data.Name}");
+            }
+            catch (Exception ex)
             {
-                var iconLabel = new Label
-                {
-                    Text = item.Icon,
-                    Font = new Font("Segoe UI Emoji", 12),
-                    Size = new Size(30, 20),
-                    Location = new Point(item.X, 15),
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.Black
-                };
-
-                var labelLabel = new Label
-                {
-                    Text = item.Label,
-                    Font = new Font("Montserrat", 8, FontStyle.Bold),
-                    Size = new Size(120, 15),
-                    Location = new Point(item.X + 35, 10),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.Black
-                };
-
-                var valueLabel = new Label
-                {
-                    Text = item.Value,
-                    Font = new Font("Montserrat", 10, FontStyle.Bold),
-                    Size = new Size(100, 20),
-                    Location = new Point(item.X + 35, 30),
-                    TextAlign = ContentAlignment.MiddleLeft,
-                    ForeColor = Color.LimeGreen
-                };
-
-                statsPanel.Controls.Add(iconLabel);
-                statsPanel.Controls.Add(labelLabel);
-                statsPanel.Controls.Add(valueLabel);
+                Logger.Error($"Ошибка при заполнении панели статистики для {data?.Surname} {data?.Name}", ex);
             }
         }
 
         protected override void OnLoad(EventArgs e)
         {
-            base.OnLoad(e);
+            try
+            {
+                base.OnLoad(e);
 
-            string pathToPhotos = Environment.CurrentDirectory;
-            profilePicture.Image = Image.FromFile(FindPhoto(userName.Text, pathToPhotos + path, "Мужской"));
-            MakePictureRound(profilePicture, Color.White, 2);
+                string pathToPhotos = Environment.CurrentDirectory;
+                profilePicture.Image = Image.FromFile(FindPhoto(userName.Text, pathToPhotos + path, "Мужской"));
+                MakePictureRound(profilePicture, Color.White, 2);
+
+                Logger.Info($"Фото загружено для клиента: {userName.Text}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Ошибка при загрузке фото для клиента {userName?.Text ?? "unknown"}", ex);
+                try
+                {
+                    // Загружаем изображение по умолчанию
+                    profilePicture.Image = Image.FromFile(Environment.CurrentDirectory + path + "userMale.png");
+                    MakePictureRound(profilePicture, Color.White, 2);
+                }
+                catch (Exception innerEx)
+                {
+                    Logger.Error("Ошибка при загрузке изображения по умолчанию", innerEx);
+                }
+            }
         }
 
         public void MakePictureRound(PictureBox pictureBox, Color borderColor, int borderThickness)
         {
-            if (pictureBox.Image == null)
+            try
             {
-                pictureBox.Region = new Region(new Rectangle(0, 0, pictureBox.Width, pictureBox.Height));
-                return;
-            }
-
-            Image originalImage = pictureBox.Image;
-
-            int diameter = Math.Min(pictureBox.Width, pictureBox.Height);
-            Bitmap roundedImage = new Bitmap(diameter, diameter);
-
-            using (Graphics g = Graphics.FromImage(roundedImage))
-            {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                GraphicsPath path = new GraphicsPath();
-                path.AddEllipse(0, 0, diameter, diameter);
-
-                g.SetClip(path);
-
-                Rectangle sourceRect; 
-                Rectangle destRect = new Rectangle(0, 0, diameter, diameter);
-
-                float imageAspectRatio = (float)originalImage.Width / originalImage.Height;
-                float pictureBoxAspectRatio = (float)diameter / diameter;
-
-                if (imageAspectRatio > pictureBoxAspectRatio)
+                if (pictureBox.Image == null)
                 {
-                    int scaledHeight = diameter;
-                    int scaledWidth = (int)(imageAspectRatio * scaledHeight);
-                    int xOffset = (scaledWidth - diameter) / 2;
-                    sourceRect = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
-                    g.DrawImage(originalImage, new Rectangle(-xOffset, 0, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
-                }
-                else
-                {
-                    int scaledWidth = diameter;
-                    int scaledHeight = (int)(scaledWidth / imageAspectRatio);
-                    int yOffset = (scaledHeight - diameter) / 2;
-                    sourceRect = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
-                    g.DrawImage(originalImage, new Rectangle(0, -yOffset, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
+                    pictureBox.Region = new Region(new Rectangle(0, 0, pictureBox.Width, pictureBox.Height));
+                    return;
                 }
 
-                g.ResetClip();
+                Image originalImage = pictureBox.Image;
 
-                using (var pen = new Pen(borderColor, borderThickness))
+                int diameter = Math.Min(pictureBox.Width, pictureBox.Height);
+                Bitmap roundedImage = new Bitmap(diameter, diameter);
+
+                using (Graphics g = Graphics.FromImage(roundedImage))
                 {
-                    g.DrawEllipse(pen, borderThickness / 2, borderThickness / 2,
-                                  diameter - borderThickness, diameter - borderThickness);
+                    g.SmoothingMode = SmoothingMode.AntiAlias;
+                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                    GraphicsPath path = new GraphicsPath();
+                    path.AddEllipse(0, 0, diameter, diameter);
+
+                    g.SetClip(path);
+
+                    Rectangle sourceRect;
+                    Rectangle destRect = new Rectangle(0, 0, diameter, diameter);
+
+                    float imageAspectRatio = (float)originalImage.Width / originalImage.Height;
+                    float pictureBoxAspectRatio = (float)diameter / diameter;
+
+                    if (imageAspectRatio > pictureBoxAspectRatio)
+                    {
+                        int scaledHeight = diameter;
+                        int scaledWidth = (int)(imageAspectRatio * scaledHeight);
+                        int xOffset = (scaledWidth - diameter) / 2;
+                        sourceRect = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
+                        g.DrawImage(originalImage, new Rectangle(-xOffset, 0, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
+                    }
+                    else
+                    {
+                        int scaledWidth = diameter;
+                        int scaledHeight = (int)(scaledWidth / imageAspectRatio);
+                        int yOffset = (scaledHeight - diameter) / 2;
+                        sourceRect = new Rectangle(0, 0, originalImage.Width, originalImage.Height);
+                        g.DrawImage(originalImage, new Rectangle(0, -yOffset, scaledWidth, scaledHeight), sourceRect, GraphicsUnit.Pixel);
+                    }
+
+                    g.ResetClip();
+
+                    using (var pen = new Pen(borderColor, borderThickness))
+                    {
+                        g.DrawEllipse(pen, borderThickness / 2, borderThickness / 2,
+                                      diameter - borderThickness, diameter - borderThickness);
+                    }
                 }
+
+                pictureBox.Image = roundedImage;
+
+                if (pictureBox.Region != null)
+                {
+                    pictureBox.Region.Dispose();
+                    pictureBox.Region = null;
+                }
+
+                GraphicsPath pictureboxPath = new GraphicsPath();
+                pictureboxPath.AddEllipse(0, 0, diameter, diameter);
+                pictureBox.Region = new Region(pictureboxPath);
             }
-
-            pictureBox.Image = roundedImage;
-
-            if (pictureBox.Region != null)
+            catch (Exception ex)
             {
-                pictureBox.Region.Dispose();
-                pictureBox.Region = null;
+                Logger.Error("Ошибка при создании круглой аватарки", ex);
             }
-
-            GraphicsPath pictureboxPath = new GraphicsPath();
-            pictureboxPath.AddEllipse(0, 0, diameter, diameter);
-            pictureBox.Region = new Region(pictureboxPath);
         }
 
 
         private string FindPhoto(string clientName, string folderPath, string sex)
         {
-            string[] allowedExt = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tif", ".tiff" };
-
-            string baseFolder = Path.IsPathRooted(folderPath) ? folderPath : Path.Combine(Environment.CurrentDirectory, folderPath);
-
             try
             {
+                string[] allowedExt = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".webp", ".tif", ".tiff" };
+
+                string baseFolder = Path.IsPathRooted(folderPath) ? folderPath : Path.Combine(Environment.CurrentDirectory, folderPath);
+
                 if (!Directory.Exists(baseFolder))
                     return string.Empty;
 
@@ -478,16 +560,26 @@ namespace GymApplicationV2._0.FormsClients
 
                 return Environment.CurrentDirectory + path + "userMale.png";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Logger.Error($"Ошибка при поиске фото для клиента {clientName}", ex);
                 return Environment.CurrentDirectory + path + "userMale.png";
             }
         }
 
         private void CloseWithAnimation(Panel personPanel)
         {
-            _fadeAnimation.CloseWithAnimation();
-            personPanel.Visible = false;
+            try
+            {
+                Logger.Info($"Закрытие формы Person для клиента: {userName?.Text ?? "unknown"}");
+                _fadeAnimation.CloseWithAnimation();
+                personPanel.Visible = false;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка при закрытии формы Person", ex);
+                personPanel.Visible = false;
+            }
         }
     }
 }
