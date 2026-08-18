@@ -48,8 +48,6 @@ namespace GymApplicationV2._0
 
         private FadeAnimation _fadeAnimation;
 
-        public Dictionary<string, string> userStatus = new Dictionary<string, string>();
-
         public Report()
         {
             InitializeComponent();
@@ -187,11 +185,15 @@ namespace GymApplicationV2._0
             radioForDay = UIStyler.CreateStyledRadioButton("За день", new System.Drawing.Point(card.Width / 3 + 5,115), true);
             radioOtherPeriod = UIStyler.CreateStyledRadioButton("Другой период", new System.Drawing.Point(card.Width / 3 + 5, 145));
 
+            jeanDateTimePickerBegin = new JeanDateTimePicker();
             jeanDateTimePickerBegin.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 - 150, 175));
+
+            jeanDateTimePickerEnd = new JeanDateTimePicker();
             jeanDateTimePickerEnd.CreateStyledDateTimePicker(new Size(140, 15), new System.Drawing.Point(card.Width / 2 + 10, 175));
 
             card.Controls.AddRange(new Control[] { title, radioForMonth, radioForWeek, radioForDay, radioOtherPeriod, jeanDateTimePickerBegin, jeanDateTimePickerEnd });
             this.Controls.Add(card);
+
         }
 
         private void CreateExportCard()
@@ -289,8 +291,6 @@ namespace GymApplicationV2._0
 
                 infoReport.forPeriod = checkBoxClientsForPeriod.Checked;
                 infoReport.sellServices = checkBoxSellServices.Checked;
-
-                infoReport.userStatus = userStatus;
 
                 infoReport.ShowDialog();
             }

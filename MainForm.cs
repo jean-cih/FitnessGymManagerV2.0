@@ -23,8 +23,8 @@ namespace GymApplicationV2._0
 {
     public partial class MainForm : ShadowedForm
     {
-        private string nameClient = "";
-        private string numberCard;
+        private string nameClient = string.Empty;
+        private string numberCard = string.Empty;
         private int numberLeft;
 
         private ToolStripDropDownMenu _menu_service;
@@ -45,8 +45,6 @@ namespace GymApplicationV2._0
             };
 
         PictureBox picture_status;
-
-        Dictionary<string, string> userStatus = new Dictionary<string, string>();
 
         public MainForm()
         {
@@ -709,15 +707,6 @@ namespace GymApplicationV2._0
                 var errorSound = new PlaySoundHelper(false);
                 errorSound.PlaySound();
 
-                if (!userStatus.ContainsKey(cardNumber))
-                {
-                    userStatus.Add(cardNumber, "Этого номера нет в действительных абонементах");
-                }
-                else
-                {
-                    userStatus[cardNumber] = "Этого номера нет в действительных абонементах (Повторно)";
-                }
-
                 UpdateDataGrid();
                 Logger.Info(cardNumber + " Этого номера нет в действительных абонементах");
                 return false;
@@ -738,15 +727,6 @@ namespace GymApplicationV2._0
                 return;
 
             UnfreezeMembership(cardNumber, date);
-
-            if (!userStatus.ContainsKey(cardNumber))
-            {
-                userStatus.Add(cardNumber, "Заморозка снята");
-            }
-            else
-            {
-                userStatus[cardNumber] = "Заморозка снята (Повторно)";
-            }
 
             Logger.Info(cardNumber + " Заморозка снята");
         }
@@ -845,14 +825,6 @@ namespace GymApplicationV2._0
 
             ResetClientMembership(cardNumber, date);
 
-            if (!userStatus.ContainsKey(cardNumber))
-            {
-                userStatus.Add(cardNumber, "Абонемент закончился по времени");
-            }
-            else
-            {
-                userStatus[cardNumber] = "Абонемент закончился по времени (Повторно)";
-            }
             Logger.Info(cardNumber + " Абонемент закончился по времени");
         }
 
@@ -974,14 +946,6 @@ namespace GymApplicationV2._0
                     new SQLiteParameter("@cardNumber", cardNumber),
                     new SQLiteParameter("@dateEnd", date));
 
-            if (!userStatus.ContainsKey(cardNumber))
-            {
-                userStatus.Add(cardNumber, "Активен");
-            }
-            else
-            {
-                userStatus[cardNumber] = "Активен (Повторно)";
-            }
             Logger.Info(cardNumber + " | " + date + " Активен");
 
             var successSound = new PlaySoundHelper();
@@ -1006,14 +970,6 @@ namespace GymApplicationV2._0
             var errorSound = new PlaySoundHelper(false);
             errorSound.PlaySound();
 
-            if (!userStatus.ContainsKey(cardNumber))
-            {
-                userStatus.Add(cardNumber, "Абонемент закончился. Посещений 0");
-            }
-            else
-            {
-                userStatus[cardNumber] = "Абонемент закончился. Посещений 0 (Повторно)";
-            }
             Logger.Info(cardNumber + "Абонемент закончился. Посещений 0");
         }
 
@@ -1029,14 +985,6 @@ namespace GymApplicationV2._0
                 new SQLiteParameter("@cardNumber", cardNumber),
                 new SQLiteParameter("@endDate", date));
 
-            if (!userStatus.ContainsKey(cardNumber))
-            {
-                userStatus.Add(cardNumber, "Активен");
-            }
-            else
-            {
-                userStatus[cardNumber] = "Активен (Повторно)";
-            }
             Logger.Info(cardNumber + " | " + date + " Активен");
 
             jeanModernButtonReturn.Visible = true;
@@ -1104,7 +1052,7 @@ namespace GymApplicationV2._0
 
         private void jeanModernButton1_Click(object sender, EventArgs e)
         {
-            if (numberCard == "")
+            if (numberCard == string.Empty)
             {
                 MessageHelper.MessageWindowOk("Клиент не выбран", "Сообщение");
                 return;
@@ -1163,7 +1111,6 @@ namespace GymApplicationV2._0
 
             using (var report = new Report())
             {
-                report.userStatus = userStatus;
                 report.ShowDialog();
             }
         }
