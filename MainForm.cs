@@ -5,6 +5,7 @@ using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Data;
 using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Helpers.GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -45,6 +47,8 @@ namespace GymApplicationV2._0
             };
 
         PictureBox picture_status;
+
+        private DatabaseBackupManager _backupManager;
 
         public MainForm()
         {

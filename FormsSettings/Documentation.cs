@@ -28,7 +28,7 @@ namespace GymApplicationV2._0.FormsSettings
             try
             {
                 InitializeComponent();
-                InitializeComponents();
+                InitializeCustomDesign();
 
                 this.StartPosition = FormStartPosition.CenterScreen;
                 this.Opacity = 0;
@@ -67,7 +67,7 @@ namespace GymApplicationV2._0.FormsSettings
             }
         }
 
-        private void InitializeComponents()
+        private void InitializeCustomDesign()
         {
             try
             {

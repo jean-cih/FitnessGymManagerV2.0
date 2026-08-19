@@ -3,6 +3,7 @@ using GymApplicationV2._0.Connections;
 using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Data;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Helpers.GymApplicationV2._0.Helpers;
 using Microsoft.Office.Interop.Excel;
 using Shadow;
 using System;
@@ -27,14 +28,17 @@ namespace GymApplicationV2._0.FormsSettings
         private readonly SplashScreen _splashScreen = new SplashScreen();
         private JeanModernButton chooseButton;
         private JeanModernButton importButton;
-        private JeanModernButton documentationButton;
+        private JeanModernButton backupsButton;
         private Panel dropZonePanel;
         private System.Windows.Forms.Label dropZoneLabel;
         private Panel titlePanel;
         private FadeAnimation _fadeAnimation;
 
+        private ToolStripDropDownMenu _menu_backups;
+
         private readonly string[] _notChangeableTexts = new[] { "📤 Импорт данных" };
         private readonly object _dbLock = new object();
+
 
         public Import()
         {
@@ -42,9 +46,6 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 InitializeComponent();
                 InitializeComponents();
-
-                this.StartPosition = FormStartPosition.CenterScreen;
-                this.Opacity = 0;
 
                 _fadeAnimation = new FadeAnimation(this);
                 _fadeAnimation.FadeIn();
@@ -66,6 +67,8 @@ namespace GymApplicationV2._0.FormsSettings
         {
             try
             {
+                this.StartPosition = FormStartPosition.CenterScreen;
+                this.Opacity = 0;
                 this.Padding = new Padding(20, 1, 20, 20);
                 this.StartPosition = FormStartPosition.CenterScreen;
                 this.DoubleBuffered = true;
@@ -266,9 +269,9 @@ namespace GymApplicationV2._0.FormsSettings
                 importButton.Click += ImportButton_Click;
                 importButton.Enabled = false;
 
-                documentationButton = new JeanModernButton
+                backupsButton = new JeanModernButton
                 {
-                    Text = "📄 Документация",
+                    Text = "🔄 Backups",
                     Size = new Size(170, 40),
                     Location = new System.Drawing.Point(625, 75),
                     BackColor = Color.FromArgb(37, 99, 235),
@@ -276,11 +279,11 @@ namespace GymApplicationV2._0.FormsSettings
                     Font = new System.Drawing.Font("Segoe UI", DataConfig.sizeFontButtons > 12 ? 12 : DataConfig.sizeFontButtons, FontStyle.Bold),
                     BorderRadius = 8,
                 };
-                documentationButton.Click += DocumentationButton_Click;
+                backupsButton.Click += BackupsButton_Click;
 
                 buttonPanel.Controls.Add(chooseButton);
                 buttonPanel.Controls.Add(importButton);
-                buttonPanel.Controls.Add(documentationButton);
+                buttonPanel.Controls.Add(backupsButton);
                 parent.Controls.Add(buttonPanel);
 
                 Logger.Info("Кнопки действий созданы");
@@ -291,22 +294,226 @@ namespace GymApplicationV2._0.FormsSettings
             }
         }
 
-        private void DocumentationButton_Click(object sender, EventArgs e)
+        private void BackupsButton_Click(object sender, EventArgs e)
         {
             try
             {
-                Logger.Info("Открытие документации");
-                using (var documentation = new Documentation())
+                Logger.Info("Просмотр списка бэкапов");
+
+                var backups = AutoBackup.GetBackups();
+
+                if (backups == null || backups.Count == 0)
                 {
-                    documentation.ShowDialog();
+                    MessageHelper.MessageWindowOk("📋 Резервные копии не найдены\n\nСоздайте первую копию через 'Создать бэкап'", "Информация");
+                    return;
                 }
-                Logger.Info("Документация закрыта");
+
+                // Используем выделенную форму
+                using (var backupForm = new BackupManagerForm())
+                {
+                    backupForm.UpdateData();
+
+                    var dialogResult = backupForm.ShowDialog();
+
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        var selectedBackup = backupForm.GetSelectedBackup();
+                        if (selectedBackup != null)
+                        {
+                            RestoreFromBackup(selectedBackup.FolderPath);
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Logger.Error("Ошибка при открытии документации", ex);
-                MessageHelper.MessageWindowOk($"Ошибка при открытии документации: {ex.Message}", "Ошибка");
+                Logger.Error("Ошибка при просмотре бэкапов", ex);
+                MessageHelper.MessageWindowOk($"Ошибка: {ex.Message}", "Ошибка");
             }
+        }
+
+        private async void CreateBackup_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                Logger.Info("Создание ручного бэкапа");
+
+                ShowSavingIndicator("Создание резервной копии...");
+
+                bool result = await AutoBackup.CreateBackupAsync();
+
+                HideSavingIndicator();
+
+                if (result)
+                {
+                    MessageHelper.ShowNotification(this, "✅ Резервная копия создана успешно!", 2000);
+                    Logger.Info("Ручной бэкап создан успешно");
+
+                    var backups = AutoBackup.GetBackups();
+                    if (backups.Count > 0)
+                    {
+                        var latest = backups.First();
+                        MessageHelper.MessageWindowOk(
+                            $"✅ Бэкап создан!\n\n" +
+                            $"📁 Папка: {latest.FolderName}\n" +
+                            $"📅 Время: {latest.CreationDateFormatted}\n" +
+                            $"📄 Файлов: {latest.FileCount}\n" +
+                            $"💾 Размер: {latest.SizeFormatted}",
+                            "Успех");
+                    }
+                }
+                else
+                {
+                    MessageHelper.MessageWindowOk("❌ Ошибка при создании резервной копии", "Ошибка");
+                    Logger.Warning("Ручной бэкап не создан");
+                }
+            }
+            catch (Exception ex)
+            {
+                HideSavingIndicator();
+                Logger.Error("Ошибка при создании ручного бэкапа", ex);
+                MessageHelper.MessageWindowOk($"Ошибка: {ex.Message}", "Ошибка");
+            }
+        }
+
+        private async void RestoreFromBackup(string backupPath)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(backupPath) || !Directory.Exists(backupPath))
+                {
+                    MessageHelper.MessageWindowOk("❌ Папка с бэкапом не найдена", "Ошибка");
+                    return;
+                }
+
+                // Получаем информацию о бэкапе
+                var dirInfo = new DirectoryInfo(backupPath);
+                var files = Directory.GetFiles(backupPath, "*.db");
+
+                // Подтверждение восстановления
+                string confirmMessage =
+                    "⚠️ ВНИМАНИЕ! Восстановление из бэкапа ЗАМЕНИТ текущие данные!\n\n" +
+                    $"📁 Бэкап: {dirInfo.Name}\n" +
+                    $"📅 Создан: {dirInfo.CreationTime:dd.MM.yyyy HH:mm:ss}\n" +
+                    $"📄 Файлов: {files.Length}\n\n" +
+                    "📋 Будут восстановлены следующие файлы:\n" +
+                    string.Join("\n", files.Select(f => $"   • {Path.GetFileName(f)}")) + "\n\n" +
+                    "💡 Рекомендуется создать бэкап текущих данных перед восстановлением.\n\n" +
+                    "Продолжить?";
+
+                if (MessageHelper.MessageWindowYesNo(confirmMessage) != DialogResult.Yes)
+                {
+                    Logger.Info("Восстановление отменено пользователем");
+                    return;
+                }
+
+                // Создаем бэкап текущих данных
+                Logger.Info("Создание бэкапа текущих данных перед восстановлением");
+                ShowSavingIndicator("Сохранение текущих данных...");
+                await AutoBackup.CreateBackupAsync();
+                HideSavingIndicator();
+
+                // Выполняем восстановление
+                Logger.Info($"Начало восстановления из бэкапа: {backupPath}");
+                ShowSavingIndicator("Восстановление данных...");
+
+                bool result = await Task.Run(() => AutoBackup.RestoreFromBackup(backupPath));
+
+                HideSavingIndicator();
+
+                if (result)
+                {
+                    MessageHelper.MessageWindowOk(
+                        "✅ Данные успешно восстановлены из бэкапа!\n\n" +
+                        $"📁 Бэкап: {dirInfo.Name}\n" +
+                        $"📅 Восстановлено: {DateTime.Now:dd.MM.yyyy HH:mm:ss}\n\n" +
+                        "⚠️ Для применения изменений требуется перезапуск приложения.",
+                        "Успех");
+
+                    Logger.Info($"Восстановление завершено из {backupPath}");
+
+                    // Предлагаем перезапустить приложение
+                    if (MessageHelper.MessageWindowYesNo("🔄 Перезапустить приложение сейчас?") == DialogResult.Yes)
+                    {
+                        Logger.Info("Перезапуск приложения после восстановления");
+                        System.Windows.Forms.Application.Restart();
+                    }
+                }
+                else
+                {
+                    MessageHelper.MessageWindowOk("❌ Ошибка при восстановлении данных из бэкапа", "Ошибка");
+                    Logger.Warning($"Ошибка восстановления из {backupPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                HideSavingIndicator();
+                Logger.Error($"Ошибка при восстановлении из {backupPath}", ex);
+                MessageHelper.MessageWindowOk($"Ошибка: {ex.Message}", "Ошибка");
+            }
+        }
+
+        private string FormatTotalSize(List<BackupInfo> backups)
+        {
+            long totalSize = backups.Sum(b => b.TotalSize);
+            string[] sizes = { "Б", "КБ", "МБ", "ГБ" };
+            double len = totalSize;
+            int order = 0;
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len = len / 1024;
+            }
+            return $"{len:0.##} {sizes[order]}";
+        }
+
+        private void ShowSavingIndicator(string message)
+        {
+            try
+            {
+                // Проверяем, нет ли уже индикатора
+                var existing = this.Controls.OfType<System.Windows.Forms.Label>()
+                    .FirstOrDefault(l => l.Tag?.ToString() == "savingIndicator");
+
+                if (existing != null) return;
+
+                var indicator = new System.Windows.Forms.Label
+                {
+                    Text = $"⏳ {message}",
+                    ForeColor = System.Drawing.Color.White,
+                    BackColor = System.Drawing.Color.FromArgb(52, 73, 94),
+                    AutoSize = true,
+                    Font = new System.Drawing.Font("Segoe UI", 12, FontStyle.Bold),
+                    Location = new System.Drawing.Point(this.Width / 2 - 150, this.Height / 2 - 25),
+                    Padding = new Padding(20, 10, 20, 10),
+                    TextAlign = ContentAlignment.MiddleCenter,
+                    Tag = "savingIndicator"
+                };
+
+                // Делаем форму поверх всех
+                this.Controls.Add(indicator);
+                indicator.BringToFront();
+                this.Refresh();
+            }
+            catch { }
+        }
+
+        private void HideSavingIndicator()
+        {
+            try
+            {
+                var indicators = this.Controls.OfType<System.Windows.Forms.Label>()
+                    .Where(l => l.Tag?.ToString() == "savingIndicator")
+                    .ToList();
+
+                foreach (var indicator in indicators)
+                {
+                    this.Controls.Remove(indicator);
+                    indicator.Dispose();
+                }
+                this.Refresh();
+            }
+            catch { }
         }
 
         private void ChooseFile_Click(object sender, EventArgs e)

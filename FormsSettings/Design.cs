@@ -51,9 +51,6 @@ namespace GymApplicationV2._0.FormsSettings
 
                 InitializeComponents();
 
-                this.StartPosition = FormStartPosition.CenterScreen;
-                this.Opacity = 0;
-
                 _fadeAnimation = new FadeAnimation(this);
                 _fadeAnimation.FadeIn();
 
@@ -103,6 +100,7 @@ namespace GymApplicationV2._0.FormsSettings
             {
                 this.Padding = new Padding(20, 1, 20, 20);
                 this.StartPosition = FormStartPosition.CenterScreen;
+                this.Opacity = 0;
                 this.DoubleBuffered = true;
 
                 this.Paint += (s, e) =>
