@@ -5,6 +5,7 @@ using GymApplicationV2._0.Controls;
 using GymApplicationV2._0.Data;
 using GymApplicationV2._0.FormsSettings;
 using GymApplicationV2._0.Helpers;
+using GymApplicationV2._0.Helpers.GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -45,6 +47,8 @@ namespace GymApplicationV2._0
             };
 
         PictureBox picture_status;
+
+        private DatabaseBackupManager _backupManager;
 
         public MainForm()
         {
@@ -620,9 +624,9 @@ namespace GymApplicationV2._0
                         if (names == null || names.Length == 0) return;
 
                         var searchQuery = BuildSearchQuery(names);
-                        string card = DuplicateResolution(searchQuery);
+                        var (card, clientName) = DuplicateResolution(searchQuery, names);
 
-                        nameClient = string.Join(" ", names);
+                        nameClient = clientName;
                         jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
 
                         if (card == "" && names.Length >= 2)
@@ -663,29 +667,29 @@ namespace GymApplicationV2._0
             }
         }
 
-        private string DuplicateResolution(string query)
+        private (string SelectedCardNumber, string ClientName) DuplicateResolution(string query, string[] names)
         {
             try
             {
                 var data = GeneralContext.GetDataFromDatabase(query,
                             IssuedMembershipContext.ConnectionStringIssued());
 
-                if (data is null || data.Rows.Count == 0) return string.Empty;
+                if (data is null || data.Rows.Count == 0) return (string.Empty, string.Empty);
 
-                if (data.Rows.Count == 1) return data.Rows[0]["№Карты"].ToString();
+                if (data.Rows.Count == 1) return (data.Rows[0]["№Карты"].ToString(), string.Join(" ", names));
 
                 Logger.Info($"Найдено {data.Rows.Count} дубликатов, открыта форма разрешения");
 
                 using (DuplicateResolution duplicate = new DuplicateResolution(data))
                 {
                     duplicate.ShowDialog();
-                    return duplicate.SelectedCardNumber;
+                    return (duplicate.SelectedCardNumber, duplicate.SelectedClient);
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Ошибка в DuplicateResolution для запроса: {query}", ex);
-                return string.Empty;
+                return (string.Empty, string.Empty);
             }
         }
 

@@ -11,13 +11,12 @@ namespace GymApplicationV2._0
 {
     internal static class Program
     {
-
-        private static bool isNewInstance = true;
+        private static string _databasesPath;
+        private static string _appFilesPath;
 
         [STAThread]
         static void Main()
         {
-
             try
             {
                 Application.EnableVisualStyles();
@@ -35,6 +34,12 @@ namespace GymApplicationV2._0
             catch (Exception ex)
             {
                 MessageHelper.MessageWindowOk(ex.ToString() + " Ошибка при запуске", "Ошибка");
+                Logger.Error($"Критическая ошибка при запуске: {ex.Message}", ex);
+            }
+            finally
+            {
+
+                CreateShutdownBackup();
             }
         }
 
@@ -45,6 +50,9 @@ namespace GymApplicationV2._0
 
             splash.UpdateProgress("Создание ресурсов", "Ресурсы", 10);
             EnsureRequiredDirectoriesExist();
+
+            Logger.Initialize(_appFilesPath);
+            Logger.Info("\n=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО: " + DateTime.Now + " ===\n");
 
             CopyPhotosToOutput();
 
@@ -61,8 +69,69 @@ namespace GymApplicationV2._0
 
             LoadSettings();
 
+            // Инициализация системы резервного копирования
+            InitializeBackupSystem(splash);
+
             splash.UpdateProgress("Готово!", "Запуск приложения", 100);
             Thread.Sleep(300);
+        }
+
+        private static void InitializeBackupSystem(LoadingScreen splash)
+        {
+            splash.UpdateProgress("Инициализация системы бэкапов...", "Резервное копирование", 85);
+
+            try
+            {
+                _databasesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Databases");
+                AutoBackup.Initialize(_databasesPath, autoBackupIntervalMinutes: 180);
+
+                splash.UpdateProgress("Создание резервной копии...", "Резервное копирование", 90);
+
+                IProgress<string> progress = new Progress<string>(msg =>
+                    splash.UpdateProgress(msg, "Резервное копирование", 92));
+
+                var task = AutoBackup.CreateBackupAsync(progress);
+                task.Wait(5000);
+
+                Logger.Info("✅ Система резервного копирования инициализирована");
+                Logger.Info($"📁 Папка бэкапов: {Path.Combine(_databasesPath, "Backups")}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Ошибка при инициализации системы бэкапов", ex);
+            }
+
+            Thread.Sleep(100);
+        }
+
+        private static void CreateShutdownBackup()
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(_databasesPath))
+                {
+                    Logger.Info("=== ПРИЛОЖЕНИЕ ЗАКРЫВАЕТСЯ: " + DateTime.Now + " ===");
+                    Logger.Info("Создание финального бэкапа...");
+
+                    var task = AutoBackup.CreateBackupAsync();
+                    task.Wait(3000);
+
+                    if (task.Result)
+                    {
+                        Logger.Info("✅ Финальный бэкап создан успешно");
+                    }
+                    else
+                    {
+                        Logger.Warning("⚠️ Финальный бэкап не создан");
+                    }
+
+                    AutoBackup.Stop();
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка при создании финального бэкапа: {ex.Message}");
+            }
         }
 
         private static void LoadSettings()
@@ -75,23 +144,33 @@ namespace GymApplicationV2._0
                 DataConfig.sizeFontText = ConfigManager.GetSetting<int>("textSize");
                 DataConfig.styleForm = ConfigManager.GetSetting<string>("designForm");
                 DataConfig.styleBackground = ConfigManager.GetSetting<string>("designBackground");
+
+                Logger.Info("Настройки загружены успешно");
             }
             catch (Exception ex)
             {
+                Logger.Error($"Ошибка загрузки настроек: {ex.Message}", ex);
                 MessageHelper.MessageWindowOk($"Ошибка загрузки настроек: {ex.Message}", "Ошибка");
-                Logger.Error($"Ошибка загрузки настроек: {ex.Message}");
             }
         }
 
         public static void CopyPhotosToOutput()
         {
-            string repoRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
-            string sourcePath = Path.Combine(repoRoot, "Photos");
-            string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
-
-            if (Directory.Exists(sourcePath))
+            try
             {
-                CopyDirectory(sourcePath, targetPath);
+                string repoRoot = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\"));
+                string sourcePath = Path.Combine(repoRoot, "Photos");
+                string targetPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Photos");
+
+                if (Directory.Exists(sourcePath))
+                {
+                    CopyDirectory(sourcePath, targetPath);
+                    Logger.Info("Фото скопированы успешно");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Ошибка при копировании фото: {ex.Message}", ex);
             }
         }
 
@@ -116,29 +195,31 @@ namespace GymApplicationV2._0
             string appDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
             // Создаем папку Databases
-            string databasesPath = Path.Combine(appDirectory, "Databases");
-            if (!Directory.Exists(databasesPath))
+            _databasesPath = Path.Combine(appDirectory, "Databases");
+            if (!Directory.Exists(_databasesPath))
             {
-                Directory.CreateDirectory(databasesPath);
+                Directory.CreateDirectory(_databasesPath);
             }
 
             // Создаем папку AppFiles
-            string appFilesPath = Path.Combine(appDirectory, "AppFiles");
-            if (!Directory.Exists(appFilesPath))
+            _appFilesPath = Path.Combine(appDirectory, "AppFiles");
+            if (!Directory.Exists(_appFilesPath))
             {
-                Directory.CreateDirectory(appFilesPath);
+                Directory.CreateDirectory(_appFilesPath);
             }
 
-            Logger.Initialize(appFilesPath);
-            Logger.Info("\n=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО: " + DateTime.Now + " ===\n");
+            // Создаем папку для бэкапов
+            string backupsPath = Path.Combine(_databasesPath, "Backups");
+            if (!Directory.Exists(backupsPath))
+            {
+                Directory.CreateDirectory(backupsPath);
+            }
         }
 
         private static void CheckIfConfigExists(LoadingScreen splash)
         {
             splash.UpdateProgress("Загрузка конфигурации...", "Инициализация", 20);
-
             ConfigManager.Initialize();
-
             Thread.Sleep(100);
         }
 
@@ -149,10 +230,10 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "Clients.db")))
             {
                 ClientsContext.CreatingDatabase();
+                Logger.Info("Создана база данных Clients.db");
             }
             Thread.Sleep(100);
         }
-
 
         private static void CheckIfDataExistsServices(LoadingScreen splash)
         {
@@ -161,6 +242,7 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "Services.db")))
             {
                 ServicesContext.CreatingDatabase();
+                Logger.Info("Создана база данных Services.db");
             }
             Thread.Sleep(100);
         }
@@ -172,6 +254,7 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "Payments.db")))
             {
                 HistoryPaymentContext.CreatingDatabase();
+                Logger.Info("Создана база данных Payments.db");
             }
             Thread.Sleep(100);
         }
@@ -183,6 +266,7 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "Archive.db")))
             {
                 ArchiveServicesContext.CreatingDatabase();
+                Logger.Info("Создана база данных Archive.db");
             }
             Thread.Sleep(100);
         }
@@ -194,6 +278,7 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "IssuedMembership.db")))
             {
                 IssuedMembershipContext.CreatingDatabase();
+                Logger.Info("Создана база данных IssuedMembership.db");
             }
             Thread.Sleep(100);
         }
@@ -205,6 +290,7 @@ namespace GymApplicationV2._0
             if (!File.Exists(GetDatabasePath("Databases", "Products.db")))
             {
                 ProductsContext.CreatingDatabase();
+                Logger.Info("Создана база данных Products.db");
             }
             Thread.Sleep(150);
         }

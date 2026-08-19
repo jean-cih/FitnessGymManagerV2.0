@@ -216,7 +216,14 @@
       <DependentUpon>JeanFormStyle.cs</DependentUpon>
     </Compile>
     <Compile Include="Components\JeanStyle.cs" />
+    <Compile Include="FormsSettings\BackupManagerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormsSettings\BackupManagerForm.Designer.cs">
+      <DependentUpon>BackupManagerForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Helpers\AppLogger.cs" />
+    <Compile Include="Helpers\AutoBackup.cs" />
     <Compile Include="Helpers\ConfigManager.cs" />
     <Compile Include="Connections\GeneralContext.cs" />
     <Compile Include="Connections\IssuedMembershipContext.cs" />
@@ -466,6 +473,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormsServices\Services\FieldForService.resx">
       <DependentUpon>FieldForService.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormsSettings\BackupManagerForm.resx">
+      <DependentUpon>BackupManagerForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
