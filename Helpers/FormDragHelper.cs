@@ -6,75 +6,61 @@ namespace GymApplicationV2._0.Helpers
 {
     public static class FormDragHelper
     {
-        private static bool _isDragging = false;
-        private static Point _lastCursor;
-        private static Point _lastForm;
-        private static Form _targetForm;
-        private static int _dragAreaHeight = 40;
-
         public static void EnableDrag(this Control control, Form form, int dragAreaHeight = 0)
         {
             if (control == null || form == null) return;
 
-            _targetForm = form;
-            _dragAreaHeight = dragAreaHeight;
+            bool isDragging = false;
+            Point lastCursor = Point.Empty;
+            Point lastFormLocation = Point.Empty;
 
-            // Отписываемся от старых событий, чтобы избежать дублирования
-            control.MouseDown -= Control_MouseDown;
-            control.MouseMove -= Control_MouseMove;
-            control.MouseUp -= Control_MouseUp;
+            void OnMouseDown(object sender, MouseEventArgs e)
+            {
+                if (e.Button != MouseButtons.Left) return;
+                if (dragAreaHeight > 0 && e.Y > dragAreaHeight) return;
 
-            // Подписываемся на новые
-            control.MouseDown += Control_MouseDown;
-            control.MouseMove += Control_MouseMove;
-            control.MouseUp += Control_MouseUp;
+                isDragging = true;
+                lastCursor = Cursor.Position;
+                lastFormLocation = form.Location;
+            }
 
-            // Если форма не имеет границ, подписываемся и на форму
+            void OnMouseMove(object sender, MouseEventArgs e)
+            {
+                if (!isDragging) return;
+
+                Point diff = Point.Subtract(Cursor.Position, new Size(lastCursor));
+                Point newLocation = Point.Add(lastFormLocation, new Size(diff));
+
+                Rectangle screen = Screen.FromControl(form).WorkingArea;
+                newLocation.X = Math.Max(screen.Left, Math.Min(newLocation.X, screen.Right - form.Width));
+                newLocation.Y = Math.Max(screen.Top, Math.Min(newLocation.Y, screen.Bottom - form.Height));
+
+                form.Location = newLocation;
+            }
+
+            void OnMouseUp(object sender, MouseEventArgs e)
+            {
+                if (e.Button == MouseButtons.Left)
+                    isDragging = false;
+            }
+
+            control.MouseDown -= OnMouseDown;
+            control.MouseMove -= OnMouseMove;
+            control.MouseUp -= OnMouseUp;
+
+            control.MouseDown += OnMouseDown;
+            control.MouseMove += OnMouseMove;
+            control.MouseUp += OnMouseUp;
+
             if (form.FormBorderStyle == FormBorderStyle.None)
             {
-                form.MouseDown -= Control_MouseDown;
-                form.MouseMove -= Control_MouseMove;
-                form.MouseUp -= Control_MouseUp;
+                form.MouseDown -= OnMouseDown;
+                form.MouseMove -= OnMouseMove;
+                form.MouseUp -= OnMouseUp;
 
-                form.MouseDown += Control_MouseDown;
-                form.MouseMove += Control_MouseMove;
-                form.MouseUp += Control_MouseUp;
-            }
-        }
-
-        private static void Control_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                if (_dragAreaHeight > 0 && e.Y > _dragAreaHeight)
-                    return;
-
-                _isDragging = true;
-                _lastCursor = Cursor.Position;
-                _lastForm = _targetForm.Location;
-            }
-        }
-
-        private static void Control_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isDragging)
-            {
-                Point diff = Point.Subtract(Cursor.Position, new Size(_lastCursor));
-                Point newLocation = Point.Add(_lastForm, new Size(diff));
-
-                Rectangle screenBounds = Screen.PrimaryScreen.WorkingArea;
-                newLocation.X = Math.Max(screenBounds.Left, Math.Min(newLocation.X, screenBounds.Right - _targetForm.Width));
-                newLocation.Y = Math.Max(screenBounds.Top, Math.Min(newLocation.Y, screenBounds.Bottom - _targetForm.Height));
-
-                _targetForm.Location = newLocation;
-            }
-        }
-
-        private static void Control_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                _isDragging = false;
+                form.MouseDown += OnMouseDown;
+                form.MouseMove += OnMouseMove;
+                form.MouseUp += OnMouseUp;
             }
         }
     }

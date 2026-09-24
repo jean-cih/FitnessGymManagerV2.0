@@ -51,9 +51,6 @@ namespace GymApplicationV2._0
             splash.UpdateProgress("Создание ресурсов", "Ресурсы", 10);
             EnsureRequiredDirectoriesExist();
 
-            Logger.Initialize(_appFilesPath);
-            Logger.Info("\n=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО: " + DateTime.Now + " ===\n");
-
             CopyPhotosToOutput();
 
             CheckIfConfigExists(splash);
@@ -213,6 +210,14 @@ namespace GymApplicationV2._0
             if (!Directory.Exists(backupsPath))
             {
                 Directory.CreateDirectory(backupsPath);
+            }
+
+            // Создаем папку для бэкапов
+            string loggerPath = Path.Combine(_appFilesPath, "Logger");
+            if (!Directory.Exists(loggerPath))
+            {
+                Logger.Initialize(loggerPath);
+                Logger.Info("\n=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО: " + DateTime.Now + " ===\n");
             }
         }
 
