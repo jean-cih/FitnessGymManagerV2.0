@@ -116,7 +116,7 @@ namespace GymApplicationV2._0
                     "Дата_рождения AS 'Дата рождения'," +
                     "Скидка," +
                     "Сохранено" +
-                    " FROM Contacts";
+                    " FROM Contacts ORDER BY Id DESC";
 
                 _currentDataTable = GeneralContext.GetDataFromDatabase(query,
                     ClientsContext.ConnectionStringClients());
@@ -209,6 +209,8 @@ namespace GymApplicationV2._0
                 {
                     var personForm = new Person(clientData, panelPerson);
                     personForm.Show(this);
+                    personForm.EnableDrag(personForm);
+
                     Logger.Info($"Создана новая форма Person для клиента {clientData.CardNumber}");
                 }
             }

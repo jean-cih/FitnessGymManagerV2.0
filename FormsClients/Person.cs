@@ -46,7 +46,7 @@ namespace GymApplicationV2._0.FormsClients
                 _fadeAnimation = new FadeAnimation(this);
                 _fadeAnimation.FadeIn();
 
-                this.EnableDrag(this);
+                //this.EnableDrag(this);
 
                 Logger.Info($"Форма Person инициализирована для клиента: {data.Surname} {data.Name}, карта: {data.CardNumber}");
             }
@@ -204,7 +204,7 @@ namespace GymApplicationV2._0.FormsClients
                 var closeButton = UIStyler.CreateStyledButton("➡", Color.FromArgb(180, 70, 70), 0, 0, Color.FromArgb(255, 140, 0), new Point(380, 680), new Size(50, 30));
                 closeButton.Click += (s, e) => CloseWithAnimation(personPanel);
 
-                personPanel.Controls.Add(closeButton);
+                this.Controls.Add(closeButton);
 
                 Logger.Info($"Дизайн формы Person инициализирован для {data.Surname} {data.Name}");
             }

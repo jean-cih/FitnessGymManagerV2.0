@@ -9,6 +9,7 @@ using GymApplicationV2._0.Helpers.GymApplicationV2._0.Helpers;
 using Shadow;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -347,7 +348,7 @@ namespace GymApplicationV2._0
             {
                 var mainCard = new JeanPanel
                 {
-                    Size = new Size(320, 300),
+                    Size = new Size(320, 340),
                     Location = new Point(80, 100),
                     BackColor = White,
                     GradientBottomColor = White,
@@ -368,13 +369,13 @@ namespace GymApplicationV2._0
                 };
 
                 // Стилизуем кнопки продаж в оранжевой гамме
-                StyleButton(jeanModernButtonNewMember, "🆕 Новый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), 0, new Point(20, 75));
+                StyleButton(jeanModernButtonNewMember, "🆕 Новый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 50), 0, new Point(20, 75));
 
-                StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 40), 0, new Point(mainCard.Width - 130 - 20, 75));
+                StyleButton(jeanModernButtonSingleTicket, "🎫 Разовый", PrimaryOrange, White, SoftOrange, Color.FromArgb(220, 120, 0), new Size(130, 50), 0, new Point(mainCard.Width - 130 - 20, 75));
 
-                StyleButton(jeanModernButtonSell, "💰 Продать", Color.FromArgb(220, 80, 60), White, Color.FromArgb(240, 100, 80), Color.FromArgb(200, 60, 40), new Size(160, 45), 0, new Point(mainCard.Width / 2 - 160 / 2, 140));
+                StyleButton(jeanModernButtonSell, "💰 Продать", Color.FromArgb(220, 80, 60), White, Color.FromArgb(240, 100, 80), Color.FromArgb(200, 60, 40), new Size(170, 60), 0, new Point(mainCard.Width / 2 - 170 / 2, 155));
 
-                StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(140, 50), 0, new Point(mainCard.Width / 2 - 140 / 2, mainCard.Height - 50 - 40));
+                StyleButton(jeanModernButtonChooseClient, "👤 Выбрать клиента", PrimaryBlue, White, LightBlue, DarkBlue, new Size(150, 60), 0, new Point(mainCard.Width / 2 - 150 / 2, mainCard.Height - 50 - 40));
 
                 mainCard.Controls.AddRange(new Control[] { titleLabel, jeanModernButtonNewMember, jeanModernButtonSingleTicket, jeanModernButtonChooseClient, jeanModernButtonSell });
 
@@ -609,13 +610,11 @@ namespace GymApplicationV2._0
 
                 if (e.KeyChar == (char)Keys.Enter)
                 {
+                    jeanModernButtonSell.Text = $"💰 Продать";
+
                     if (Regex.IsMatch(jeanTextBoxNumberCard.Text, @"^-?\d+(\d+)?$") || jeanTextBoxNumberCard.Text.Length == 0)
                     {
                         numberCard = jeanTextBoxNumberCard.Text.Trim();
-                        ClearCardNumber();
-
-                        Logger.Info($"Обработка карты: {numberCard}");
-                        ProcessMembership(numberCard);
                     }
                     else
                     {
@@ -624,24 +623,27 @@ namespace GymApplicationV2._0
                         if (names == null || names.Length == 0) return;
 
                         var searchQuery = BuildSearchQuery(names);
-                        var (card, clientName) = DuplicateResolution(searchQuery, names);
+                        string card = DuplicateResolution(searchQuery, names);
 
-                        nameClient = clientName;
-                        jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
-
-                        if (card == "" && names.Length >= 2)
+                        if (card == "" && names.Length > 1)
                         {
-                            string query = $@"SELECT №Карты
-                                FROM Archive 
-                                WHERE Клиент LIKE '%{names[0]}%' 
-                                AND Клиент LIKE '%{names[1]}%'";
+                            string query = @"
+                                SELECT №Карты, Клиент
+                                FROM Archive
+                                WHERE Клиент LIKE @name1 AND Клиент LIKE @name2";
 
-                            object archiveClientNumber = GeneralContext.GetElementFromDatabase(query,
-                            ArchiveServicesContext.ConnectionStringArchive());
+                            var table = GeneralContext.GetDataFromDatabase(query,
+                                ArchiveServicesContext.ConnectionStringArchive(),
+                                new SQLiteParameter("@name1", $"%{names[0]}%"),
+                                new SQLiteParameter("@name2", $"%{names[1]}%"));
 
-                            if (archiveClientNumber != null)
+                            if (table != null && table.Rows.Count != 0)
                             {
-                                numberCard = archiveClientNumber.ToString();
+                                DataRow row = table.Rows[0];
+                                numberCard = row["№Карты"]?.ToString() ?? string.Empty;
+                                nameClient = row["Клиент"]?.ToString() ?? string.Empty;
+
+                                jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
                                 Logger.Info($"Найден клиент в архиве: {numberCard}");
                             }
 
@@ -649,16 +651,18 @@ namespace GymApplicationV2._0
                             errorSound.PlaySound();
 
                             UpdateDataGrid();
+                            ClearCardNumber();
 
                             return;
                         }
 
                         numberCard = card;
-                        ClearCardNumber();
-
-                        Logger.Info($"Обработка карты после поиска: {numberCard}");
-                        ProcessMembership(numberCard);
                     }
+
+                    ClearCardNumber();
+
+                    Logger.Info($"Обработка карты: {numberCard}");
+                    ProcessMembership(numberCard);
                 }
             }
             catch (Exception ex)
@@ -667,29 +671,29 @@ namespace GymApplicationV2._0
             }
         }
 
-        private (string SelectedCardNumber, string ClientName) DuplicateResolution(string query, string[] names)
+        private string DuplicateResolution(string query, string[] names)
         {
             try
             {
                 var data = GeneralContext.GetDataFromDatabase(query,
                             IssuedMembershipContext.ConnectionStringIssued());
 
-                if (data is null || data.Rows.Count == 0) return (string.Empty, string.Empty);
+                if (data is null || data.Rows.Count == 0) return string.Empty;
 
-                if (data.Rows.Count == 1) return (data.Rows[0]["№Карты"].ToString(), string.Join(" ", names));
+                if (data.Rows.Count == 1) return data.Rows[0]["№Карты"].ToString();
 
                 Logger.Info($"Найдено {data.Rows.Count} дубликатов, открыта форма разрешения");
 
                 using (DuplicateResolution duplicate = new DuplicateResolution(data))
                 {
                     duplicate.ShowDialog();
-                    return (duplicate.SelectedCardNumber, duplicate.SelectedClient);
+                    return duplicate.SelectedCardNumber;
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Ошибка в DuplicateResolution для запроса: {query}", ex);
-                return (string.Empty, string.Empty);
+                return string.Empty;
             }
         }
 
@@ -752,22 +756,6 @@ namespace GymApplicationV2._0
             }
         }
 
-        private void UpdateSellButton(IssuedMembershipContext.IssuedInfo issuedInfo)
-        {
-            try
-            {
-                if (issuedInfo != null)
-                {
-                    nameClient = issuedInfo.FullName;
-                    jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Ошибка в UpdateSellButton", ex);
-            }
-        }
-
         private void UpdateDataGrid()
         {
             try
@@ -788,9 +776,28 @@ namespace GymApplicationV2._0
         {
             try
             {
-                if (!ValidateIssuedExists(card)) return;
+                if (!ValidateIssuedExists(card))
+                {
+                    string queryArchive = @"SELECT Клиент
+                        FROM Archive
+                        WHERE №Карты = @cardNumber";
 
-                string query = @"SELECT Абонемент, Дата_окончания FROM Issued 
+                    var table = GeneralContext.GetDataFromDatabase(queryArchive,
+                        ArchiveServicesContext.ConnectionStringArchive(),
+                        new SQLiteParameter("@cardNumber", card));
+
+                    if (table != null && table.Rows.Count != 0)
+                    {
+                        nameClient = table.Rows[0]["Клиент"]?.ToString() ?? string.Empty;
+
+                        jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
+                        Logger.Info($"Найден клиент в архиве: {numberCard}");
+                    }
+
+                    return;
+                }
+
+                string query = @"SELECT Абонемент, Дата_окончания, Клиент FROM Issued 
                     WHERE №Карты = @cardNumber
                     ORDER BY date(Дата_окончания) ASC
                     LIMIT 1";
@@ -802,6 +809,9 @@ namespace GymApplicationV2._0
 
                 string membership = data.Rows[0]["Абонемент"].ToString();
                 string date = data.Rows[0]["Дата_окончания"].ToString();
+                nameClient = data.Rows[0]["Клиент"].ToString();
+
+                jeanModernButtonSell.Text = $"💰 Продать\n{nameClient}";
 
                 checkDelayStartDate(date, card);
 
@@ -884,6 +894,8 @@ namespace GymApplicationV2._0
 
                 if (jeanTextBoxNumberCard.Text.Length != 13)
                     return;
+
+                jeanModernButtonSell.Text = $"💰 Продать";
 
                 numberCard = jeanTextBoxNumberCard.Text.Trim();
                 ClearCardNumber();
@@ -1057,7 +1069,6 @@ namespace GymApplicationV2._0
                 picture_status.Image = Properties.Resources.redError;
 
                 IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber, date);
-                UpdateSellButton(issuedInfo);
 
                 ArchiveExpiredMembership(cardNumber, issuedInfo);
 
@@ -1241,7 +1252,6 @@ namespace GymApplicationV2._0
                 picture_status.Image = Properties.Resources.redError;
 
                 IssuedMembershipContext.IssuedInfo issuedInfo = GetIssuedInfo(cardNumber, date);
-                UpdateSellButton(issuedInfo);
 
                 ArchiveExpiredMembership(cardNumber, issuedInfo);
 
